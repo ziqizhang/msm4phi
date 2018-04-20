@@ -4,7 +4,7 @@ import json
 import os
 import traceback
 import urllib.request
-import urllib.request
+import time
 
 import datetime
 
@@ -25,7 +25,7 @@ logging.basicConfig(filename=LOG_DIR + '/twitter_stream.log', level=logging.INFO
 # feat_vectorizer=fv_chase_basic.FeatureVectorizerChaseBasic()
 SCALING_STRATEGY = -1
 
-COMMIT_BATCH_SIZE=10
+COMMIT_BATCH_SIZE=50
 SOLR_CORE_TWEETS= "tweets"
 
 
@@ -247,17 +247,17 @@ class TwitterStream(StreamListener):
         coordinates = tweet_json["coordinates"]
         # user_location, only compute geocode if other means have failed
 
-        if coordinates == None:
-            coordinates = place_coordinates
+        # if coordinates == None:
+        #     coordinates = place_coordinates
+        #
+        # coord_lat = None
+        # coord_lon = None
+        # if coordinates is not None and len(coordinates) > 0:
+        #     coord_lat = coordinates[0]
+        #     coord_lon = coordinates[1]
 
-        coord_lat = None
-        coord_lon = None
-        if coordinates is not None and len(coordinates) > 0:
-            coord_lat = coordinates[0]
-            coord_lon = coordinates[1]
-
-        doc['coordinate_lat']=coord_lat
-        doc['coordinate_lon']=coord_lon
+        #doc['coordinate_lat']=coord_lat
+        #doc['coordinate_lon']=coord_lon
         doc['place_full_name']=place_full_name
         doc['place_coordinates']=place_coordinates
 
@@ -274,7 +274,20 @@ if __name__=="__main__":
     api=tweepy.API(auth)
     # ===== streaming =====
     twitterStream = Stream(auth, TwitterStream(sys.argv[3]))
-    twitterStream.filter(track=sc["keywords"], languages=LANGUAGES_ACCETED)
+
+    while True:
+        try:
+            twitterStream.filter(track=sc["keywords"], languages=LANGUAGES_ACCETED)
+        except Exception as exc:
+            traceback.print_exc(file=sys.stdout)
+            print("unknown exception, wait for 5 seconds to continue")
+            logger.info("unknown exception, wait for 5 seconds to continue")
+            time.sleep(5)
+
+            continue
+
+
+
 
     # ===== index existing data =====
     # index_data("/home/zqz/Work/chase/data/ml/public/w+ws/labeled_data.csv",
