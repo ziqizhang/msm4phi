@@ -135,27 +135,45 @@ class TwitterStream(StreamListener):
         else:
             entities=tweet_json["entities"]
         hashtags = entities["hashtags"]
-        hashtag_list = []
+        if 'entities_hashtag' in doc:
+            hashtag_list=doc['entities_hashtag']
+        else:
+            hashtag_list = []
         for hashtag in hashtags:
-            hashtag_list.append(hashtag["text"].lower())
+            h=hashtag["text"].lower()
+            if not h in hashtag_list:
+                hashtag_list.append(h)
 
         # entities urls
         urls = entities["urls"]
-        url_list = []
+        if 'entities_url' in doc:
+            url_list=doc['entities_url']
+        else:
+            url_list = []
         for url in urls:
             url_list.append(url["expanded_url"])
 
         # entities symbols
         symbols = entities["symbols"]
-        symbols_list = []
+        if 'entities_symbol' in doc:
+            symbols_list=doc['entities_symbol']
+        else:
+            symbols_list = []
         for symbol in symbols:
-            symbols_list.append(symbol["text"])
+            s = symbol["text"].lower()
+            if not s in symbols_list:
+                symbols_list.append(s)
 
         # entities user_mentions
         user_mentions = entities["user_mentions"]
-        user_mention_list = []
+        if 'entities_user_mention' in doc:
+            user_mention_list=doc['entities_user_mention']
+        else:
+            user_mention_list = []
         for um in user_mentions:
-            user_mention_list.append(um["id"])
+            id=str(um["id_str"]).lower()
+            if not id in user_mention_list:
+                user_mention_list.append(id)
 
         # media
         if "extended_tweet" in tweet_json and "extended_entities" in tweet_json["extended_tweet"]:
@@ -180,6 +198,7 @@ class TwitterStream(StreamListener):
         # quoted status id if exists
         if "quoted_status_id_str" in tweet_json:
             quoted_status_id = tweet_json["quoted_status_id_str"]
+            self.collect_tweet_entities(doc, tweet_json['quoted_status'])
         else:
             quoted_status_id = None
         doc['quoted_status_id_str']= quoted_status_id
@@ -202,6 +221,7 @@ class TwitterStream(StreamListener):
         doc['retweeted']= tweet_json["retweeted"]
         if "retweeted_status" in tweet_json:
             doc['retweeted_status_id_str'] =tweet_json["retweeted_status"]["id_str"]
+            self.collect_tweet_entities(doc,tweet_json['retweeted_status'])
 
     def collect_tweet_favorite_info(self,doc:dict, tweet_json:dict):
         doc['favorite_count']=tweet_json["favorite_count"] #nullable
