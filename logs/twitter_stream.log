@@ -1,0 +1,219 @@
+INFO:__main__:2018-04-20 11:28:18.154392 processed: 10
+INFO:__main__:2018-04-20 11:28:50.794453 processed: 20
+INFO:__main__:2018-04-20 11:29:19.168993 processed: 30
+INFO:__main__:2018-04-20 11:29:47.658396 processed: 40
+INFO:__main__:2018-04-20 11:30:01.438376 processed: 50
+INFO:__main__:2018-04-20 11:30:15.121116 processed: 60
+INFO:__main__:2018-04-20 11:30:36.566851 processed: 70
+INFO:__main__:2018-04-20 11:30:53.898353 processed: 80
+INFO:__main__:2018-04-20 11:31:20.293780 processed: 90
+WARNING:SolrClient.transport:Connection Error: [None] POST - http://localhost:8983/solr/tweets/update - HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))
+ERROR:SolrClient.transport:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1239, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1285, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1234, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1026, in _send_output
+    self.send(msg)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 964, in send
+    self.connect()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 150, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 440, in send
+    timeout=timeout
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/retry.py", line 388, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 50, in _send
+    res = self.session.request(method, url, params=params, data=data, headers=headers)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 508, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 618, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 508, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 39, in inner
+    return function(self, host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 57, in send_request
+    res_dict, c_inf = self._send(host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 61, in _send
+    raise ConnectionError('N/A', str(e), e)
+SolrClient.exceptions.ConnectionError: ('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+INFO:__main__:Error encountered for counter=91, tweet=987277532826296320, error:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b085909e8>: Failed to establish a new connection: [Errno 111] Connection refused',))",),)) (see log file for details)
+INFO:__main__:	 input data json written to /home/zz/Work/msm4phi/logs/987277532826296320.txt
+WARNING:SolrClient.transport:Connection Error: [None] POST - http://localhost:8983/solr/tweets/update - HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))
+ERROR:SolrClient.transport:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1239, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1285, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1234, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1026, in _send_output
+    self.send(msg)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 964, in send
+    self.connect()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 150, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 440, in send
+    timeout=timeout
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/retry.py", line 388, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 50, in _send
+    res = self.session.request(method, url, params=params, data=data, headers=headers)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 508, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 618, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 508, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 39, in inner
+    return function(self, host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 57, in send_request
+    res_dict, c_inf = self._send(host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 61, in _send
+    raise ConnectionError('N/A', str(e), e)
+SolrClient.exceptions.ConnectionError: ('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+INFO:__main__:Error encountered for counter=92, tweet=987277569262260231, error:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b07c69048>: Failed to establish a new connection: [Errno 111] Connection refused',))",),)) (see log file for details)
+INFO:__main__:	 input data json written to /home/zz/Work/msm4phi/logs/987277569262260231.txt
+WARNING:SolrClient.transport:Connection Error: [None] POST - http://localhost:8983/solr/tweets/update - HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))
+ERROR:SolrClient.transport:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 141, in _new_conn
+    (self.host, self.port), self.timeout, **extra_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 83, in create_connection
+    raise err
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 357, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1239, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1285, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1234, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 1026, in _send_output
+    self.send(msg)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/http/client.py", line 964, in send
+    self.connect()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 166, in connect
+    conn = self._new_conn()
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connection.py", line 150, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 440, in send
+    timeout=timeout
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/urllib3/util/retry.py", line 388, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 50, in _send
+    res = self.session.request(method, url, params=params, data=data, headers=headers)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 508, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/sessions.py", line 618, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/requests/adapters.py", line 508, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 39, in inner
+    return function(self, host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportbase.py", line 57, in send_request
+    res_dict, c_inf = self._send(host, **kwargs)
+  File "/home/zz/Programs/anaconda3/lib/python3.6/site-packages/SolrClient/transport/transportrequests.py", line 61, in _send
+    raise ConnectionError('N/A', str(e), e)
+SolrClient.exceptions.ConnectionError: ('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))",),))
+INFO:__main__:Error encountered for counter=93, tweet=987277571548172288, error:('N/A', "HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))", ConnectionError(MaxRetryError("HTTPConnectionPool(host='localhost', port=8983): Max retries exceeded with url: /solr/tweets/update?wt=json&indent=false (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f5b0855fd68>: Failed to establish a new connection: [Errno 111] Connection refused',))",),)) (see log file for details)
+INFO:__main__:	 input data json written to /home/zz/Work/msm4phi/logs/987277571548172288.txt

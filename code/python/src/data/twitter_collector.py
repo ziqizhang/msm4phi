@@ -4,8 +4,6 @@ import json
 import os
 import traceback
 import urllib.request
-import pandas as pd
-import time
 import urllib.request
 
 import datetime
@@ -27,7 +25,7 @@ logging.basicConfig(filename=LOG_DIR + '/twitter_stream.log', level=logging.INFO
 # feat_vectorizer=fv_chase_basic.FeatureVectorizerChaseBasic()
 SCALING_STRATEGY = -1
 
-
+COMMIT_BATCH_SIZE=10
 SOLR_CORE_TWEETS= "tweets"
 
 
@@ -35,6 +33,7 @@ def commit(core_name, solr_url):
     code = urllib.request. \
         urlopen("{}/{}/update?commit=true".
                 format(solr_url, core_name)).read()
+    return code
 
 def read_auth(file):
     vars = {}
@@ -50,12 +49,13 @@ def read_search_criteria(file):
     with open(file) as auth_file:
         for line in auth_file:
             name, var = line.partition("=")[::2]
-            vars[name.strip()] = str(var).strip()
+            vars[name.strip()] = str(var).split(",")
     return vars
 
 
 class TwitterStream(StreamListener):
     #https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
+    __solr_url=None
     __solr = None
     __core = None
     __count = 0
@@ -63,13 +63,14 @@ class TwitterStream(StreamListener):
 
     def __init__(self, solr_url):
         super().__init__()
+        self.__solr_url=solr_url
         self.__solr = SolrClient(solr_url)
         self.__core = SOLR_CORE_TWEETS
 
     def on_data(self, data):
         self.__count += 1
-        if self.__count % 200 == 0:
-            code = commit(SOLR_CORE_TWEETS, self.__solr)
+        if self.__count % COMMIT_BATCH_SIZE == 0:
+            code = commit(SOLR_CORE_TWEETS, self.__solr_url)
             now = datetime.datetime.now()
             print("{} processed: {}".
                   format(now, self.__count))
@@ -87,9 +88,13 @@ class TwitterStream(StreamListener):
 
                 doc={'id': jdata["id_str"],
                          'created_at': str_solr_time,
-                         'lang': jdata["lang"],
-                         'status_text': jdata["extended_tweet"]["full_text"]
+                         'lang': jdata["lang"]
                          }
+
+                if "extended_tweet" in jdata:
+                    doc['status_text']= jdata["extended_tweet"]["full_text"]
+                else:
+                    doc['status_text']=jdata["text"]
                 self.collect_tweet_entities(doc,jdata)
                 self.collect_tweet_quote_info(doc,jdata)
                 self.collect_retweet_info(doc,jdata)
@@ -125,7 +130,10 @@ class TwitterStream(StreamListener):
     def collect_tweet_entities(self, doc:dict, tweet_json:dict):
         ##################### tweet entities ###################
         # entities hashtags
-        entities=tweet_json["extended_tweet"]["entities"]
+        if "extended_tweet" in tweet_json:
+            entities=tweet_json["extended_tweet"]["entities"]
+        else:
+            entities=tweet_json["entities"]
         hashtags = entities["hashtags"]
         hashtag_list = []
         for hashtag in hashtags:
@@ -149,13 +157,18 @@ class TwitterStream(StreamListener):
         for um in user_mentions:
             user_mention_list.append(um["id"])
 
-        # media todo
-        ext_entities = tweet_json["extended_tweet"]["extended_entities"]
+        # media
+        if "extended_tweet" in tweet_json and "extended_entities" in tweet_json["extended_tweet"]:
+            ext_entities = tweet_json["extended_tweet"]["extended_entities"]
+        elif "extended_entities" in tweet_json:
+            ext_entities = tweet_json["extended_entities"]
+        else:
+            ext_entities=None
         if ext_entities is not None:
             media=ext_entities["media"]
             if media is not None:
-                doc['media_url']=media["media_url"]
-                doc['media_type']=media["media_type"]
+                doc['entities_media_url']=media[0]["media_url"]
+                doc['entities_media_type']=media[0]["type"]
 
         doc['entities_hashtag']= hashtag_list
         doc['entities_symbol']= symbols_list
@@ -171,19 +184,24 @@ class TwitterStream(StreamListener):
             quoted_status_id = None
         doc['quoted_status_id_str']= quoted_status_id
         doc['is_quote_status']=tweet_json["is_quote_status"]
-        doc['quote_count']=tweet_json["quote_count"] #nullable
+        if "quote_count" in tweet_json:
+            doc['quote_count']=tweet_json["quote_count"]
 
 
     def collect_tweet_reply_info(self,doc:dict, tweet_json:dict):
-        doc['in_reply_to_screen_name']= tweet_json["in_reply_to_screen_name"] #nullable
-        doc['in_reply_to_status_id_str']= tweet_json["in_reply_to_status_id_str"]#nullable
-        doc['in_reply_to_user_id_str']= tweet_json["in_reply_to_user_id_str"]#nullable
+        if "in_reply_to_screen_name" in tweet_json:
+            doc['in_reply_to_screen_name']= tweet_json["in_reply_to_screen_name"]
+        if "in_reply_to_status_id_str" in tweet_json:
+            doc['in_reply_to_status_id_str']= tweet_json["in_reply_to_status_id_str"]
+        if "in_reply_to_user_id_str" in tweet_json:
+            doc['in_reply_to_user_id_str']= tweet_json["in_reply_to_user_id_str"]
         doc['reply_count']=tweet_json["reply_count"]
 
     def collect_retweet_info(self,doc:dict, tweet_json:dict):
         doc['retweet_count']= tweet_json["retweet_count"]
         doc['retweeted']= tweet_json["retweeted"]
-        doc['retweeted_status_id_str'] =tweet_json["retweeted_status"]["id_str"] #nullable
+        if "retweeted_status" in tweet_json:
+            doc['retweeted_status_id_str'] =tweet_json["retweeted_status"]["id_str"]
 
     def collect_tweet_favorite_info(self,doc:dict, tweet_json:dict):
         doc['favorite_count']=tweet_json["favorite_count"] #nullable
@@ -194,6 +212,7 @@ class TwitterStream(StreamListener):
         doc['user_statuses_count']= tweet_json["user"]["statuses_count"]
         doc['user_friends_count']=tweet_json["user"]["friends_count"]
         doc['user_followers_count']= tweet_json["user"]["followers_count"]
+        doc['user_desc']=tweet_json["user"]["description"]
 
     def collect_tweet_location_info(self,doc:dict, tweet_json:dict):
         # place exists
@@ -222,34 +241,6 @@ class TwitterStream(StreamListener):
         doc['place_full_name']=place_full_name
         doc['place_coordinates']=place_coordinates
 
-def index_data(in_file, tweepy_api, tweet_id_col, tweet_label_col):
-    start=0
-
-    data=pd.read_csv(in_file, sep=',', encoding="utf-8")
-    index=0
-    missed=0
-    for row in data.itertuples():
-        if index<start:
-            index+=1
-            continue
-        tweetid=str(row[tweet_id_col])
-        label=row[tweet_label_col]
-        if label!='2':
-            label='0'
-
-        try:
-            tweet = tweepy_api.get_status(tweetid)
-            text=tweet.text
-
-            index+=1
-            if index%100==0:
-                print(index)
-        except tweepy.error.TweepError:
-            traceback.print_exc(file=sys.stdout)
-            missed+=1
-            print("==="+str(tweetid)+","+label)
-        time.sleep(1)
-
 
 if __name__=="__main__":
     oauth = read_auth(sys.argv[1])
@@ -263,7 +254,7 @@ if __name__=="__main__":
     api=tweepy.API(auth)
     # ===== streaming =====
     twitterStream = Stream(auth, TwitterStream(sys.argv[3]))
-    twitterStream.filter(track=[sc["KEYWORDS"]], languages=LANGUAGES_ACCETED)
+    twitterStream.filter(track=sc["keywords"], languages=LANGUAGES_ACCETED)
 
     # ===== index existing data =====
     # index_data("/home/zqz/Work/chase/data/ml/public/w+ws/labeled_data.csv",

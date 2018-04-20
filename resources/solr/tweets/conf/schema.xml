@@ -172,7 +172,7 @@
 
 	<field name="retweet_count" type="int" indexed="true" stored="true" multiValued="false"/>	
 	<field name="retweeted" type="boolean" indexed="true" stored="true" multiValued="false"/>
-	<field name="retweeted_status_id_str" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+	<field name="retweeted_status_id_str" type="string" indexed="true" stored="true" multiValued="false" />
 	
 	<field name="quoted_status_id_str" type="string" indexed="true" stored="true" multiValued="false"/>		
 	<field name="is_quote_status" type="string" indexed="true" stored="true" multiValued="false"/>	
@@ -186,12 +186,13 @@
 	<field name="entities_media_url" type="string" indexed="true" stored="true" multiValued="true"/>
 	<field name="entities_media_type" type="string" indexed="true" stored="true" multiValued="true"/>
 
-	<field name="user_id" type="string" indexed="true" stored="true" multiValued="false"/>
+	<field name="user_id_str" type="string" indexed="true" stored="true" multiValued="false"/>
 	<field name="user_screen_name" type="string" indexed="true" stored="true" multiValued="false"/>
 	<field name="user_statuses_count" type="int" indexed="true" stored="true" multiValued="false"/>
 	<field name="user_friends_count" type="int" indexed="true" stored="true" multiValued="false"/>
 	<field name="user_followers_count" type="int" indexed="true" stored="true" multiValued="false"/>
 	<field name="user_location" type="string" indexed="true" stored="true" multiValued="false"/>
+	<field name="user_desc" type="string" indexed="true" stored="true" multiValued="false"/>
 
        	<dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
 	   <dynamicField name="*_is" type="int"    indexed="true"  stored="true"  multiValued="true"/>
