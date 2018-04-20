@@ -1,5 +1,4 @@
 import logging
-import random
 import sys
 import json
 import os
@@ -9,7 +8,6 @@ import pandas as pd
 import time
 import urllib.request
 
-import pickle
 import datetime
 
 import tweepy
@@ -255,7 +253,6 @@ def index_data(in_file, tweepy_api, tweet_id_col, tweet_label_col):
 
 if __name__=="__main__":
     oauth = read_auth(sys.argv[1])
-    googleauth=read_auth(sys.argv[3])
     print(sys.argv[1])
     sc = read_search_criteria(sys.argv[2])
     print(sys.argv[2])
@@ -265,7 +262,7 @@ if __name__=="__main__":
 
     api=tweepy.API(auth)
     # ===== streaming =====
-    twitterStream = Stream(auth, TwitterStream(sys.argv[4]))
+    twitterStream = Stream(auth, TwitterStream(sys.argv[3]))
     twitterStream.filter(track=[sc["KEYWORDS"]], languages=LANGUAGES_ACCETED)
 
     # ===== index existing data =====
