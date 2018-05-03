@@ -238,7 +238,7 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
             String isQuoteStatus=d.getFirstValue("is_quote_status")==null?"":
                     d.getFirstValue("is_quote_status").toString();
             isQuoteStatus=isQuoteStatus.equalsIgnoreCase("false")?"0":"1";
-            
+
             String language="en";
             String possiblySensitive="";
             String quotedStatusID=d.getFirstValue("quoted_status_id_str")==null?"":

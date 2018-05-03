@@ -21,8 +21,25 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 public class Util {
+
+    public static Twitter authenticateTwitter(String consumerKey,
+                                           String consumerSecret,
+                                           String accessKey,
+                                           String accessSecrete){
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(consumerKey)
+                .setOAuthConsumerSecret(consumerSecret)
+                .setOAuthAccessToken(accessKey)
+                .setOAuthAccessTokenSecret(accessSecrete);
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        return tf.getInstance();
+    }
 
     public static URL expandShortenedURL(String strURL) throws IOException {
 
