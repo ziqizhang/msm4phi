@@ -11,12 +11,14 @@ import org.apache.solr.common.SolrDocumentList;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.RecursiveTask;
 
 public class WorkerTweetExport extends RecursiveTask<Integer> {
+    final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     private SolrClient solrClient;
-    private int resultBatchSize = 5000;
+    private int resultBatchSize = 10;
     private String outFolder;
     private int maxTasksPerThread;
     private static final Logger LOG = Logger.getLogger(WorkerTweetExport.class.getName());
@@ -66,7 +68,7 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
 
             CSVWriter csvWriter = null;
             try {
-                csvWriter = Util.createCSVWriter(outFolder + "/" + en.getKey().replaceAll("#", "_"));
+                csvWriter = Util.createCSVWriter(outFolder + "/" + en.getKey().replaceAll("#", "_")+".csv");
                 writeCSVHeader(csvWriter);
             } catch (IOException e) {
                 LOG.warn(String.format("\tfailed due to unable to create output file at %s \n\tcontinue to the next hashtag",
@@ -83,12 +85,12 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                     if (res != null)
                         total = res.getResults().getNumFound();
                     //update results
-                    LOG.info(String.format("\ttotal results of %d, currently processing from %d to %d...",
+                    LOG.info(String.format("\t\ttotal results of %d, currently processing from %d to %d...",
                             total, q.getStart(), q.getStart() + q.getRows()));
                     writeCSVContent(csvWriter, res.getResults());
 
                 } catch (Exception e) {
-                    LOG.warn(String.format("\tquery %s caused an exception: \n\t %s \n\t trying for the next query...",
+                    LOG.warn(String.format("\t\tquery %s caused an exception: \n\t %s \n\t trying for the next query...",
                             q.toQueryString(), ExceptionUtils.getFullStackTrace(e)));
                 }
 
@@ -99,12 +101,10 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                     stop = true;
 
             }
-            if (csvWriter!=null) {
-                try {
-                    csvWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                csvWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -213,12 +213,12 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
      */
     private void writeCSVContent(CSVWriter csvWriter, SolrDocumentList results) {
         for (SolrDocument d : results) {
-            String vertex1 = d.getFieldValue("user_screen_name").toString();
+            String vertex1 = "ID_"+d.getFieldValue("user_id_str").toString();
             String reciprocated = "";
             String col3 = "";
             String relationship = "";
-            Date relationshipDate = (Date) d.getFieldValue("created_at");//todo
-            String dateStr="";
+            Date relationshipDate = (Date) d.getFieldValue("created_at");
+            String dateStr=DATE_FORMAT.format(relationshipDate);
             String tweet = d.getFieldValue("status_text").toString();
             String[] urls_and_domains = getEntityURLsAndDomains(d);
             String hashtags = getEntityHashtags(d);
@@ -227,25 +227,27 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
             String twitterPage=getTwitterPageForTweet(d);
             String lat = d.getFieldValue("coordinate_lat")==null?"":d.getFieldValue("coordinate_lat").toString();
             String lon = d.getFieldValue("coordinate_lon")==null?"":d.getFieldValue("coordinate_lon").toString();
-            String importedID=d.getFieldValue("id").toString();
+            String importedID="ID_"+d.getFieldValue("id").toString();
             String inReplyToTweetID=d.getFirstValue("in_reply_to_status_id_str")==null?"":
-                    d.getFirstValue("in_reply_to_status_id_str").toString();
+                    "ID_"+d.getFirstValue("in_reply_to_status_id_str").toString();
             String favorited="0";
             String favoriteCount=d.getFirstValue("favorite_count")==null?"":
                     d.getFirstValue("favorite_count").toString();
-            String inReplyToUserID=d.getFirstValue("in_reply_to_screen_name")==null?"":
-                    d.getFirstValue("in_reply_to_screen_name").toString();
+            String inReplyToUserID=d.getFirstValue("in_reply_to_user_id_str")==null?"":
+                    "ID_"+d.getFirstValue("in_reply_to_user_id_str").toString();
             String isQuoteStatus=d.getFirstValue("is_quote_status")==null?"":
                     d.getFirstValue("is_quote_status").toString();
+            isQuoteStatus=isQuoteStatus.equalsIgnoreCase("false")?"0":"1";
+            
             String language="en";
             String possiblySensitive="";
             String quotedStatusID=d.getFirstValue("quoted_status_id_str")==null?"":
-                    d.getFirstValue("quoted_status_id_str").toString();
+                    "ID_"+d.getFirstValue("quoted_status_id_str").toString();
             String retweeted="0";
             String retweetedCount=d.getFirstValue("retweet_count")==null?"":
                     d.getFirstValue("retweet_count").toString();
             String retweetID=d.getFirstValue("retweeted_status_id_str")==null?"":
-                    d.getFirstValue("retweeted_status_id_str").toString();
+                    "ID_"+d.getFirstValue("retweeted_status_id_str").toString();
             String source="", truncated="", importedTweetType="";
 
 
@@ -254,9 +256,9 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                 relationship = "Mentions";
                 for(Object vertex2 : userMentions) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, vertex2.toString(), reciprocated,col3,relationship, dateStr,
+                            vertex1, "ID_"+vertex2.toString(), reciprocated,col3,relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1],hashtags, media,
-                            tweetImg, twitterPage,lat, lon,importedID,
+                            tweetImg, dateStr, twitterPage,lat, lon,importedID,
                             inReplyToTweetID, favorited,favoriteCount, inReplyToUserID,isQuoteStatus,
                             language, possiblySensitive,quotedStatusID,retweeted,
                             retweetedCount, retweetID,source,truncated,importedID,
@@ -264,14 +266,14 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                     });
                 }
             }
-            Collection<Object> reply2UserIDs = d.getFieldValues("in_reply_to_screen_name");
+            Collection<Object> reply2UserIDs = d.getFieldValues("in_reply_to_user_id_str");
             if (reply2UserIDs != null) {
                 relationship = "Replies to";
                 for(Object vertex2 : reply2UserIDs) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, vertex2.toString(), reciprocated,col3,relationship, dateStr,
+                            vertex1, "ID_"+vertex2.toString(), reciprocated,col3,relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1],hashtags, media,
-                            tweetImg, twitterPage,lat, lon,importedID,
+                            tweetImg, dateStr,twitterPage,lat, lon,importedID,
                             inReplyToTweetID, favorited,favoriteCount, inReplyToUserID,isQuoteStatus,
                             language, possiblySensitive,quotedStatusID,retweeted,
                             retweetedCount, retweetID,source,truncated,importedID,
@@ -284,7 +286,7 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                 csvWriter.writeNext(new String[]{
                         vertex1, vertex1, reciprocated,col3,relationship, dateStr,
                         tweet, urls_and_domains[0], urls_and_domains[1],hashtags, media,
-                        tweetImg, twitterPage,lat, lon,importedID,
+                        tweetImg, dateStr, twitterPage,lat, lon,importedID,
                         inReplyToTweetID, favorited,favoriteCount, inReplyToUserID,isQuoteStatus,
                         language, possiblySensitive,quotedStatusID,retweeted,
                         retweetedCount, retweetID,source,truncated,importedID,
@@ -303,10 +305,10 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
         Collection<Object> values = d.getFieldValues("entities_hashtag");
         if (values != null) {
             for (Object o : values) {
-                hashtags.append(hashtags.toString()).append(" ");
+                hashtags.append(o.toString()).append(" ");
             }
         }
-        return hashtags.toString();
+        return hashtags.toString().trim();
     }
 
     private String getEntityMedia(SolrDocument d) {
@@ -317,18 +319,18 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
                 media.append(media.toString()).append(" ");
             }
         }
-        return media.toString();
+        return media.toString().trim();
     }
 
     private String[] getEntityURLsAndDomains(SolrDocument d) {
-        StringBuilder urls = new StringBuilder();
+        Set<String> urls=new HashSet<>();
         Set<String> domains = new HashSet<>();
         Collection<Object> values = d.getFieldValues("entities_url");
         if (values != null) {
             for (Object o : values) {
                 try {
                     URL url = Util.expandShortenedURL(o.toString());
-                    urls.append(url.toString()).append(" ");
+                    urls.add(url.toString());
                     domains.add(url.getHost());
                 } catch (Exception e) {
                     LOG.warn(ExceptionUtils.getFullStackTrace(e));
@@ -336,9 +338,11 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
             }
         }
         StringBuilder domainStr = new StringBuilder();
-        for (String dm : domains) {
+        StringBuilder urlStr = new StringBuilder();
+        for (String dm : domains)
             domainStr.append(dm).append(" ");
-        }
-        return new String[]{urls.toString().trim(), domainStr.toString().trim()};
+        for (String us : urls)
+            urlStr.append(us).append(" ");
+        return new String[]{urlStr.toString().trim(), domainStr.toString().trim()};
     }
 }
