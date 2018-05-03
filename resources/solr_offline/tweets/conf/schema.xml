@@ -177,7 +177,7 @@
 	<field name="quoted_status_id_str" type="string" indexed="true" stored="true" multiValued="false"/>		
 	<field name="is_quote_status" type="string" indexed="true" stored="true" multiValued="false"/>	
 	<field name="quote_count" type="int" indexed="true" stored="true" multiValued="false"/>	
-
+	<field name="text" type="text_general" indexed="true" stored="true" multiValued="false"/>	
 	<field name="status_text" type="text_general" indexed="true" stored="true" multiValued="false"/>
 	<field name="entities_hashtag" type="string" indexed="true" stored="true" multiValued="true"/>
 	<field name="entities_symbol" type="string" indexed="true" stored="true" multiValued="true"/>
@@ -207,7 +207,8 @@
 	   <dynamicField name="*_d"  type="double" indexed="true"  stored="true"/>
 	   <dynamicField name="*_ds" type="double" indexed="true"  stored="true"  multiValued="true"/>
        <dynamicField name="random_*" type="random" />
-   
+   	
+	<copyField source="status_text" dest="text"/>
 	   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->	     
@@ -215,7 +216,7 @@
 
 	<uniqueKey>id</uniqueKey>
 
-	<defaultSearchField>id</defaultSearchField>
+	<!--defaultSearchField>id</defaultSearchField-->
 
-	<solrQueryParser defaultOperator="OR" />
+	<!--solrQueryParser defaultOperator="OR" /-->
 </schema>
