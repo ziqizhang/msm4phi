@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+/**
+ * This should be used only after 'favorite' and 'retweet' stats are collected as a postprocess, see AppPostProcess
+ */
 public class AppNodeXLExporter {
     public static void main(String[] args) throws IOException {
         MasterTweetExport exporter=new MasterTweetExport(

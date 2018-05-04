@@ -13,11 +13,8 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 
 /**
  * Process the collected tweets in the solr index to add information that is not available during streaming:
@@ -39,10 +36,10 @@ public class PostProcessor {
     private final int BATCH_SIZE = 9000;
     private Twitter twitter;
 
-    public PostProcessor(Path solrHome, String solrCore,
+    public PostProcessor(SolrClient solrClient,
                          String twitterConsumerKey, String twitterConsumerSecret,
                          String twitterAccessToken, String twitterAccessSecret) {
-        this.solrClient = Util.getSolrClient(solrHome, solrCore);
+        this.solrClient = solrClient;
         this.twitter = Util.authenticateTwitter(twitterConsumerKey, twitterConsumerSecret, twitterAccessToken,
                 twitterAccessSecret);
     }
@@ -60,12 +57,13 @@ public class PostProcessor {
             long total = 0;
             try {
                 res = Util.performQuery(q, solrClient);
-                if (res != null)
+                if (res != null) {
                     total = res.getResults().getNumFound();
-                //update results
-                LOG.info(String.format("\t\ttotal results of %d, currently processing from %d to %d...",
-                        total, q.getStart(), q.getStart() + q.getRows()));
-                updateBatch(res, solrClient);
+                    //update results
+                    LOG.info(String.format("\t\ttotal results of %d, currently processing from %d to %d...",
+                            total, q.getStart(), q.getStart() + q.getRows()));
+                    updateBatch(res, solrClient);
+                }
 
             } catch (Exception e) {
                 LOG.warn(String.format("\t\tquery %s caused an exception: \n\t %s \n\t trying for the next query...",
@@ -79,6 +77,7 @@ public class PostProcessor {
                 stop = true;
 
         }
+
 
     }
 

@@ -73,6 +73,14 @@ public class Util {
         return query;
     }
 
+    public static SolrQuery createQueryTweetsOfUser(int resultBatchSize, String userID) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("user_id_str:"+userID);
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+        return query;
+    }
+
     public static QueryResponse performQuery(SolrQuery q, SolrClient solrClient) throws IOException, SolrServerException {
         return solrClient.query(q);
     }
