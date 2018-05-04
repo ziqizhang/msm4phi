@@ -2,8 +2,8 @@ package uk.ac.shef.inf.msm4phi;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.apache.lucene.index.Terms;
 import org.apache.solr.client.solrj.SolrClient;
+import uk.ac.shef.inf.msm4phi.export.WorkerTweetExport;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,37 +13,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 
-public class MasterTweetExport {
+public class IndexAnalyserMaster {
 
-    private static final Logger LOG = Logger.getLogger(MasterTweetExport.class.getName());
+    private static final Logger LOG = Logger.getLogger(IndexAnalyserMaster.class.getName());
 
-    private SolrClient solrClient;
     private Map<String, List<String>> hashtagMap;
     private int threads=1;
-    private String outFolder;
+    private IndexAnalyserWorker worker;
 
-    public MasterTweetExport(Path solrHome, String solrCore, File hashtagFile, String outFolder) throws IOException {
-        this.solrClient= Util.getSolrClient(solrHome, solrCore);
+    public IndexAnalyserMaster(File hashtagFile,
+                               IndexAnalyserWorker worker) throws IOException {
         this.hashtagMap=Util.readHashtags(hashtagFile);
-        this.outFolder=outFolder;
+        this.worker=worker;
     }
 
     public void process() {
         try {
 
             int maxPerThread = hashtagMap.size() / threads;
-
+            worker.setHashtagMap(this.hashtagMap);
+            worker.setMaxTasksPerThread(maxPerThread);
 
             LOG.info(String.format("Beginning processing %d hastags on %d threads, at %s", hashtagMap.size(), threads,
                     new Date().toString()));
-            WorkerTweetExport exporter = new WorkerTweetExport(this.solrClient, this.hashtagMap, maxPerThread, outFolder);
 
             ForkJoinPool forkJoinPool = new ForkJoinPool(maxPerThread);
-            int total = forkJoinPool.invoke(exporter);
+            int total = forkJoinPool.invoke(worker);
 
             LOG.info(String.format("Completed $%d hashtags at %s", total, new Date().toString()));
-
-            solrClient.close();
 
         } catch (Exception ioe) {
             StringBuilder sb = new StringBuilder("Failed to build features!");

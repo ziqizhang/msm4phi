@@ -1,4 +1,4 @@
-package uk.ac.shef.inf.msm4phi;
+package uk.ac.shef.inf.msm4phi.export;
 
 import com.opencsv.CSVWriter;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -8,30 +8,22 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import uk.ac.shef.inf.msm4phi.IndexAnalyserWorker;
+import uk.ac.shef.inf.msm4phi.Util;
 
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.RecursiveTask;
 
-public class WorkerTweetExport extends RecursiveTask<Integer> {
+public class WorkerTweetExport extends IndexAnalyserWorker {
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    private SolrClient solrClient;
-    private int resultBatchSize = 10;
-    private String outFolder;
-    private int maxTasksPerThread;
     private static final Logger LOG = Logger.getLogger(WorkerTweetExport.class.getName());
 
-    private Map<String, List<String>> hashtagMap;
-
-    public WorkerTweetExport(SolrClient solrClient, Map<String, List<String>> hashtagMap, int maxTasksPerThread,
-                             String outFolder) {
-        this.solrClient = solrClient;
-        this.hashtagMap = hashtagMap;
-        this.maxTasksPerThread = maxTasksPerThread;
-        this.outFolder = outFolder;
+    public WorkerTweetExport(int id, SolrClient solrClient, String outFolder) {
+        super(id, solrClient, outFolder);
     }
+
 
     public int getResultBatchSize() {
         return this.resultBatchSize;
@@ -40,20 +32,6 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
     public void setResultBatchSize(int resultBatchSize) {
         this.resultBatchSize = resultBatchSize;
     }
-
-    @Override
-    protected Integer compute() {
-        if (this.hashtagMap.size() > maxTasksPerThread) {
-            List<WorkerTweetExport> subWorkers =
-                    new ArrayList<>(createSubWorkers());
-            for (WorkerTweetExport subWorker : subWorkers)
-                subWorker.fork();
-            return mergeResult(subWorkers);
-        } else {
-            return computeSingleWorker(hashtagMap);
-        }
-    }
-
 
     /**
      * Query the solr backend to process tweets
@@ -112,40 +90,11 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
     }
 
 
-    protected List<WorkerTweetExport> createSubWorkers() {
-        List<WorkerTweetExport> subWorkers =
-                new ArrayList<>();
-
-        boolean b = false;
-        Map<String, List<String>> splitTask1 = new HashMap<>();
-        Map<String, List<String>> splitTask2 = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : hashtagMap.entrySet()) {
-            if (b)
-                splitTask1.put(e.getKey(), e.getValue());
-            else
-                splitTask2.put(e.getKey(), e.getValue());
-            b = !b;
-        }
-
-        WorkerTweetExport subWorker1 = createInstance(splitTask1);
-        WorkerTweetExport subWorker2 = createInstance(splitTask2);
-
-        subWorkers.add(subWorker1);
-        subWorkers.add(subWorker2);
-
-        return subWorkers;
-    }
-
-    protected WorkerTweetExport createInstance(Map<String, List<String>> splitTasks) {
-        return new WorkerTweetExport(this.solrClient, splitTasks, maxTasksPerThread, outFolder);
-    }
-
-    protected int mergeResult(List<WorkerTweetExport> workers) {
-        Integer total = 0;
-        for (WorkerTweetExport worker : workers) {
-            total += worker.join();
-        }
-        return total;
+    protected WorkerTweetExport createInstance(Map<String, List<String>> splitTasks, int id) {
+        WorkerTweetExport worker = new WorkerTweetExport(id, this.solrClient, outFolder);
+        worker.setHashtagMap(splitTasks);
+        worker.setMaxTasksPerThread(this.maxTasksPerThread);
+        return worker;
     }
 
 
@@ -316,7 +265,7 @@ public class WorkerTweetExport extends RecursiveTask<Integer> {
         Collection<Object> values = d.getFieldValues("entities_media_url");
         if (values != null) {
             for (Object o : values) {
-                media.append(media.toString()).append(" ");
+                media.append(o.toString()).append(" ");
             }
         }
         return media.toString().trim();

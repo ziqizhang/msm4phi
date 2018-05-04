@@ -1,4 +1,4 @@
-package uk.ac.shef.inf.msm4phi;
+package uk.ac.shef.inf.msm4phi.indexing;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -8,6 +8,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import twitter4j.*;
+import uk.ac.shef.inf.msm4phi.Util;
 
 import java.util.*;
 
@@ -26,7 +27,6 @@ public class IndexPopulatorUser {
         this.userCoreClient = userCore;
         this.twitter = Util.authenticateTwitter(twitterConsumerKey, twitterConsumerSecret, twitterAccessToken,
                 twitterAccessSecret);
-
     }
 
     public void process() {

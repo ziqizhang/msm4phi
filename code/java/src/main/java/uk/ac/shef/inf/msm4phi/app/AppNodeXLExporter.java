@@ -1,6 +1,9 @@
 package uk.ac.shef.inf.msm4phi.app;
 
-import uk.ac.shef.inf.msm4phi.MasterTweetExport;
+import org.apache.solr.client.solrj.SolrClient;
+import uk.ac.shef.inf.msm4phi.IndexAnalyserMaster;
+import uk.ac.shef.inf.msm4phi.Util;
+import uk.ac.shef.inf.msm4phi.export.WorkerTweetExport;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +14,12 @@ import java.nio.file.Paths;
  */
 public class AppNodeXLExporter {
     public static void main(String[] args) throws IOException {
-        MasterTweetExport exporter=new MasterTweetExport(
-                Paths.get("/home/zz/Work/msm4phi/resources/solr_offline"),"tweets",
+        SolrClient solrClient = Util.getSolrClient(Paths.get("/home/zz/Work/msm4phi/resources/solr_offline"),"tweets");
+        WorkerTweetExport worker = new WorkerTweetExport(0,solrClient,
+                "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/nodexl");
+        IndexAnalyserMaster exporter=new IndexAnalyserMaster(
                 new File("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/2_PART2_processed_hashtags.tsv"),
-                "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/nodexl"
+                worker
         );
         exporter.setThreads(1);
         exporter.process();

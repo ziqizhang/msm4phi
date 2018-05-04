@@ -1,7 +1,7 @@
 package uk.ac.shef.inf.msm4phi.app;
 
 import org.apache.solr.client.solrj.SolrClient;
-import uk.ac.shef.inf.msm4phi.PostProcessor;
+import uk.ac.shef.inf.msm4phi.indexing.PostProcessor;
 import uk.ac.shef.inf.msm4phi.Util;
 
 import java.nio.file.Paths;

@@ -1,10 +1,9 @@
-package uk.ac.shef.inf.msm4phi;
+package uk.ac.shef.inf.msm4phi.indexing;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -12,8 +11,8 @@ import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import uk.ac.shef.inf.msm4phi.Util;
 
-import java.nio.file.Path;
 import java.util.*;
 
 /**
