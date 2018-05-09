@@ -73,6 +73,24 @@ public class Util {
         return query;
     }
 
+    public static SolrQuery createQueryUsersOfHashtags(int resultBatchSize, String... hashtags) {
+        SolrQuery query = new SolrQuery();
+        StringBuilder qValues = new StringBuilder();
+
+        int count = 0;
+        for (String h : hashtags) {
+            count++;
+            if (count == 1)
+                qValues.append(h);
+            else
+                qValues.append(" OR ").append(h);
+        }
+        query.setQuery("entities_hashtag:(" + qValues.toString() + ")");
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+        return query;
+    }
+
     public static SolrQuery createQTOHWithInteractions(int resultBatchSize, String... hashtags) {
         SolrQuery query = new SolrQuery();
         StringBuilder qValues = new StringBuilder();
