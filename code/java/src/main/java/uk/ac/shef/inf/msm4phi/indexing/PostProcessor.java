@@ -34,6 +34,7 @@ public class PostProcessor {
     private final int SEC_BETWEEN_CALLS = 15 * 60 / 900;  //900 calls per 15 minutes.
     private final int BATCH_SIZE = 9000;
     private Twitter twitter;
+    private int twitterCalls=0;
 
     public PostProcessor(SolrClient solrClient,
                          String twitterConsumerKey, String twitterConsumerSecret,
@@ -89,13 +90,16 @@ public class PostProcessor {
      */
     private void updateBatch(QueryResponse res, SolrClient solrClient) {
         Map<String, SolrDocument> lookupIDs = new HashMap<>();
+        twitterCalls=0;
+        int count=0;
         for (SolrDocument d : res.getResults()) {
+            count++;
             String tweetID = d.get("id").toString();
             lookupIDs.put(tweetID, d);
+            List<SolrInputDocument> updates = new ArrayList<>();
 
-            if (lookupIDs.size() == MAX_LOOKUP_ID_PER_CALL) {
+            if (lookupIDs.size() == MAX_LOOKUP_ID_PER_CALL || count==res.getResults().size()) {
                 //make call
-
                 try {
                     ResponseList<Status> tweets = makeTwitterLookupCall(lookupIDs.keySet());
 
@@ -111,16 +115,11 @@ public class PostProcessor {
                             }// add the map as the field value
                             if (tw.getRetweetCount() > 0) {
                                 Map<String, Object> fieldRTModifier = new HashMap<>(1);
-                                fieldRTModifier.put("set", tw.getFavoriteCount());
+                                fieldRTModifier.put("set", tw.getRetweetCount());
                                 updateDoc.addField("retweet_count", fieldRTModifier);
-                            }// add the map as the field value
 
-                            try {
-                                solrClient.add(updateDoc);
-                            } catch (Exception e) {
-                                LOG.warn(String.format("\t\tunable to update document with id: %s \n\t %s",
-                                        String.valueOf(tw.getId()), ExceptionUtils.getFullStackTrace(e)));
-                            }
+                            }// add the map as the field value
+                            updates.add(updateDoc);
                         }
                     }
 
@@ -133,6 +132,7 @@ public class PostProcessor {
                 lookupIDs.clear();
 
                 try {
+                    solrClient.add(updates);
                     solrClient.commit();
                     Thread.sleep(SEC_BETWEEN_CALLS * 1000);
                 } catch (Exception e) {
@@ -145,6 +145,9 @@ public class PostProcessor {
 
 
     private ResponseList<Status> makeTwitterLookupCall(Set<String> strings) throws TwitterException {
+        twitterCalls++;
+        LOG.info(String.format("\t\t\tmaking %dth Twitter call for a batch of max %d Tweets, total ids to query =%d",
+                twitterCalls,BATCH_SIZE,strings.size()));
         long[] ids = new long[strings.size()];
         String[] idStr = strings.toArray(new String[0]);
         for (int i = 0; i < ids.length; i++)
