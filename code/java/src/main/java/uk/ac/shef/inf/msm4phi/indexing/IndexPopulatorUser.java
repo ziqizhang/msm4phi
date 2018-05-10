@@ -43,12 +43,13 @@ public class IndexPopulatorUser {
 
         int countU = 0;
         Iterator<String> userIt = uniqueUsers.iterator();
-        Map<String, User> preFetchedUsers = new HashMap<>();
+        Map<String, User> preFetchedUsers = new LinkedHashMap<>();
         while (userIt.hasNext()) {
             String userID = userIt.next();
 
             if (!preFetchedUsers.containsKey(userID))
-                preFetchedUsers = makeTwitterLookupCall(uniqueUsers.subList(0, 100));
+                preFetchedUsers = 100<uniqueUsers.size()? makeTwitterLookupCall(uniqueUsers.subList(0, 100)):
+                        makeTwitterLookupCall(uniqueUsers.subList(0, uniqueUsers.size()));
 
             LOG.info(String.format("\t currently processing #%d, %s", countU, userID));
             //Twitter API part
@@ -57,7 +58,7 @@ public class IndexPopulatorUser {
             populateFromTwitterAPI(userID, newDoc, preFetchedUsers);
 
             //solr index part
-            populateFromTweetIndex(userID, newDoc, userCoreClient);
+            populateFromTweetIndex(userID, newDoc, tweetCoreClient);
 
             //commit
             userIt.remove();
@@ -65,8 +66,8 @@ public class IndexPopulatorUser {
             try {
                 userCoreClient.add(newDoc);
             } catch (Exception e) {
-                LOG.warn(String.format("\t\tfailed to add user data to index: %s",
-                        userID));
+                LOG.warn(String.format("\t\tfailed to add user data to index: %s \n\t %s",
+                        userID, ExceptionUtils.getFullStackTrace(e)));
             }
             if (countU % 500 == 0) {
                 try {
@@ -175,11 +176,11 @@ public class IndexPopulatorUser {
                                 mentions.add(o.toString());
                         }
                         if (d.getFieldValues("entities_media_url") != null) {
-                            for (Object o : d.getFieldValues("entities_symbol"))
+                            for (Object o : d.getFieldValues("entities_media_url"))
                                 mediaURLs.add(o.toString());
                         }
                         if (d.getFieldValues("entities_media_type") != null) {
-                            for (Object o : d.getFieldValues("entities_symbol"))
+                            for (Object o : d.getFieldValues("entities_media_type"))
                                 mediaTypes.add(o.toString());
                         }
                     }
@@ -234,17 +235,21 @@ public class IndexPopulatorUser {
      */
     private void populateFromTwitterAPI(String userID, SolrInputDocument newDoc, Map<String, User> userData) {
         User u = userData.get(userID);
-        newDoc.addField("user_name", u.getName());
-        newDoc.addField("user_screen_name", u.getScreenName());
-        newDoc.addField("user_statuses_count", u.getStatusesCount());
-        newDoc.addField("user_friends_count", u.getFriendsCount());
-        newDoc.addField("user_followers_count", u.getFollowersCount());
-        newDoc.addField("user_listed_count", u.getListedCount());
-        newDoc.addField("user_location", u.getLocation());
-        newDoc.addField("user_desc", u.getDescription());
-        newDoc.addField("user_url", u.getURL());
-        newDoc.addField("profile_background_image_url", u.getProfileBackgroundImageURL());
-        newDoc.addField("profile_image_url", u.getProfileImageURL());
+        if (u==null)
+            LOG.warn(String.format("\t\tuser %s no longer exists!", userID));
+        else {
+            newDoc.addField("user_name", u.getName());
+            newDoc.addField("user_screen_name", u.getScreenName());
+            newDoc.addField("user_statuses_count", u.getStatusesCount());
+            newDoc.addField("user_friends_count", u.getFriendsCount());
+            newDoc.addField("user_followers_count", u.getFollowersCount());
+            newDoc.addField("user_listed_count", u.getListedCount());
+            newDoc.addField("user_location", u.getLocation());
+            newDoc.addField("user_desc", u.getDescription());
+            newDoc.addField("user_url", u.getURL());
+            newDoc.addField("profile_background_image_url", u.getProfileBackgroundImageURL());
+            newDoc.addField("profile_image_url", u.getProfileImageURL());
+        }
     }
 
     private Map<String, User> makeTwitterLookupCall(List<String> userIDs) {
@@ -259,7 +264,7 @@ public class IndexPopulatorUser {
         }
         prevCallDate = new Date();
 
-        Map<String, User> result = new HashMap<>();
+        Map<String, User> result = new LinkedHashMap<>();
         try {
             long[] ids = new long[userIDs.size()];
             String[] idStr = userIDs.toArray(new String[0]);
@@ -268,9 +273,11 @@ public class IndexPopulatorUser {
             ResponseList<User> users = twitter.lookupUsers(ids);
 
             //update each solr doc based on the twitter api results
-            for (User u : users) {
-                result.put(String.valueOf(u.getId()), u);
-            }
+            Map<String, User> tmp = new HashMap<>();
+            for (User u : users)
+                tmp.put(String.valueOf(u.getId()), u);
+            for (String uid : userIDs)
+                result.put(uid, tmp.get(uid));
 
         } catch (TwitterException e) {
             LOG.warn(String.format("\t\tunable to query Twitter, ids are: %s \n\t %s",

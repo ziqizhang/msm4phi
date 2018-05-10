@@ -15,5 +15,6 @@ public class AppPostProcess {
         pprocess.process();
 
         solrClient.close();
+        System.exit(0);
     }
 }

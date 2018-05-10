@@ -23,8 +23,8 @@ import java.util.*;
  * <p>
  * <br/> favorite_count
  * <br/> retweet_count
- * <br/> retweeted
- * <br/> quote_count
+ * <br/> retweeted - always false. use 'retweet_count>0' for this purpose
+ * <br/> quote_count - not available from twit4j
  */
 public class PostProcessor {
     private static final Logger LOG = Logger.getLogger(PostProcessor.class.getName());

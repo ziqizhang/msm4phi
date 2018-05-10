@@ -34,5 +34,6 @@ public class AppStatsExtractor {
         IndexAnalyserMaster master = new IndexAnalyserMaster(new File(args[2]), worker);
         master.process();
 
+        solrClient.close();
     }
 }
