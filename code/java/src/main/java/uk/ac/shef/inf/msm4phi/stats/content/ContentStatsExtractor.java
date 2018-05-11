@@ -22,12 +22,16 @@ public class ContentStatsExtractor extends IndexAnalyserWorker {
 
     @Override
     protected int computeSingleWorker(Map<String, List<String>> tasks) {
+        int totalHashtags=0;
         CSVWriter csvWriter = null;
         try {
             csvWriter = Util.createCSVWriter(outFolder + "/" + id + ".csv");
             writeCSVHeader(csvWriter);
 
             for (Map.Entry<String, List<String>> en : tasks.entrySet()) {
+                /*if (en.getValue().contains("hepb"))
+                    System.out.println();*/
+                totalHashtags++;
                 LOG.info(String.format("\t processing hashtag '%s' with %d variants...", en.getKey(), en.getValue().size()));
                 SolrQuery q = Util.createQueryTweetsOfHashtags(resultBatchSize, en.getValue().toArray(new String[0]));
 
@@ -89,26 +93,31 @@ public class ContentStatsExtractor extends IndexAnalyserWorker {
                 String[] line = new String[17];
                 line[0] = en.getKey();
                 line[1] = String.valueOf(total);
-                line[2] = String.format("%.4f,val", (double) uniqueHashtags.size() / total);
-                line[3] = String.format("%.4f,val", (double) uniqueMentions.size() / total);
-                line[4] = String.format("%.4f,val", (double) uniqueURLs.size() / total);
-                line[5] = String.format("%.4f,val", (double) uniqueMedia.size() / total);
-                line[6] = String.format("%.4f,val", (double) uniqueSymbol.size() / total);
-                uniqueHashtags.addAll(uniqueMentions);
-                uniqueHashtags.addAll(uniqueURLs);
-                uniqueHashtags.addAll(uniqueMedia);
-                uniqueHashtags.addAll(uniqueSymbol);
-                line[7] = String.format("%.4f,val", (double) uniqueHashtags.size() / total);
+                if (total==0)
+                    for (int i=2; i<17; i++)
+                        line[i]="0";
+                else {
+                    line[2] = String.format("%.4f", (double) uniqueHashtags.size() / total);
+                    line[3] = String.format("%.4f", (double) uniqueMentions.size() / total);
+                    line[4] = String.format("%.4f", (double) uniqueURLs.size() / total);
+                    line[5] = String.format("%.4f", (double) uniqueMedia.size() / total);
+                    line[6] = String.format("%.4f", (double) uniqueSymbol.size() / total);
+                    uniqueHashtags.addAll(uniqueMentions);
+                    uniqueHashtags.addAll(uniqueURLs);
+                    uniqueHashtags.addAll(uniqueMedia);
+                    uniqueHashtags.addAll(uniqueSymbol);
+                    line[7] = String.format("%.4f", (double) uniqueHashtags.size() / total);
 
-                line[8] = String.format("%.4f,val", (double) hashtags / total);
-                line[9] = String.format("%.4f,val", (double) mentions / total);
-                line[10] = String.format("%.4f,val", (double) urls / total);
-                line[11] = String.format("%.4f,val", (double) media / total);
-                line[12] = String.format("%.4f,val", (double) symbols / total);
-                line[13] = String.format("%.4f,val", (double) (hashtags + mentions + urls + media + symbols) / total);
-                line[14] = String.format("%.4f,val", (double) uniqueWords.size() / total);
-                line[15] = String.format("%.4f,val", (double) length / total);
-                line[16] = String.format("%.4f,val", (double) uniqueWords.size() / length);
+                    line[8] = String.format("%.4f", (double) hashtags / total);
+                    line[9] = String.format("%.4f", (double) mentions / total);
+                    line[10] = String.format("%.4f", (double) urls / total);
+                    line[11] = String.format("%.4f", (double) media / total);
+                    line[12] = String.format("%.4f", (double) symbols / total);
+                    line[13] = String.format("%.4f", (double) (hashtags + mentions + urls + media + symbols) / total);
+                    line[14] = String.format("%.4f", (double) uniqueWords.size() / total);
+                    line[15] = String.format("%.4f", (double) length / total);
+                    line[16] = String.format("%.4f", (double) uniqueWords.size() / length);
+                }
                 csvWriter.writeNext(line);
             }
 
@@ -116,7 +125,7 @@ public class ContentStatsExtractor extends IndexAnalyserWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return totalHashtags;
     }
 
     /**
@@ -134,8 +143,8 @@ public class ContentStatsExtractor extends IndexAnalyserWorker {
      * <br/> avg_media -> average media per tweet
      * <br/> avg_symbol-> average symbols
      * <br/> avg_anyentity -> average entity (any kind) per tweet
-     * <br/> avg_tweet_length -> lengths by words
      * <br/> avg_tweet_uniquewords  -> unique words as set, divided by # of tweets
+     * <br/> avg_tweet_length -> lengths by words
      * <br/> avg_tweet_density -> uniquewords/total length
      *
      * @param csvWriter
@@ -148,7 +157,7 @@ public class ContentStatsExtractor extends IndexAnalyserWorker {
                 //6                     7                         8                  9            10
                 "avg_unique_symbol", "avg_unique_anyentity", "avg_hashtags", "avg_mention", "avg_urls",
                 //11            12              13                      14          15
-                "avg_media", "avg_symbol", "avg_anyentity", "avg_tweet_length", "avg_tweet_density"};
+                "avg_media", "avg_symbol", "avg_anyentity", "avg_tweet_uniquewords","avg_tweet_length", "avg_tweet_density"};
         csvWriter.writeNext(headerRecord);
     }
 

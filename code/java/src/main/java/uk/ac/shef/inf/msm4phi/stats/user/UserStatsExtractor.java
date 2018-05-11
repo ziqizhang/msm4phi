@@ -27,11 +27,15 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
     @Override
     protected int computeSingleWorker(Map<String, List<String>> tasks) {
         CSVWriter csvWriter = null;
+        int totalHashtags=0;
         try {
             csvWriter = Util.createCSVWriter(outFolder + "/" + id + ".csv");
             writeCSVHeader(csvWriter);
 
             for (Map.Entry<String, List<String>> en : tasks.entrySet()) {
+                totalHashtags++;
+                /*if (en.getValue().contains("heartdisease"))
+                    System.out.println();*/
                 LOG.info(String.format("\t processing hashtag '%s' with %d variants...", en.getKey(), en.getValue().size()));
                 SolrQuery q = Util.createQueryUsersOfHashtags(resultBatchSize, en.getValue().toArray(new String[0]));
 
@@ -113,7 +117,7 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
 
                 LOG.info(String.format("\t calculating SD and outliers for CG followers (elements of %d)...",
                         arrayCGFollowers.size()));
-                double cg_reach = cg==0?0: (double)cp_follower / cg;
+                double cg_reach = cg==0?0: (double)cg_follower / cg;
                 primitives=ArrayUtils.toPrimitive(arrayCGFollowers.toArray(new Double[0]));
                 double dev_cgr=primitives.length>0?sd.evaluate(primitives):0;
                 outliers=primitives.length<MIN_INSTNACES_FOR_OUTLIER
@@ -161,7 +165,7 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return totalHashtags;
     }
 
     @Override

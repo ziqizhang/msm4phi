@@ -23,11 +23,13 @@ public class InteractionStatsExtractor extends IndexAnalyserWorker {
     @Override
     protected int computeSingleWorker(Map<String, List<String>> tasks) {
         CSVWriter csvWriter = null;
+        int totalHashtags=0;
         try {
             csvWriter = Util.createCSVWriter(outFolder + "/" + id + ".csv");
             writeCSVHeader(csvWriter);
 
             for (Map.Entry<String, List<String>> en : tasks.entrySet()) {
+                totalHashtags++;
                 LOG.info(String.format("\t processing hashtag '%s' with %d variants...", en.getKey(), en.getValue().size()));
                 SolrQuery q = Util.createQTOHWithInteractions(resultBatchSize, en.getValue().toArray(new String[0]));
                 SolrQuery qGeneral=Util.createQueryTweetsOfHashtags(10,en.getValue().toArray(new String[0]));
@@ -118,16 +120,20 @@ public class InteractionStatsExtractor extends IndexAnalyserWorker {
                 String[] line = new String[10];
                 line[0] = en.getKey();
                 line[1] = String.valueOf(total);
-                line[2] = String.format("%.4f,val", (double) (retweeted+quoted) / totalGeneral);
-                line[3] = String.format("%.4f,val", (double) (rt_freq+quote_freq) / totalGeneral);
-                line[4] = String.format("%.4f,val", (double) liked / totalGeneral);
-                line[5] = String.format("%.4f,val", (double) like_freq / totalGeneral);
-                line[6] = String.format("%.4f,val", (double) replied / totalGeneral);
-                line[7] = String.format("%.4f,val", (double) reply_freq / totalGeneral);
-                line[8] = String.format("%.4f,val", (double) interacted / totalGeneral);
-                line[9] = String.format("%.4f,val",
-                        (double) (rt_freq+quote_freq+like_freq+reply_freq) / totalGeneral);
-
+                if (totalGeneral==0)
+                    for (int i=2; i<10; i++)
+                        line[i]="0";
+                else {
+                    line[2] = String.format("%.4f", (double) (retweeted + quoted) / totalGeneral);
+                    line[3] = String.format("%.4f", (double) (rt_freq + quote_freq) / totalGeneral);
+                    line[4] = String.format("%.4f", (double) liked / totalGeneral);
+                    line[5] = String.format("%.4f", (double) like_freq / totalGeneral);
+                    line[6] = String.format("%.4f", (double) replied / totalGeneral);
+                    line[7] = String.format("%.4f", (double) reply_freq / totalGeneral);
+                    line[8] = String.format("%.4f", (double) interacted / totalGeneral);
+                    line[9] = String.format("%.4f",
+                            (double) (rt_freq + quote_freq + like_freq + reply_freq) / totalGeneral);
+                }
 
                 csvWriter.writeNext(line);
             }
@@ -136,7 +142,7 @@ public class InteractionStatsExtractor extends IndexAnalyserWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return totalHashtags;
     }
 
     /**

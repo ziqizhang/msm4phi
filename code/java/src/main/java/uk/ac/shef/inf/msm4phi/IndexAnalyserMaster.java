@@ -18,7 +18,7 @@ public class IndexAnalyserMaster {
     private static final Logger LOG = Logger.getLogger(IndexAnalyserMaster.class.getName());
 
     private Map<String, List<String>> hashtagMap;
-    private int threads=1;
+    private int threads=2;
     private IndexAnalyserWorker worker;
 
     public IndexAnalyserMaster(File hashtagFile,
@@ -40,7 +40,7 @@ public class IndexAnalyserMaster {
             ForkJoinPool forkJoinPool = new ForkJoinPool(maxPerThread);
             int total = forkJoinPool.invoke(worker);
 
-            LOG.info(String.format("Completed $%d hashtags at %s", total, new Date().toString()));
+            LOG.info(String.format("Completed %d hashtags at %s", total, new Date().toString()));
 
         } catch (Exception ioe) {
             StringBuilder sb = new StringBuilder("Failed to build features!");
