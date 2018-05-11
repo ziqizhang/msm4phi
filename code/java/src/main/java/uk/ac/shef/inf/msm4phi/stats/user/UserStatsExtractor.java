@@ -1,7 +1,6 @@
 package uk.ac.shef.inf.msm4phi.stats.user;
 
 import com.opencsv.CSVWriter;
-import flanagan.analysis.Outliers;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -19,6 +18,7 @@ import java.util.*;
 public class UserStatsExtractor extends IndexAnalyserWorker {
     private static final Logger LOG = Logger.getLogger(UserStatsExtractor.class.getName());
     private StandardDeviation sd = new StandardDeviation();
+    private final int MIN_INSTNACES_FOR_OUTLIER=10;
 
     public UserStatsExtractor(int id, SolrClient solrClient, String outFolder) {
         super(id, solrClient, outFolder);
@@ -97,59 +97,63 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
                         arrayUserNewTweets.size()));
                 double avg_nt_per_cg = cg==0?0:(double) total_nt / cg;
                 double[] primitives=ArrayUtils.toPrimitive(arrayUserNewTweets.toArray(new Double[0]));
-                double dev_nt=sd.evaluate(primitives);
-                List<Object> outliers=Outliers.outliersESD(primitives, (int)(0.5*primitives.length));
-                double[] nt_outlier_stats= calculateOutlierStats(outliers,avg_nt_per_cg, primitives.length);
+                double dev_nt=primitives.length>0?sd.evaluate(primitives):0;
+                List<List<Double>> outliers=primitives.length<MIN_INSTNACES_FOR_OUTLIER
+                        ?null:Util.detectOutliersIQR(primitives);
+                double[] nt_outlier_stats= calculateOutlierStats(outliers, primitives.length);
 
                 LOG.info(String.format("\t calculating SD and outliers for CP (elements of %d)...",
                         arrayUserReTweets.size()));
                 double avg_rt_per_cp=cp==0?0: (double)total_rt / cp;
                 primitives=ArrayUtils.toPrimitive(arrayUserReTweets.toArray(new Double[0]));
-                double dev_rt=sd.evaluate(primitives);
-                outliers=Outliers.outliersESD(primitives, (int)(0.5*primitives.length));
-                double[] rt_outlier_stats= calculateOutlierStats(outliers,avg_rt_per_cp, primitives.length);
+                double dev_rt=primitives.length>0?sd.evaluate(primitives):0;
+                outliers=primitives.length<MIN_INSTNACES_FOR_OUTLIER
+                        ?null:Util.detectOutliersIQR(primitives);
+                double[] rt_outlier_stats= calculateOutlierStats(outliers, primitives.length);
 
                 LOG.info(String.format("\t calculating SD and outliers for CG followers (elements of %d)...",
                         arrayCGFollowers.size()));
                 double cg_reach = cg==0?0: (double)cp_follower / cg;
                 primitives=ArrayUtils.toPrimitive(arrayCGFollowers.toArray(new Double[0]));
-                double dev_cgr=sd.evaluate(primitives);
-                outliers=Outliers.outliersESD(primitives, (int)(0.5*primitives.length));
-                double[] cgr_outlier_stats= calculateOutlierStats(outliers,cg_reach, primitives.length);
+                double dev_cgr=primitives.length>0?sd.evaluate(primitives):0;
+                outliers=primitives.length<MIN_INSTNACES_FOR_OUTLIER
+                        ?null:Util.detectOutliersIQR(primitives);
+                double[] cgr_outlier_stats= calculateOutlierStats(outliers, primitives.length);
 
                 LOG.info(String.format("\t calculating SD and outliers for CP followers (elements of %d)...",
                         arrayCPFollowers.size()));
                 double cp_reach = cp==0?0: (double)cp_follower / cp;
                 primitives=ArrayUtils.toPrimitive(arrayCPFollowers.toArray(new Double[0]));
-                double dev_cpr=sd.evaluate(primitives);
-                outliers=Outliers.outliersESD(primitives, (int)(0.5*primitives.length));
-                double[] cpr_outlier_stats= calculateOutlierStats(outliers,cp_reach, primitives.length);
+                double dev_cpr=primitives.length>0?sd.evaluate(primitives):0;
+                outliers=primitives.length<MIN_INSTNACES_FOR_OUTLIER
+                        ?null:Util.detectOutliersIQR(primitives);
+                double[] cpr_outlier_stats= calculateOutlierStats(outliers, primitives.length);
 
                 //prepare line to write to csv
                 String[] line = new String[20];
                 line[0] = en.getKey();
                 line[1] = String.valueOf(users);
-                line[2] = String.format("%.4f,val", (double) cg / users);
-                line[3] = String.format("%.4f,val", (double) cp / users);
-                line[4] = String.format("%.4f,val", avg_nt_per_cg);
-                line[5] = String.format("%.4f,val", dev_nt);
-                line[6] = String.format("%.4f,val", nt_outlier_stats[0]);
-                line[7] = String.format("%.4f,val", nt_outlier_stats[1]);
+                line[2] = String.format("%.4f", users==0?0:(double) cg / users);
+                line[3] = String.format("%.4f", users==0?0:(double) cp / users);
+                line[4] = String.format("%.4f", avg_nt_per_cg);
+                line[5] = String.format("%.4f", dev_nt);
+                line[6] = String.format("%.4f", nt_outlier_stats[0]);
+                line[7] = String.format("%.4f", nt_outlier_stats[1]);
 
-                line[8] = String.format("%.4f,val", (double) avg_rt_per_cp);
-                line[9] = String.format("%.4f,val", (double) dev_rt);
-                line[10] = String.format("%.4f,val", rt_outlier_stats[0]);
-                line[11] = String.format("%.4f,val", rt_outlier_stats[1]);
+                line[8] = String.format("%.4f", (double) avg_rt_per_cp);
+                line[9] = String.format("%.4f", (double) dev_rt);
+                line[10] = String.format("%.4f", rt_outlier_stats[0]);
+                line[11] = String.format("%.4f", rt_outlier_stats[1]);
 
-                line[12] = String.format("%.4f,val", (double) cg_reach);
-                line[13] = String.format("%.4f,val", dev_cgr);
-                line[14] = String.format("%.4f,val", cgr_outlier_stats[0]);
-                line[15] = String.format("%.4f,val", cgr_outlier_stats[1]);
+                line[12] = String.format("%.4f", (double) cg_reach);
+                line[13] = String.format("%.4f", dev_cgr);
+                line[14] = String.format("%.4f", cgr_outlier_stats[0]);
+                line[15] = String.format("%.4f", cgr_outlier_stats[1]);
 
-                line[16] = String.format("%.4f,val", (double) cp_reach);
-                line[17] = String.format("%.4f,val", dev_cpr);
-                line[18] = String.format("%.4f,val", cpr_outlier_stats[0]);
-                line[19] = String.format("%.4f,val", cpr_outlier_stats[1]);
+                line[16] = String.format("%.4f", (double) cp_reach);
+                line[17] = String.format("%.4f", dev_cpr);
+                line[18] = String.format("%.4f", cpr_outlier_stats[0]);
+                line[19] = String.format("%.4f", cpr_outlier_stats[1]);
                 csvWriter.writeNext(line);
             }
 
@@ -216,17 +220,11 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
         return 0;
     }
 
-    private double[] calculateOutlierStats(List<Object> detectedValues, double mean, int arraySize){
-        if (arraySize==0)
-            return new double[]{0,0};
-        int belowMean=0, aboveMean=0;
-        for (Object o : detectedValues){
-            double v = Double.valueOf(o.toString());
-            if(v>mean)
-                aboveMean++;
-            else
-                belowMean++;
-        }
-        return new double[]{(double)belowMean/arraySize, (double)aboveMean/arraySize};
+    private double[] calculateOutlierStats(List<List<Double>> detectedValues, int arraySize){
+        if (detectedValues==null)
+            return new double[]{-1,-1};
+
+        return new double[]{(double)detectedValues.get(0).size()/arraySize, (
+                double)detectedValues.get(1).size()/arraySize};
     }
 }

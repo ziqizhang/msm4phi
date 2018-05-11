@@ -10,10 +10,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.opencsv.*;
 import org.apache.solr.client.solrj.SolrClient;
@@ -85,7 +82,7 @@ public class Util {
             else
                 qValues.append(" OR ").append(h);
         }
-        query.setQuery("entities_hashtag:(" + qValues.toString() + ")");
+        query.setQuery("user_entities_hashtag:(" + qValues.toString() + ")");
         query.setStart(0);
         query.setRows(resultBatchSize);
         return query;
@@ -170,4 +167,38 @@ public class Util {
         return csvWriter;
     }
 
+    public static List<List<Double>> detectOutliersIQR(double[] values){
+        if (values == null || values.length == 0)
+            return null;
+
+        // Rank order the values
+        double[] v = new double[values.length];
+        System.arraycopy(values, 0, v, 0, values.length);
+        Arrays.sort(v);
+
+        int n = Math.round(v.length * 25 / 100);
+        double lowerQ = v[n];
+        n = Math.round(v.length * 75 / 100);
+        double upperQ=v[n];
+        double iqr = upperQ-lowerQ;
+        if (iqr==0)
+            return null;
+
+        double outlier_lowerBoundary = lowerQ-1.5*iqr;
+        double outlier_upperBoundary=upperQ+1.5*iqr;
+
+        List<List<Double>> result = new ArrayList<>();
+        List<Double> lower_outliers=new ArrayList<>();
+        List<Double> upper_outliers=new ArrayList<>();
+        for (double d: values){
+            if (d>outlier_upperBoundary)
+                upper_outliers.add(d);
+            if (d<outlier_lowerBoundary)
+                lower_outliers.add(d);
+        }
+        result.add(lower_outliers);
+        result.add(upper_outliers);
+
+        return result;
+    }
 }
