@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -165,6 +164,12 @@ public class Util {
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                 CSVWriter.DEFAULT_LINE_END);
         return csvWriter;
+    }
+
+    public static List<String[]> readCSV(String csvFile) throws IOException {
+        Reader reader = Files.newBufferedReader(Paths.get(csvFile));
+        CSVReader csvReader = new CSVReader(reader);
+        return csvReader.readAll();
     }
 
     public static List<List<Double>> detectOutliersIQR(double[] values){

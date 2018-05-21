@@ -8,7 +8,7 @@ import java.util.concurrent.RecursiveTask;
 public abstract class IndexAnalyserWorker extends RecursiveTask<Integer> {
     protected int id;
     protected SolrClient solrClient;
-    protected int resultBatchSize = 10;
+    protected int resultBatchSize = 10000;
     protected String outFolder;
     protected int maxTasksPerThread;
 

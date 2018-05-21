@@ -48,7 +48,7 @@ public class IndexPopulatorUser {
             String userID = userIt.next();
 
             if (!preFetchedUsers.containsKey(userID))
-                preFetchedUsers = 100<uniqueUsers.size()? makeTwitterLookupCall(uniqueUsers.subList(0, 100)):
+                preFetchedUsers = 100 < uniqueUsers.size() ? makeTwitterLookupCall(uniqueUsers.subList(0, 100)) :
                         makeTwitterLookupCall(uniqueUsers.subList(0, uniqueUsers.size()));
 
             LOG.info(String.format("\t currently processing #%d, %s", countU, userID));
@@ -140,7 +140,7 @@ public class IndexPopulatorUser {
                             userID, total, q.getStart(), q.getStart() + q.getRows()));
                     for (SolrDocument d : res.getResults()) {
                         String text = d.getFieldValue("status_text").toString();
-                        if (text.toLowerCase().startsWith("@rt"))
+                        if (text.toLowerCase().startsWith("rt "))
                             retweet++;
                         else
                             newTweet++;
@@ -198,20 +198,20 @@ public class IndexPopulatorUser {
                 stop = true;
         }
 
-        newDoc.addField("user_newtweet_count",newTweet);
-        newDoc.addField("user_retweet_count",retweet);
-        newDoc.addField("user_reply_count",reply);
-        newDoc.addField("user_quote_count",quote);
-        newDoc.addField("user_favorited_count",favorited);
-        newDoc.addField("user_replied_count",replied);
-        newDoc.addField("user_retweeted_count",retweeted);
-        newDoc.addField("user_quoted_count",quoted);
-        newDoc.addField("user_entities_hashtag",hashtags);
-        newDoc.addField("user_entities_symbol",symbols);
-        newDoc.addField("user_entities_url",urls);
-        newDoc.addField("user_entities_user_mention",mentions);
-        newDoc.addField("user_entities_media_url",mediaURLs);
-        newDoc.addField("user_entities_media_type",mediaTypes);
+        newDoc.addField("user_newtweet_count", newTweet);
+        newDoc.addField("user_retweet_count", retweet);
+        newDoc.addField("user_reply_count", reply);
+        newDoc.addField("user_quote_count", quote);
+        newDoc.addField("user_favorited_count", favorited);
+        newDoc.addField("user_replied_count", replied);
+        newDoc.addField("user_retweeted_count", retweeted);
+        newDoc.addField("user_quoted_count", quoted);
+        newDoc.addField("user_entities_hashtag", hashtags);
+        newDoc.addField("user_entities_symbol", symbols);
+        newDoc.addField("user_entities_url", urls);
+        newDoc.addField("user_entities_user_mention", mentions);
+        newDoc.addField("user_entities_media_url", mediaURLs);
+        newDoc.addField("user_entities_media_type", mediaTypes);
     }
 
     /**
@@ -235,7 +235,7 @@ public class IndexPopulatorUser {
      */
     private void populateFromTwitterAPI(String userID, SolrInputDocument newDoc, Map<String, User> userData) {
         User u = userData.get(userID);
-        if (u==null)
+        if (u == null)
             LOG.warn(String.format("\t\tuser %s no longer exists!", userID));
         else {
             newDoc.addField("user_name", u.getName());
@@ -254,14 +254,14 @@ public class IndexPopulatorUser {
 
     private Map<String, User> makeTwitterLookupCall(List<String> userIDs) {
         Date now = new Date();
-        long wait = (1200 - now.getTime() - prevCallDate.getTime());
-        if (wait > 0) {
-            LOG.warn(String.format("\t\t API calling too frequent. Waiting %d milliseconds...", wait));
-            try {
-                Thread.sleep(wait);
-            } catch (InterruptedException e) {
-            }
+        /*long wait = (1200 - now.getTime() - prevCallDate.getTime());
+        if (wait > 0) {*/
+        //LOG.warn(String.format("\t\t API calling too frequent. Waiting %d milliseconds...", wait));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
+        //}
         prevCallDate = new Date();
 
         Map<String, User> result = new LinkedHashMap<>();

@@ -18,7 +18,7 @@ public class IndexAnalyserMaster {
     private static final Logger LOG = Logger.getLogger(IndexAnalyserMaster.class.getName());
 
     private Map<String, List<String>> hashtagMap;
-    private int threads=2;
+    private int threads=1;
     private IndexAnalyserWorker worker;
 
     public IndexAnalyserMaster(File hashtagFile,

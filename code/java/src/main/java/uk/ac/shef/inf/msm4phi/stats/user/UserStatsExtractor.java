@@ -205,13 +205,13 @@ public class UserStatsExtractor extends IndexAnalyserWorker {
         //0         1       2
         String[] headerRecord = {"tag", "unique_users", "%_content_gen",
                 //3             4               5              6               7
-                "%_content_pp", "avg_nt_per_cg", "dev_nt", "%cg_outliers+", "%cg_outliers-",
+                "%_content_pp", "avg_nt_per_cg", "dev_nt", "%cg_outliers-", "%cg_outliers+",
                 //8                9                 10         11
-                "avg_rt_per_cp", "dev_rt", "%cp_outliers+","%cp_outliers-",
+                "avg_rt_per_cp", "dev_rt", "%cp_outliers-","%cp_outliers+",
                 //12          13               14          15
-                "cg_reach", "dev_cgr", "cgr_outliers+","cgr_outliers-",
+                "cg_reach", "dev_cgr", "cgr_outliers-","cgr_outliers+",
                 //16        17          18              19
-                "cp_reach", "dev_cpr", "cpr_outliers+","cpr_outliers-"};
+                "cp_reach", "dev_cpr", "cpr_outliers-","cpr_outliers+"};
         csvWriter.writeNext(headerRecord);
     }
 
