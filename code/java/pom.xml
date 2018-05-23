@@ -52,6 +52,15 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.efficient-java-matrix-library/ejml -->
+
+        <!-- https://mvnrepository.com/artifact/com.googlecode.matrix-toolkits-java/mtj -->
+        <dependency>
+            <groupId>com.googlecode.matrix-toolkits-java</groupId>
+            <artifactId>mtj</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
         <dependency>
             <groupId>flanagan</groupId>
             <artifactId>flanagan-math</artifactId>
