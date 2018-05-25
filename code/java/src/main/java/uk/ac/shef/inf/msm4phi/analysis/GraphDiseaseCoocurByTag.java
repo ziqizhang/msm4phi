@@ -28,10 +28,18 @@ public class GraphDiseaseCoocurByTag {
     private static final int resultBatchSize=10000;
     private static final Logger LOG = Logger.getLogger(GraphDiseaseCoocurByTag.class.getName());
 
+    private Set<String> exclusion = new HashSet<>();
+
+    public GraphDiseaseCoocurByTag(String exclusionFile) throws IOException {
+        if (exclusionFile!=null)
+            exclusion =Common.readExcludeList(exclusionFile,Integer.MAX_VALUE);
+    }
+
     void process(SolrClient tweetCore, String hashtagFile, String outFile) throws IOException {
         Map<String, List<String>> disease2tagsInput=Util.readHashtags(new File(hashtagFile));
         Pair<Matrix, List<String>> output=calculateSimilarityMatrix(disease2tagsInput,tweetCore);
         Common.saveMatrixData(output.getLeft(), output.getRight(), outFile);
+        Common.saveCommunityPairSimilarityData(output.getLeft(), output.getRight(), outFile+".pairs.csv");
     }
 
     private Pair<Matrix, List<String>> calculateSimilarityMatrix(Map<String, List<String>> disease2tagsInput,
@@ -66,7 +74,7 @@ public class GraphDiseaseCoocurByTag {
             }
         }
 
-        normalize(m, max);
+        //normalize(m, max);
 
         return new ImmutablePair<>(m, filteredDiseases);
     }
@@ -116,6 +124,7 @@ public class GraphDiseaseCoocurByTag {
                 stop = true;
 
         }
+        tags.removeAll(exclusion);
         return tags;
     }
 }

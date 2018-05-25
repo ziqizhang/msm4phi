@@ -60,11 +60,20 @@ public class HashtagCommunityPresence {
                 .append(".25 quantile,").append(StatUtils.percentile(values, 0.25)).append("\n")
                 .append("min community presence,").append(StatUtils.min(values)).append("\n")
                 .append("average,").append(StatUtils.mean(values)).append("\n\n")
-                .append("Top 100 by community presence (as #of communities)\n");
+                .append("Top 500 by community presence (as #of communities)\n");
 
         for (int i=0; i<500; i++){
             sb.append(tags.get(i)).append(",").append(diseaseNum.get(i)).append("\n");
         }
+        sb.append("\n");
+
+        List<List<Double>> outliers=Util.detectOutliersIQR(values);
+        sb.append("OUTLIERS,").append(outliers.get(1).size()).append("\n");
+        for (int i=0; i<outliers.get(1).size(); i++){
+            sb.append(tags.get(i)).append(",").append(diseaseNum.get(i)).append("\n");
+        }
+
+
         p.println(sb.toString());
         p.close();
 

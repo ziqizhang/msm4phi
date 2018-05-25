@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import uk.ac.shef.inf.msm4phi.Util;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,6 +66,14 @@ public class UserCommunityPresence {
         for (int i=0; i<500; i++){
             sb.append(res.getRight().get(users.get(i))).append(",").append(diseaseNum.get(i)).append("\n");
         }
+        sb.append("\n");
+
+        List<List<Double>> outliers= Util.detectOutliersIQR(values);
+        sb.append("OUTLIERS,").append(outliers.get(1).size()).append("\n");
+        for (int i=0; i<outliers.get(1).size(); i++){
+            sb.append(res.getRight().get(users.get(i))).append(",").append(diseaseNum.get(i)).append("\n");
+        }
+
         p.println(sb.toString());
         p.close();
 

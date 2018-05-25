@@ -30,7 +30,7 @@ public class StatsCleaner {
     private static final int CONTENT_COL_TWEET=1;
     private static final int USER_COL_U=1;
 
-    private static final int[] REMOVE_COLS_CONTENT={0,1,2,3,4,5,6,7,13};
+    private static final int[] REMOVE_COLS_CONTENT={0,1,2,3,4,5,6,7,13,16};
     private static final int[] REMOVE_COLS_INTERACTION={0,1,6,7,8,9};
     private static final int[] REMOVE_COLS_USER={0,1,5,6,9,10,13,14,17,18};
 

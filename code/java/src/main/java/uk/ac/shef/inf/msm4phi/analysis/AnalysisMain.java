@@ -18,13 +18,21 @@ public class AnalysisMain {
         //generateDistributionStats(tweetSolrClient, userSolrClient, args[1],args[2]);
 
         //create graph similarities
-        createGraphSimilarityMatrix(tweetSolrClient, userSolrClient, args[1], args[2]);
+        //createGraphSimilarityMatrix(tweetSolrClient, userSolrClient, args[1], args[2]);
 
+        //create tag coocurring stats
+        generateFrequentCoocurringTags(tweetSolrClient, args[1],args[2]);
 
         tweetSolrClient.close();
         userSolrClient.close();
 
         System.exit(0);
+    }
+
+    private static void generateFrequentCoocurringTags(SolrClient tweetCore,
+                                                       String hashtagFile, String outFolder) throws IOException {
+        FrequentCooccurTagFinder finder = new FrequentCooccurTagFinder(null);
+        finder.process(tweetCore,hashtagFile,outFolder+"/tag_coocurr.csv");
     }
 
     private static void generateDistributionStats(SolrClient tweetCore, SolrClient userCore,
@@ -41,10 +49,16 @@ public class AnalysisMain {
 
     private static void createGraphSimilarityMatrix(SolrClient tweetCore, SolrClient userCore,
                                                     String hashtagFile, String outFolder) throws IOException {
-        GraphDiseaseCoocurByTag gdt = new GraphDiseaseCoocurByTag();
+        GraphDiseaseCoocurByTag gdt =
+                new GraphDiseaseCoocurByTag(outFolder+"/distribution/presence-hashtag.csv");
         gdt.process(tweetCore,hashtagFile,outFolder+"/graphsim_tag.csv");
 
-        GraphDiseaseCoocurByUser gdu = new GraphDiseaseCoocurByUser();
+        GraphDiseaseCoocurByUser gdu =
+                new GraphDiseaseCoocurByUser(outFolder+"/distribution/presence-user.csv");
         gdu.process(userCore, hashtagFile, outFolder+"/graphsim_user.csv");
+        /*GraphDiseaseCoocurBySelectedTag gdst =
+                new GraphDiseaseCoocurBySelectedTag(null);
+        gdst.process(tweetCore,hashtagFile,outFolder+"/graphsim_stag.csv");*/
+
     }
 }

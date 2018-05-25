@@ -25,10 +25,19 @@ public class GraphDiseaseCoocurByUser {
     private static final int resultBatchSize=10000;
     private static final Logger LOG = Logger.getLogger(GraphDiseaseCoocurByUser.class.getName());
 
+    private Set<String> exclusion = new HashSet<>();
+
+    public GraphDiseaseCoocurByUser(String exclusionFile) throws IOException {
+        if (exclusionFile!=null)
+            exclusion =Common.readExcludeList(exclusionFile,Integer.MAX_VALUE);
+    }
+
+
     void process(SolrClient userCore, String hashtagFile, String outFile) throws IOException {
         Map<String, List<String>> disease2tagsInput= Util.readHashtags(new File(hashtagFile));
         Pair<Matrix, List<String>> output=calculateSimilarityMatrix(disease2tagsInput,userCore);
         Common.saveMatrixData(output.getLeft(), output.getRight(), outFile);
+        Common.saveCommunityPairSimilarityData(output.getLeft(), output.getRight(), outFile+".pairs.csv");
     }
 
     private Pair<Matrix, List<String>> calculateSimilarityMatrix(Map<String, List<String>> disease2tagsInput,
@@ -64,7 +73,7 @@ public class GraphDiseaseCoocurByUser {
             }
         }
 
-        normalize(m, max);
+        //normalize(m, max);
 
         return new ImmutablePair<>(m, filteredDiseases);
     }
@@ -113,6 +122,7 @@ public class GraphDiseaseCoocurByUser {
                 stop = true;
 
         }
+        userIDs.removeAll(exclusion);
         return userIDs;
     }
 }

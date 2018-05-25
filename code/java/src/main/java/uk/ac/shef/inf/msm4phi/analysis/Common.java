@@ -2,6 +2,7 @@ package uk.ac.shef.inf.msm4phi.analysis;
 
 import com.opencsv.CSVWriter;
 import no.uib.cipr.matrix.Matrix;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,6 +16,7 @@ import uk.ac.shef.inf.msm4phi.stats.user.UserStatsExtractor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class Common {
@@ -228,15 +230,71 @@ public class Common {
         String[] header = new String[matrixIndex.size()+1];
         header[0]="";
         for(int i=0; i<matrixIndex.size(); i++)
-            header[i+1]=matrixIndex.get(i);
+            header[i+1]=trimHashChar(matrixIndex.get(i));
         csvWriter.writeNext(header);
         for (int r=0; r<m.numRows();r++){
             String[] row = new String[matrixIndex.size()+1];
-            row[0]=matrixIndex.get(r);
+            row[0]=trimHashChar(matrixIndex.get(r));
             for(int c=0;c<m.numColumns(); c++)
                 row[c+1]=String.valueOf(m.get(r,c));
             csvWriter.writeNext(row);
         }
         csvWriter.close();
+    }
+
+    static void saveCommunityPairSimilarityData(Matrix m, List<String> matrixIndex, String outFile) throws IOException {
+        CSVWriter csvWriter = null;
+
+        csvWriter = Util.createCSVWriter(outFile);
+        String[] header = new String[3];
+        header[0]="DiseaseCommunity1";
+        header[1]="DiseaseCommunity2";
+        header[2]="SimilarityScore(Dice)";
+
+        for(int i=0; i<matrixIndex.size();i++){
+            String d1 = matrixIndex.get(i);
+            for(int j=i+1; j<matrixIndex.size();j++){
+                String d2 =matrixIndex.get(j);
+                double sim = m.get(i,j);
+                if(sim>0){
+                    String[] row =new String[3];
+                    row[0]=d1;
+                    row[1]=d2;
+                    row[2]=String.valueOf(sim);
+                    csvWriter.writeNext(row);
+                }
+
+            }
+        }
+
+        csvWriter.close();
+    }
+
+    static String trimHashChar(String s){
+        if(s.startsWith("#"))
+            return s.substring(1).trim();
+        return s;
+    }
+
+    static Set<String> readExcludeList(String csvFile, int max) throws IOException {
+        List<String> lines=FileUtils.readLines(new File(csvFile), Charset.forName("utf-8"));
+        Set<String> exclusion=new HashSet<>();
+        boolean foundStart=false;
+        int count=0;
+        for(String l : lines){
+            if (l.startsWith("OUTLIERS")){
+                foundStart=true;
+                continue;
+            }
+            if(foundStart){
+                String[] parts = l.split(",");
+                if(count>=max||l.equalsIgnoreCase(""))
+                    break;
+
+                exclusion.add(parts[0].trim());
+                count++;
+            }
+        }
+        return exclusion;
     }
 }
