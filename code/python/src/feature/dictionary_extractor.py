@@ -1,48 +1,12 @@
 # this code creates dictionary for different types of user profiles automatically
+import csv
 import functools
 
+import os
 import pandas as pd
-from ekphrasis.classes.preprocessor import TextPreProcessor
-from ekphrasis.classes.tokenizer import SocialTokenizer
-from ekphrasis.dicts.emoticons import emoticons
 from feature import nlp
 
 text_normalization_option = 1  # 0=stemming, 1=lemma, 2=nothing
-
-text_processor = TextPreProcessor(
-    # terms that will be normalized
-    # normalize=['url', 'email', 'percent', 'money', 'phone', 'user',
-    #                'time', 'url', 'date', 'number'],
-    #     # terms that will be annotated
-    #     annotate={"hashtag", "allcaps", "elongated", "repeated",
-    #               'emphasis', 'censored'},
-
-    normalize=[],
-    # terms that will be annotated
-    annotate={'elongated',
-              'emphasis'},
-    fix_html=True,  # fix HTML tokens
-
-    # corpus from which the word statistics are going to be used
-    # for word segmentation
-    segmenter="twitter",
-
-    # corpus from which the word statistics are going to be used
-    # for spell correction
-    corrector="twitter",
-
-    unpack_hashtags=True,  # perform word segmentation on hashtags
-    unpack_contractions=True,  # Unpack contractions (can't -> can not)
-    spell_correct_elong=False,  # spell correction for elongated words
-
-    # select a tokenizer. You can use SocialTokenizer, or pass your own
-    # the tokenizer, should take as input a string and return a list of tokens
-    tokenizer=SocialTokenizer(lowercase=False).tokenize,
-
-    # list of dictionaries, for replacing tokens extracted from the text,
-    # with other expressions. You can pass more than one dictionaries.
-    dicts=[emoticons]
-)
 
 
 
@@ -74,12 +38,7 @@ def load_user_profile_text(user_features_csv, *col_text):
                 if type(row[c])==str:
                     tweet_text += row[c] + " "
 
-            tweet_text = text_processor.pre_process_doc(tweet_text.strip())
-            tweet_text = list(filter(lambda a: a != '<elongated>', tweet_text))
-            tweet_text = list(filter(lambda a: a != '<emphasis>', tweet_text))
-            tweet_text = list(filter(lambda a: a != 'RT', tweet_text))
-            tweet_text = list(filter(lambda a: a != '"', tweet_text))
-            tweet_text = " ".join(tweet_text)
+            tweet_text=nlp.normalize_tweet(tweet_text)
             if len(tweet_text) > 1:
                 proftext.append(tweet_text)
         label_to_proftext[l]=proftext
@@ -152,9 +111,9 @@ def extract_dict(label_to_proftext: dict):
     return label_vocab_to_totalfreq, label_vocab_to_weightedscore, label_to_nouns, label_to_verbs
 
 
-def create_filtered_dict(outfolder, vocab_with_score: dict,
-                         label_to_nouns, label_to_verbs,
-                         topN, verb_topN, noun_topN):
+def rank_pass_one(outfolder, vocab_with_score: dict,
+                  label_to_nouns, label_to_verbs,
+                  topN, verb_topN, noun_topN):
     for l, vocab in vocab_with_score.items():
         nouns_of_l = label_to_nouns[l]
         verbs_of_l = label_to_verbs[l]
@@ -193,20 +152,96 @@ def create_filtered_dict(outfolder, vocab_with_score: dict,
             file.write(v + "\n")
 
 
+def rank_pass_two(pass_one_outputfolder, topN, outfolder):
+    updated_postype_dictionaries = {}
+
+    postype_dictionaries=load_extracted_dictionary(pass_one_outputfolder, topN,"verb","noun","any")
+
+
+    for postype, dicts in postype_dictionaries.items():
+        concatenated_dict={}
+        label_sumscores={}
+        for label, _dicts in dicts.items():
+            sum=0
+            for w, score in _dicts.items():
+                if w in concatenated_dict.keys():
+                    concatenated_dict[w]+=int(score)
+                else:
+                    concatenated_dict[w]=int(score)
+                sum+=int(score)
+            label_sumscores[label]=sum
+
+        updated_label_dictionaries = {}
+        for label, _dicts in dicts.items():
+            __dicts = {}
+            for v, score in _dicts.items():
+                new_score=int(score)/concatenated_dict[v] * (int(score)/label_sumscores[label])
+                __dicts[v]=new_score
+            updated_label_dictionaries[label]=__dicts
+
+        updated_postype_dictionaries[postype] = updated_label_dictionaries
+
+    for postype, dicts in updated_postype_dictionaries.items():
+        for label, _dicts in dicts.items():
+            sorted_by_value = sorted(_dicts.items(), reverse=True, key=lambda kv: kv[1])
+            file = open(outfolder + "/" + label + "_" +postype+ ".csv", 'w')
+            for v in sorted_by_value:
+                file.write(v[0]+","+str(v[1]) + "\n")
+
+
+#load dictionaries created by either rank_pass_one, or two
+def load_extracted_dictionary(folder, topN,*permitted_postypes):
+    postype_dictionary={}
+    for file in os.listdir(folder):
+        path_elements=os.path.split(file)
+        identifiers = path_elements[len(path_elements)-1].split("_")
+        label=identifiers[0]
+        postype=identifiers[2]
+        if postype.endswith(".csv"):
+            postype=postype[0: len(postype)-4]
+
+        if postype not in permitted_postypes:
+            continue
+
+        if postype in postype_dictionary.keys():
+            label_dictionary =postype_dictionary[postype]
+        else:
+            label_dictionary ={}
+
+        if label in label_dictionary.keys():
+            dictionary = label_dictionary[label]
+        else:
+            dictionary={}
+
+        with open(folder+"/"+file, newline='\n') as csvfile:
+            csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            count=0
+            for row in csvreader:
+                dictionary[row[0]]=row[1]
+                count+=1
+                if count==topN:
+                    break
+
+        label_dictionary[label]=dictionary
+        postype_dictionary[postype]=label_dictionary
+
+    return postype_dictionary
+
 if __name__ == "__main__":
-    # col 40-label; col 22-desc;
+    #col 40-label; col 22-desc;
     profile_text = load_user_profile_text("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/"
                                           "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv",
                                           15) #22)
     vocab_to_totalfreq, vocab_to_weightedscore, label_to_nouns, label_to_verbs = \
         extract_dict(profile_text)
 
-    create_filtered_dict(
-        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature/frequency",
+    rank_pass_one(
+        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature/name/frequency_pass1",
         vocab_to_totalfreq, label_to_nouns, label_to_verbs,
         200, 100, 100)
 
-    create_filtered_dict(
-        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature/frequency_rel",
-        vocab_to_weightedscore, label_to_nouns, label_to_verbs,
-        20, 10, 10)
+    rank_pass_two("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/"
+                  "dictionary_feature/name/frequency_pass1",
+                  5000,
+                   "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/"
+                   "dictionary_feature/name/frequency_pass2")
