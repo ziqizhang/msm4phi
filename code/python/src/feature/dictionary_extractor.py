@@ -1,6 +1,5 @@
 # this code creates dictionary for different types of user profiles automatically
 import csv
-import functools
 
 import os
 import pandas as pd
