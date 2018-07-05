@@ -57,11 +57,13 @@ def update_word_to_disease(word_to_disease:dict, hashtag_text, disease):
 
 def load_disease_hashtag_dictionary(csvfile):
     out_dict={}
-    csvreader = csv.reader(csvfile, delimiter='\t', quotechar='"')
-    for row in csvreader:
-        word = row[0]
-        diseases=row[1:]
-        out_dict[word]=diseases
+    with open(csvfile, newline='\n') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for row in csvreader:
+            word = row[0].lower()
+            diseases=row[1:]
+            diseases = list(filter(None, diseases))
+            out_dict[word]=diseases
     return out_dict
 
 if __name__=="__main__":

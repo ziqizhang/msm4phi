@@ -1,11 +1,11 @@
-# this code creates dictionary for different types of user profiles automatically
+# this code creates dictionaries (not features) for different types of user profiles automatically
 import csv
 
 import os
 import pandas as pd
 from feature import nlp
 
-text_normalization_option = 1  # 0=stemming, 1=lemma, 2=nothing
+text_normalization_option = 0  # 0=stemming, 1=lemma, 2=nothing
 
 
 
@@ -195,7 +195,10 @@ def load_extracted_dictionary(folder, topN,*permitted_postypes):
         path_elements=os.path.split(file)
         identifiers = path_elements[len(path_elements)-1].split("_")
         label=identifiers[0]
-        postype=identifiers[2]
+        if len(identifiers)==3:
+            postype=identifiers[2]
+        else:
+            postype=identifiers[1]
         if postype.endswith(".csv"):
             postype=postype[0: len(postype)-4]
 
@@ -230,17 +233,15 @@ if __name__ == "__main__":
     #col 40-label; col 22-desc;
     profile_text = load_user_profile_text("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/"
                                           "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv",
-                                          15) #22)
+                                          22) #22-profile; 15-name)
     vocab_to_totalfreq, vocab_to_weightedscore, label_to_nouns, label_to_verbs = \
         extract_dict(profile_text)
 
     rank_pass_one(
-        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature/name/frequency_pass1",
+        "/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass1",
         vocab_to_totalfreq, label_to_nouns, label_to_verbs,
         200, 100, 100)
 
-    rank_pass_two("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/"
-                  "dictionary_feature/name/frequency_pass1",
+    rank_pass_two("/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass1",
                   5000,
-                   "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/"
-                   "dictionary_feature/name/frequency_pass2")
+                   "/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass2")
