@@ -6,6 +6,7 @@ import re
 import pandas as pd
 from feature import dictionary_extractor as de
 from feature import nlp
+from feature import dictionary_extractor_dhashtag as dedh
 
 
 # input: a dictionary containing different dictionaries to be used
@@ -91,6 +92,7 @@ def match_extracted_healthconditions(dictionary: dict, csv_input_feature_file, c
 def match_generic_gazetteer(dictionaries: dict, csv_input_feature_file, col_id, outfile,
                             *col_target_texts):
     df = pd.read_csv(csv_input_feature_file, header=0, delimiter=",", quoting=0).as_matrix()
+    profession_regex = '\b*ist\b'
 
     output_matrix = []
 
@@ -116,7 +118,12 @@ def match_generic_gazetteer(dictionaries: dict, csv_input_feature_file, col_id, 
             if len(toks.intersection(dictionary)) > 0:
                 output_matrix.append("1")
             else:
-                output_matrix.append("0")
+                if k == 'profession' and len(re.findall(profession_regex, target_text)):
+                    output_matrix.append("1")
+                else:
+                    output_matrix.append("0")
+
+
 
         output_matrix.append(row_data)
 
@@ -163,3 +170,66 @@ def find_word_matches(dictionary, target_text, text_normalization_option):
     return scoresum, matchsum, matchmax, matchbool
 
 # Profile: pattern, e.g., 'VERB X X HealthCondition'
+def flatten_dictionary(postype_dictionaries):
+    out_dict={}
+    for postype, dictionaries in postype_dictionaries.items():
+        for label, dicts in dictionaries.items():
+            out_dict[postype+"_"+label]=dicts
+    return out_dict
+
+def load_generic_dictionary(txtfile):
+    with open(txtfile) as f:
+        content = f.readlines()
+    # you may also want to remove whitespace characters like `\n` at the end of each line
+    content = [x.strip() for x in content]
+    return content
+
+if __name__=="__main__":
+    dictionary_folder="/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary"
+    csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/" \
+                   "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv"
+    outfolder="/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature"
+    target_text_cols=[22]
+    target_text_name_suffix="_profile"
+    col_id=0
+
+    #load auto extracted dictionaries, match to 'profile'
+    postype_dictionaries = \
+        de.load_extracted_dictionary(dictionary_folder+"/profile/frequency_pass2",
+                                     5000, "verb", "noun")
+    extracted_dictionaries = flatten_dictionary(postype_dictionaries)
+    match_extracted_dictionary(extracted_dictionaries, csv_input_feature_file,
+                               col_id, outfolder,
+                               target_text_cols)
+
+    #load hashtag dictionaries
+    hashtag_dictionary = dedh.load_disease_hashtag_dictionary(
+        dictionary_folder+"hashtag_dict/dictionary_hashtag_disease.csv"
+    )
+    match_extracted_healthconditions(hashtag_dictionary, csv_input_feature_file, col_id,
+                                     outfolder+"/feature_disease_hashtag_match"+target_text_name_suffix+".csv",
+                                     target_text_cols)
+
+    disease_word_dictionary=dedh.load_disease_hashtag_dictionary(
+        dictionary_folder+"hashtag_dict/dictionary_word_disease.csv"
+    )
+    match_extracted_healthconditions(disease_word_dictionary, csv_input_feature_file, col_id,
+                                     outfolder + "/feature_disease_word_match"+target_text_name_suffix+".csv",
+                                     target_text_cols)
+
+
+    #load other generic dictionaries
+    #person name
+    person_name_dict=load_generic_dictionary(dictionary_folder+"name/person_names.txt")
+    #person title
+    person_title_dict = load_generic_dictionary(dictionary_folder+"person_titles.txt")
+    #profession
+    person_profession_dict = load_generic_dictionary(dictionary_folder+"person_professions.txt")
+    generic_dict={}
+    generic_dict["person_name"]=person_name_dict
+    generic_dict["person_title"]=person_title_dict
+    generic_dict["person_profession"]=person_profession_dict
+    match_generic_gazetteer(generic_dict,csv_input_feature_file,
+                            col_id, outfolder+"feature_generic_dict_match"+target_text_name_suffix+".csv",
+                            target_text_cols)
+

@@ -55,6 +55,15 @@ def update_word_to_disease(word_to_disease:dict, hashtag_text, disease):
     diseases.add(disease)
     word_to_disease[disease_strip_hashtag]=diseases
 
+def load_disease_hashtag_dictionary(csvfile):
+    out_dict={}
+    csvreader = csv.reader(csvfile, delimiter='\t', quotechar='"')
+    for row in csvreader:
+        word = row[0]
+        diseases=row[1:]
+        out_dict[word]=diseases
+    return out_dict
+
 if __name__=="__main__":
     create_disease_dictionary(
         "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/2_PART2_processed_hashtags.tsv",
