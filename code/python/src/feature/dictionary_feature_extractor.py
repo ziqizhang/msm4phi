@@ -224,12 +224,17 @@ if __name__=="__main__":
     #original feature csv file containing at least the text fields to be matched, and user id
     csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/" \
                    "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv"
-    #output folder to save dictionary features
-    outfolder="/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature_2"
-    #column id of the target text field
-    target_text_cols=22 #22=profile text; 15=name field
-    dict_lemstem_option="dict2"
 
+
+
+    #dict1-dictionary created based on lemmatisation; dict2-based on stemming
+    #therefore also change the value'text_normalization_option = 0' in dictionary_extractor to use corresponding normalisation on text
+    dict_lemstem_option="dict2"
+    # output folder to save dictionary features
+    outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature_2"
+
+    # column id of the target text field
+    target_text_cols = 22  # 22=profile text; 15=name field
     target_text_name_suffix="_profile"
     col_id=0
     #how many entries from each dictionary should be selected for matching(top n). Changing this param will generate
