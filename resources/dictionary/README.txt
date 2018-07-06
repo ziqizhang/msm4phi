@@ -1,3 +1,16 @@
-within both 'name' and 'profile' are dictionaries created automatically from the name and profile fields of a user.
++auto_created - dictionaries extracted based on profiles/names
+	- name: extracted based on names
+ 	- profile: extracted based on profiles
+        (within each folder, there are dict1/dict2. Dict1 are matched using lemmatisation to normalise
+         dictionary entries and target texts; dict2 uses stemming; then within either dict1 or 2 there
+        are frequency_pass1/2 folders. Use frequency_pass2)
 
-and in each folder there is dict1 and dict2. for 1 we use lemmatisation; for 2 we use stemming
++hashtag_dict - dictionaries extracted from the 300+ disease hashtags, including original hashtags and also
+   		words extracted from the hashtags
+
+
++manually_created - person_?.txt: manually curated lists of person titles and professions
+   	 	    [other files].txt: manually created type-specific dictionaries (keywords) based on
+		    analysis of a sample
+
+

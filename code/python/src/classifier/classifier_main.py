@@ -65,49 +65,20 @@ class ObjectPairClassifer(object):
     data_feature_file = None
     task_name = None
     identifier=None
-    feature_col_start = None  # inclusive
-    feature_col_end = None  # exclusive 16
-    feature_size = None  # exclusive 12
-    truth_col = None  # inclusive 12
     outfolder=None
 
-    def __init__(self, task, identifier, feature_file, feature_col_start, feature_col_end, feature_size, truth_col,
+    def __init__(self, task, identifier, data_X, data_y,
                  outfolder):
-        self.training_data = numpy.empty
-        self.training_label = numpy.empty
+        self.training_data = data_X
+        self.training_label = data_y
         self.test_data = numpy.empty
-        self.data_feature_file = feature_file
         self.identifier=identifier
         self.task_name = task
-        self.feature_col_start = feature_col_start  # inclusive
-        self.feature_col_end = feature_col_end  # exclusive 16
-        self.feature_size = feature_size  # exclusive 12
-        self.truth_col = truth_col  # inclusive 12
         self.outfolder=outfolder
 
-    def load_training_data(self):
-        df = pd.read_csv(self.data_feature_file, header=0, delimiter=",", quoting=0,
-                         usecols=range(self.feature_col_start, self.feature_col_end)).as_matrix()
 
-        classifier_util.timestamped_print("load training data [%s] from [%s]" % (len(df), self.data_feature_file))
-
-        X, y = df[:, :self.feature_size], \
-               df[:,
-               self.truth_col]  # X selects all rows (:), then up to columns 9; y selects all rows, and column 10 only
-        ##############################
-        # Convert feature vectors to float64 type
-        X = X.astype(numpy.float64)
-
-        ############################
-        self.training_data = X
-        self.training_label = y
-
-
-
-    def load_testing_data(self, testing_file):
-        df = pd.read_csv(testing_file, header=0, delimiter=",", quoting=0,
-                         usecols=range(self.feature_col_start, self.feature_col_end)).as_matrix()
-        self.test_data = df[:, :self.feature_size]
+    def load_testing_data(self, data_test_X):
+        self.test_data = data_test_X
 
     def training(self):
         print("training data size:", len(self.training_data))
