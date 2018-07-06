@@ -1,5 +1,7 @@
 import sys
 
+import datetime
+
 from exp import feature_creator as fc
 from classifier import classifier_main as cm
 
@@ -12,13 +14,21 @@ if __name__ == "__main__":
     #this is the folder to save output to
     outfolder=sys.argv[3]
 
-    #SETTING1 basic features
+    # SETTING1 tfidf weighted nagram features
+    print(datetime.datetime.now())
+    X, y = fc.create_textfeatures_profile_and_name(csv_basic_feature)
+    cls = cm.Classifer("stakeholdercls", "ngram_from_profiles", X, y, outfolder)
+    cls.run()
+
+    #SETTING2 basic features
+    print(datetime.datetime.now())
     X, y=fc.create_basic(csv_basic_feature)
     cls = cm.Classifer("stakeholdercls","basic", X, y,outfolder)
     cls.run()
-
-
-    #SETTING2 basic features + tweet_feature/diseases_in_tweets.csv
+    #
+    #
+    # #SETTING2 basic features + tweet_feature/diseases_in_tweets.csv
+    print(datetime.datetime.now())
     X,y=fc.create_basic_and_autocreated_dictionary(csv_basic_feature,csv_other_feature)
     cls = cm.Classifer("stakeholdercls", "basic+tweetfeature1", X, y, outfolder)
     cls.run()

@@ -34,7 +34,7 @@ ngram_vectorizer = TfidfVectorizer(
             # vectorizer = sklearn.feature_extraction.text.CountVectorizer(
             tokenizer=nlp.tokenize,
             preprocessor=nlp.normalize_tweet,
-            ngram_range=(1, 3),
+            ngram_range=(1, 1),
             stop_words=nlp.stopwords,  # We do better when we keep stopwords
             use_idf=True,
             smooth_idf=False,
@@ -83,35 +83,3 @@ def get_skipgram(tweets, nIn, kIn):
     logger.info("\t\t complete, dim={}, {}".format(tfidf.shape, datetime.datetime.now()))
     vocab = {v: i for i, v in enumerate(vectorizer.get_feature_names())}
     return tfidf, vocab
-
-def other_features_(tweet, cleaned_tweet):
-    """This function takes a string and returns a list of features.
-    These include Sentiment scores, Text and Readability scores,
-    as well as Twitter specific features.
-
-    This is modified to only include those features in the final
-    model."""
-    #print("WARNING>>>>>>>>>>>>>>>>> VADERSENTIMENT DISABLED")
-    sentiment  = nlp.sentiment_analyzer.polarity_scores(tweet)
-
-    words = cleaned_tweet #Get text only
-
-    syllables = textstat.syllable_count(words) #count syllables in words
-    num_chars = sum(len(w) for w in words) #num chars in words
-    num_chars_total = len(tweet)
-    num_terms = len(tweet.split())
-    num_words = len(words.split())
-    avg_syl = round(float((syllables+0.001))/float(num_words+0.001),4)
-    num_unique_terms = len(set(words.split()))
-    ###Modified FK grade, where avg words per sentence is just num words/1
-    FKRA = round(float(0.39 * float(num_words)/1.0) + float(11.8 * avg_syl) - 15.59,1)
-    ##Modified FRE score, where sentence fixed to 1
-    FRE = round(206.835 - 1.015*(float(num_words)/1.0) - (84.6*float(avg_syl)),2)
-
-    features = [FKRA, FRE, syllables, num_chars, num_chars_total, num_terms, num_words,
-                num_unique_terms, sentiment['compound']]
-    #features = pandas.DataFrame(features)
-    return features
-
-
-

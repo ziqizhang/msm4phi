@@ -8,7 +8,6 @@ if __name__=="__main__":
     csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
 
 
-
     #dict1-dictionary created based on lemmatisation; dict2-based on stemming
     #therefore also change the value'text_normalization_option = 0' in dictionary_extractor to use corresponding normalisation on text
     dict_lemstem_option="dict1"

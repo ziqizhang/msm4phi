@@ -50,7 +50,7 @@ MANUAL_SELECTED_FEATURES = []
 # The number of CPUs to use to do the computation. -1 means 'all CPUs'
 NUM_CPU = -1
 
-N_FOLD_VALIDATION = 10
+N_FOLD_VALIDATION = 5
 
 
 #####################################################

@@ -1,4 +1,4 @@
-from keras.layers import Dense
+from keras.layers import Dense, Embedding
 from keras.layers import Dropout
 from keras.models import Sequential
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -14,6 +14,7 @@ from sklearn.model_selection import GridSearchCV
 import os
 from time import time
 import numpy as np
+from classifier import dnn_util as du
 
 
 def learn_discriminative(cpus, nfold, task, load_model, model, X_train, y_train, X_test, y_test,
@@ -24,29 +25,34 @@ def learn_discriminative(cpus, nfold, task, load_model, model, X_train, y_train,
     if (model == "rf"):
         print("== Random Forest ...")
         classifier = RandomForestClassifier(n_estimators=20, n_jobs=cpus)
-        rfc_tuning_params = {"max_depth": [3, 5, None],
-                             "max_features": [1, 3, 5, 7, 10],
-                             "min_samples_split": [2, 5, 10],
-                             "min_samples_leaf": [1, 3, 10],
-                             "bootstrap": [True, False],
-                             "criterion": ["gini", "entropy"]}
+        # rfc_tuning_params = {"max_depth": [3, 5, None],
+        #                      "max_features": [1, 3, 5, 7, 10],
+        #                      "min_samples_split": [2, 5, 10],
+        #                      "min_samples_leaf": [1, 3, 10],
+        #                      "bootstrap": [True, False],
+        #                      "criterion": ["gini", "entropy"]}
+        rfc_tuning_params = {}
         classifier = GridSearchCV(classifier, param_grid=rfc_tuning_params, cv=nfold,
                                   n_jobs=cpus)
         model_file = os.path.join(outfolder, "random-forest_classifier-%s.m" % task)
     if (model == "svm-l"):
-        tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
-                            {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
+        tuned_parameters = [{'C': [0.01]},
+                            {'C': [0.01]}]
+        #tuned_parameters = [{'C': [0.01]}]
+
         print("== SVM, kernel=linear ...")
-        classifier = svm.LinearSVC()
-        classifier = GridSearchCV(classifier, tuned_parameters[1], cv=nfold, n_jobs=cpus)
+        classifier = svm.LinearSVC(class_weight='balanced', C=0.01, penalty='l2', loss='squared_hinge',
+                                   multi_class='ovr')
+        classifier = GridSearchCV(classifier, tuned_parameters[0], cv=nfold, n_jobs=cpus)
         model_file = os.path.join(outfolder, "liblinear-svm-linear-%s.m" % task)
 
     if (model == "svm-rbf"):
-        tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
-                            {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
+        # tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
+        #                     {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
+        tuned_parameters = []
         print("== SVM, kernel=rbf ...")
         classifier = svm.SVC()
-        classifier = GridSearchCV(classifier, param_grid=tuned_parameters[0], cv=nfold, n_jobs=cpus)
+        classifier = GridSearchCV(classifier, param_grid=tuned_parameters, cv=nfold, n_jobs=cpus)
         model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
 
     best_param = []
@@ -83,11 +89,12 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
     model_file = None
     if (model == "sgd"):
         print("== SGD ...")
-        sgd_params = {"loss": ["log", "modified_huber", "squared_hinge", 'squared_loss'],
-                      "penalty": ['l2', 'l1'],
-                      "alpha": [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1],
-                      "n_iter": [1000],
-                      "learning_rate": ["optimal"]}
+        sgd_params = {}
+        # "loss": ["log", "modified_huber", "squared_hinge", 'squared_loss'],
+        #               "penalty": ['l2', 'l1'],
+        #               "alpha": [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1],
+        #               "n_iter": [1000],
+        #               "learning_rate": ["optimal"]}
         classifier = SGDClassifier(loss='log', penalty='l2', n_jobs=cpus)
 
         classifier = GridSearchCV(classifier, param_grid=sgd_params, cv=nfold,
@@ -97,7 +104,7 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
         print("== Stochastic Logistic Regression ...")
         slr_params = {"penalty": ['l2'],
                       "solver": ['liblinear'],
-                      "C": list(np.power(10.0, np.arange(-10, 10))),
+                      #"C": list(np.power(10.0, np.arange(-10, 10))),
                       "max_iter": [10000]}
         classifier = LogisticRegression(random_state=111)
         classifier = GridSearchCV(classifier, param_grid=slr_params, cv=nfold,
@@ -188,3 +195,52 @@ def create_model(input_dim,dropout_rate=0.0):
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
+
+def concat_matrices(matrix1, matrix2):
+    concat = np.concatenate((matrix1,matrix2), axis=1)
+    return concat
+
+
+def create_model(model_descriptor: str, max_index=100, wemb_matrix=None, wdist_matrix=None):
+    '''A model that uses word embeddings'''
+    word_embedding_dim_output=300
+    max_sequence_length_profile=100
+    if wemb_matrix is None:
+        if wdist_matrix is not None:
+            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim_output,
+                                          input_length=max_sequence_length_profile),
+                                Embedding(input_dim=max_index, output_dim=len(wdist_matrix[0]),
+                                          weights=[wdist_matrix],
+                                          input_length=max_sequence_length_profile,
+                                          trainable=False)]
+        else:
+            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim_output,
+                                          input_length=max_sequence_length_profile)]
+
+    else:
+        if wdist_matrix is not None:
+            concat_matrices = du.concat_matrices(wemb_matrix, wdist_matrix)
+            # load pre-trained word embeddings into an Embedding layer
+            # note that we set trainable = False so as to keep the embeddings fixed
+            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(concat_matrices[0]),
+                                          weights=[concat_matrices],
+                                          input_length=max_sequence_length_profile,
+                                          trainable=False)]
+        else:
+            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(wemb_matrix[0]),
+                                          weights=[wemb_matrix],
+                                          input_length=max_sequence_length_profile,
+                                          trainable=False)]
+
+    if model_descriptor.startswith("b_"):
+        model_descriptor = model_descriptor[2:].strip()
+        model = du.create_model_with_branch(embedding_layers, model_descriptor)
+    elif model_descriptor.startswith("f_"):
+        model = du.create_final_model_with_concat_cnn(embedding_layers, model_descriptor)
+    else:
+        model = du.create_model_without_branch(embedding_layers, model_descriptor)
+    # create_model_conv_lstm_multi_filter(embedding_layer)
+
+    # logger.info("New run started at {}\n{}".format(datetime.datetime.now(), model.summary()))
+    return model
+
