@@ -3,14 +3,10 @@ import functools
 import pickle
 
 import logging
-import numpy as np
 from nltk.util import skipgrams
-from sklearn.externals import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
-from textstat.textstat import *
 
 from feature import nlp
-import sys
 
 logger = logging.getLogger(__name__)
 NGRAM_FEATURES_VOCAB="feature_vocab_ngram"

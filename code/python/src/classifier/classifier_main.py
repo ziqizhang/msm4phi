@@ -21,9 +21,9 @@ from classifier import classifier_util
 WITH_SGD = False
 WITH_SLR = False
 WITH_RANDOM_FOREST = False
-WITH_LIBLINEAR_SVM = True
+WITH_LIBLINEAR_SVM = False
 WITH_RBF_SVM = False
-WITH_ANN = False
+WITH_ANN = True
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True
@@ -66,14 +66,17 @@ class Classifer(object):
     identifier = None
     outfolder = None
 
+
     def __init__(self, task, identifier, data_X, data_y,
-                 outfolder):
+                 outfolder, text_data=None, dnn_embedding_file=None):
+        self.test_data=None
         self.training_data = data_X
         self.training_label = data_y
-        self.test_data = None
+        self.text_data = text_data
         self.identifier = identifier
         self.task_name = task
         self.outfolder = outfolder
+        self.dnn_embedding_file=dnn_embedding_file
 
     def load_testing_data(self, data_test_X):
         self.test_data = data_test_X
@@ -127,7 +130,8 @@ class Classifer(object):
 
         ################# Artificial Neural Network #################
         if WITH_ANN:
-            cl.learn_dnn(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "ann", self.feature_size,
+            cl.learn_dnn(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
+                         self.dnn_embedding_file, self.text_data,
                          X_train,
                          y_train, X_test, y_test, self.identifier, self.outfolder)
 
