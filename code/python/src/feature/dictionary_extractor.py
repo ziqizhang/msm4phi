@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from feature import nlp
 
-text_normalization_option = 0  # 0=stemming, 1=lemma, 2=nothing
+text_normalization_option = 1  # 0=stemming, 1=lemma, 2=nothing
 
 
 
@@ -199,7 +199,7 @@ def load_extracted_dictionary(folder, topN,*permitted_postypes):
             postype=identifiers[2]
         else:
             postype=identifiers[1]
-        if postype.endswith(".csv"):
+        if postype.endswith(".csv") or postype.endswith(".txt"):
             postype=postype[0: len(postype)-4]
 
         if postype not in permitted_postypes:
@@ -219,7 +219,10 @@ def load_extracted_dictionary(folder, topN,*permitted_postypes):
             csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
             count=0
             for row in csvreader:
-                dictionary[row[0]]=row[1]
+                if len(row)==2:
+                    dictionary[row[0]]=row[1]
+                else:
+                    dictionary[row[0]]=0.0
                 count+=1
                 if count==topN:
                     break

@@ -13,9 +13,9 @@ if __name__ == "__main__":
     outfolder=sys.argv[3]
 
     #SETTING1 basic features
-    # X, y=fc.create_basic(csv_basic_feature)
-    # cls = cm.Classifer("stakeholdercls","basic", X, y,outfolder)
-    # cls.run()
+    X, y=fc.create_basic(csv_basic_feature)
+    cls = cm.Classifer("stakeholdercls","basic", X, y,outfolder)
+    cls.run()
 
 
     #SETTING2 basic features + tweet_feature/diseases_in_tweets.csv

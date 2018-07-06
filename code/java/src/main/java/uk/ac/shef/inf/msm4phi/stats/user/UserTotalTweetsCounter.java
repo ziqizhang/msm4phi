@@ -39,7 +39,7 @@ public class UserTotalTweetsCounter {
 
         UserTotalTweetsCounter utc = new UserTotalTweetsCounter(start,end,
                 args[0],args[1],args[2],args[3]);
-        List<String[]> users=utc.readUsers(args[4],0,1,13,14);
+        List<String[]> users=utc.readUsers(args[4],0,1,26,27);
         utc.countTweets(users, args[5]);
     }
 

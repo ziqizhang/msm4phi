@@ -30,7 +30,7 @@ public class UserRecentTweetCollector {
                 args[1],args[2],args[3],args[4]
         );
         List<String[]> users=
-                UserTotalTweetsCounter.readUsers(args[5],0,1,13,14);
+                UserTotalTweetsCounter.readUsers(args[5],0,1,26,27);
         utc.countTweets(users, args[6]);
     }
 

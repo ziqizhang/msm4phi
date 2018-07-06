@@ -27,7 +27,7 @@ WITH_ANN = False
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True
-SCALING = False
+SCALING = True
 # feature scaling with bound [0,1] is ncessarily for MNB model
 SCALING_STRATEGY_MIN_MAX = 0
 # MEAN and Standard Deviation scaling is the standard feature scaling method
@@ -70,7 +70,7 @@ class Classifer(object):
                  outfolder):
         self.training_data = data_X
         self.training_label = data_y
-        self.test_data = numpy.empty
+        self.test_data = None
         self.identifier = identifier
         self.task_name = task
         self.outfolder = outfolder
@@ -228,10 +228,12 @@ class Classifer(object):
 
             if SCALING_STRATEGY == SCALING_STRATEGY_MEAN_STD:
                 self.training_data = classifier_util.feature_scaling_mean_std(self.training_data)
-                self.test_data = classifier_util.feature_scaling_mean_std(self.test_data)
+                if self.test_data is not None:
+                    self.test_data = classifier_util.feature_scaling_mean_std(self.test_data)
             elif SCALING_STRATEGY == SCALING_STRATEGY_MIN_MAX:
                 self.training_data = classifier_util.feature_scaling_min_max(self.test_data)
-                self.test_data = classifier_util.feature_scaling_min_max(self.test_data)
+                if self.test_data is not None:
+                    self.test_data = classifier_util.feature_scaling_min_max(self.test_data)
             else:
                 raise ArithmeticError("SCALING STRATEGY IS NOT SET CORRECTLY!")
 

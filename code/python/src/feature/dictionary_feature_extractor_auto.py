@@ -27,19 +27,24 @@ def match_extracted_dictionary(dictionaries: dict, csv_input_feature_file, col_i
     for row in df:
         row_data = [row[col_id]]
         target_text = ""
+
+        skip=False
         for tt_col in col_target_texts:
             text = row[tt_col]
             if type(text) is float:
-                for k in dict_labels:
-                    row_data.append("0")
-                    row_data.append("0")
-                    row_data.append("0")
-                    row_data.append("0")
-                output_matrix.append(row_data)
-                continue
+                skip=True
+                break
 
             target_text += text + " "
 
+        if skip:
+            for k in dict_labels:
+                row_data.append("0")
+                row_data.append("0")
+                row_data.append("0")
+                row_data.append("0")
+            output_matrix.append(row_data)
+            continue
         target_text = target_text.strip()
 
         if len(target_text) < 2:
@@ -77,14 +82,21 @@ def match_extracted_healthconditions(dictionary: dict, csv_input_feature_file, c
     for row in df:
         row_data = [row[col_id]]
         target_text = ""
+
+        skip=False
         for tt_col in col_target_texts:
             text = row[tt_col]
             if type(text) is float:
-                row_data.append("0")
-                row_data.append("0")
-                output_matrix.append(row_data)
-                continue
+                skip=True
+                break
             target_text += row[tt_col] + " "
+
+        if skip:
+            row_data.append("0")
+            row_data.append("0")
+            output_matrix.append(row_data)
+            continue
+
         target_text = target_text.strip().lower()
 
         if len(target_text) < 2:
@@ -125,14 +137,20 @@ def match_generic_gazetteer(dictionaries: dict, csv_input_feature_file, col_id, 
     for row in df:
         row_data = [row[col_id]]
         target_text = ""
+
+        skip=False
         for tt_col in col_target_texts:
             text = row[tt_col]
             if type(text) is float:
-                for k in dict_labels:
-                    row_data.append("0")
-                output_matrix.append(row_data)
-                continue
+                skip=True
+                break;
             target_text += row[tt_col] + " "
+
+        if skip:
+            for k in dict_labels:
+                row_data.append("0")
+            output_matrix.append(row_data)
+            continue
         target_text = target_text.strip().lower()
 
         if len(target_text) < 2:
@@ -222,16 +240,15 @@ if __name__=="__main__":
     #folder containing the dictionaries
     dictionary_folder="/home/zz/Work/msm4phi/resources/dictionary"
     #original feature csv file containing at least the text fields to be matched, and user id
-    csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/" \
-                   "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv"
+    csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
 
 
 
     #dict1-dictionary created based on lemmatisation; dict2-based on stemming
     #therefore also change the value'text_normalization_option = 0' in dictionary_extractor to use corresponding normalisation on text
-    dict_lemstem_option="dict2"
+    dict_lemstem_option="dict1"
     # output folder to save dictionary features
-    outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/stakeholder_classification/dictionary_feature_2"
+    outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/dictionary_feature_1"
 
     # column id of the target text field
     target_text_cols = 22  # 22=profile text; 15=name field
@@ -243,11 +260,11 @@ if __name__=="__main__":
 
     #load auto extracted dictionaries, match to 'profile'
     postype_dictionaries = \
-        de.load_extracted_dictionary(dictionary_folder+"/profile/"+dict_lemstem_option+"/frequency_pass2",
+        de.load_extracted_dictionary(dictionary_folder+"/auto_created/profile/"+dict_lemstem_option+"/frequency_pass2",
                                      topN_of_dict, "verb", "noun")
     extracted_dictionaries = flatten_dictionary(postype_dictionaries)
     match_extracted_dictionary(extracted_dictionaries, csv_input_feature_file,
-                               col_id, outfolder+"/feature_extracted_dict_match"+target_text_name_suffix+".csv",
+                               col_id, outfolder+"/feature_autocreated_dict_match"+target_text_name_suffix+".csv",
                                target_text_cols)
 
     #load hashtag dictionaries
@@ -270,9 +287,9 @@ if __name__=="__main__":
     #person name
     #person_name_dict=load_generic_dictionary(dictionary_folder+"/name/person_names.txt")
     #person title
-    person_title_dict = load_generic_dictionary(dictionary_folder+"/person_titles.txt")
+    person_title_dict = load_generic_dictionary(dictionary_folder+"/manually_created/person_titles.txt")
     #profession
-    person_profession_dict = load_generic_dictionary(dictionary_folder+"/person_professions.txt")
+    person_profession_dict = load_generic_dictionary(dictionary_folder+"/manually_created/person_professions.txt")
     generic_dict={}
     #person name should only be used to match against the 'name' fields
     #generic_dict["person_name"]=person_name_dict
