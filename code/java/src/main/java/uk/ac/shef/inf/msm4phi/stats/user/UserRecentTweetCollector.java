@@ -23,6 +23,17 @@ import java.util.List;
  * (use api)
  */
 public class UserRecentTweetCollector {
+
+    public static void main(String[] args) throws IOException {
+        UserRecentTweetCollector utc = new UserRecentTweetCollector(
+                Integer.valueOf(args[0]),
+                args[1],args[2],args[3],args[4]
+        );
+        List<String[]> users=
+                UserTotalTweetsCounter.readUsers(args[5],0,1,13,14);
+        utc.countTweets(users, args[6]);
+    }
+
     private static final Logger LOG = Logger.getLogger(UserRecentTweetCollector.class.getName());
     private Twitter twitter;
     private int tweetCount;
@@ -61,6 +72,8 @@ public class UserRecentTweetCollector {
             int page=1, total_added=0;
 
             String[] row =new String[3+tweetCount];
+            row[0]=u[0];
+            row[1]=u[1];
             while(true) {
                 LOG.info(String.format("\t\tpage %s",
                         page));
@@ -83,7 +96,7 @@ public class UserRecentTweetCollector {
 
 
                 for(Status s :statuses){
-                    row[total_added+3]=s.getText().replaceAll("\\s+"," ").trim();
+                    row[total_added+2]=s.getText().replaceAll("\\s+"," ").trim();
                     total_added++;
                     if (total_added==tweetCount)
                         break;

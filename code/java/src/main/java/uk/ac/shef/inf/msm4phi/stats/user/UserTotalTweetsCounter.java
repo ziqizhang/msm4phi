@@ -151,7 +151,7 @@ public class UserTotalTweetsCounter {
         csvWriter.close();
     }
 
-    private List<String[]> readUsers(String inputCSV, int colID, int colScreename,
+    static List<String[]> readUsers(String inputCSV, int colID, int colScreename,
                                      int colNT, int colRT) throws IOException {
         Reader reader = Files.newBufferedReader(Paths.get(inputCSV));
         CSVReader csvReader = new CSVReader(reader);
