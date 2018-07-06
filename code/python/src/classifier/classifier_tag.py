@@ -35,4 +35,4 @@ def tag(cpus, model, task, test_data, outfolder):
 
     best_estimator = util.load_classifier_model(model_file)
     prediction_dev = best_estimator.predict_proba(test_data)
-    util.saveOutput(prediction_dev, model,outfolder)
+    util.saveOutput(prediction_dev, model,task,outfolder)

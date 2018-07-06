@@ -1,0 +1,20 @@
+basicN-fold results:
+,precision, recall, f1, support
+Advocates,0.36,0.64,0.46,892
+HPI,0.24,0.05,0.09,365
+HPO,0.22,0.11,0.15,273
+Other,0.48,0.55,0.52,963
+Patient,0.16,0.04,0.06,274
+Research,0.14,0.06,0.09,333
+avg,0.27,0.24,0.23,3100
+
+basic+tweetfeature1N-fold results:
+,precision, recall, f1, support
+Advocates,0.37,0.59,0.46,892
+HPI,0.14,0.09,0.11,365
+HPO,0.21,0.10,0.13,273
+Other,0.47,0.35,0.40,963
+Patient,0.12,0.19,0.15,274
+Research,0.14,0.08,0.10,333
+avg,0.24,0.23,0.22,3100
+

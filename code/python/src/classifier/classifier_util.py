@@ -9,7 +9,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.multiclass import unique_labels
-
+import pandas as pd
 
 def load_classifier_model(classifier_pickled=None):
     if classifier_pickled:
@@ -17,7 +17,7 @@ def load_classifier_model(classifier_pickled=None):
             classifier = pickle.load(model)
         return classifier
 
-def outputFalsePredictions(pred, truth, model_name, task):
+def outputFalsePredictions(pred, truth, model_name, task,outfolder):
     filename = os.path.join(outfolder, "false_nfold_pred-%s-%s.csv" % (model_name, task))
     file = open(filename, "w")
     for p, t in zip(pred, truth):
@@ -29,7 +29,7 @@ def outputFalsePredictions(pred, truth, model_name, task):
             file.write(line)
     file.close()
 
-def saveOutput(prediction, model_name, task):
+def saveOutput(prediction, model_name, task,outfolder):
     filename = os.path.join(outfolder, "prediction-%s-%s.csv" % (model_name, task))
     file = open(filename, "w")
     for entry in prediction:
@@ -65,8 +65,8 @@ def prepare_score_string(p, r, f1, s, labels, target_names, digits):
 
 def save_scores(nfold_predictions, x_test, heldout_predictions, y_test, model_name, task_name,
                 identifier, digits, outfolder):
-    outputFalsePredictions(nfold_predictions, x_test, model_name, task_name)
-    filename = os.path.join(outfolder+"/scores", "%s-%s.csv" % (model_name, task_name))
+    #outputFalsePredictions(nfold_predictions, x_test, model_name, task_name,outfolder)
+    filename = os.path.join(outfolder, "%s-%s.csv" % (model_name, task_name))
     file = open(filename, "a+")
     file.write(identifier)
     if nfold_predictions is not None:
@@ -127,7 +127,7 @@ def validate_training_set(training_set):
     # print("np all isfinite: ", np.all(np.isfinite(training_set)))
     # check any NaN row
     print("Training set info: " + str(training_set.shape))
-
+    df=pd.DataFrame(training_set)
     row_i = 0
     for i in training_set:
         row_i += 1
@@ -169,4 +169,4 @@ def clean_training_data(inFile, outFile):
 
 
 
-clean_training_data("data/raw/training_per_raw.csv","data/raw/training_per_raw_c.csv")
+#clean_training_data("data/raw/training_per_raw.csv","data/raw/training_per_raw_c.csv")
