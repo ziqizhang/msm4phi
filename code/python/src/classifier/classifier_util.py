@@ -63,7 +63,7 @@ def prepare_score_string(p, r, f1, s, labels, target_names, digits):
     string += '{0}'.format(np.sum(s))+"\n\n"
     return string
 
-def save_scores(nfold_predictions, x_test, heldout_predictions, y_test, model_name, task_name,
+def save_scores(nfold_predictions, y_train, heldout_predictions, y_test, model_name, task_name,
                 identifier, digits, outfolder):
     #outputFalsePredictions(nfold_predictions, x_test, model_name, task_name,outfolder)
     filename = os.path.join(outfolder, "%s-%s.csv" % (model_name, task_name))
@@ -71,9 +71,9 @@ def save_scores(nfold_predictions, x_test, heldout_predictions, y_test, model_na
     file.write(identifier)
     if nfold_predictions is not None:
         file.write("N-fold results:\n")
-        labels = unique_labels(x_test, nfold_predictions)
+        labels = unique_labels(y_train, nfold_predictions)
         target_names = ['%s' % l for l in labels]
-        p, r, f1, s = precision_recall_fscore_support(x_test, nfold_predictions,
+        p, r, f1, s = precision_recall_fscore_support(y_train, nfold_predictions,
                                                       labels=labels)
         line=prepare_score_string(p,r,f1,s,labels,target_names,digits)
         file.write(line)

@@ -1,5 +1,6 @@
 import functools
 
+import datetime
 import gensim
 import pandas as pd
 from keras.layers import Embedding
@@ -202,14 +203,15 @@ def learn_dnn(cpus, nfold, task, load_model,
 
         # self.save_classifier_model(best_estimator, ann_model_file)
 
+    print(datetime.datetime.now())
     print("testing on development set ....")
     if (X_test is not None):
         heldout_predictions_final = best_estimator.predict(X_test)
-        util.save_scores(nfold_predictions, text_based_features, heldout_predictions_final, y_test, model, task, identifier, 2,
+        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task, identifier, 2,
                          outfolder)
 
     else:
-        util.save_scores(nfold_predictions, text_based_features, None, y_test, model, task, identifier, 2, outfolder)
+        util.save_scores(nfold_predictions, y_train, None,y_test,"dnn", task, identifier, 2, outfolder)
 
     # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
     #                       time_ann_predict_dev,

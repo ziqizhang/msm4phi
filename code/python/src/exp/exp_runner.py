@@ -18,19 +18,9 @@ if __name__ == "__main__":
     #this is the folder to save output to
     outfolder=sys.argv[3]
 
-    # SETTING1 dnn applied to profile, with numeric features
-    print(datetime.datetime.now())
-    X, y = fc.create_basic_and_autocreated_dictionary(csv_basic_feature, csv_other_feature)
-    df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    df.astype(str)
-    profiles = df[:, 22]
-    profiles = ["" if type(x) is float else x for x in profiles]
-    cls = cm.Classifer("stakeholdercls", "dnn_profile_with_numeric", X, y, outfolder,
-                       text_data=profiles, dnn_embedding_file=dnn_embedding_file)
-    cls.run()
 
-
-    # SETTING1 tfidf weighted nagram features
+    # SETTING1 tfidf weighted nagram (text only. see code how features are
+    # concatenated. You can do the same for text+other numeric) features
     print(datetime.datetime.now())
     X, y = fc.create_textfeatures_profile_and_name(csv_basic_feature)
     cls = cm.Classifer("stakeholdercls", "ngram_from_profiles", X, y, outfolder)
