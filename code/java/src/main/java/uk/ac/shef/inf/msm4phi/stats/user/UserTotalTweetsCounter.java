@@ -80,6 +80,7 @@ public class UserTotalTweetsCounter {
             countU++;
 
             String screenname=u[1];
+
             LOG.info(String.format("processing user %s, %s",
                     screenname, String.valueOf(countU)));
 

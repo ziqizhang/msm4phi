@@ -64,7 +64,8 @@ public class UserRecentTweetCollector {
         int countU=0;
         for(String[] u : users){
             countU++;
-
+            if (countU==17)
+                System.out.println();
             String screenname=u[1];
             LOG.info(String.format("processing user %s, %s",
                     screenname, String.valueOf(countU)));
@@ -87,9 +88,9 @@ public class UserRecentTweetCollector {
                             screenname, ExceptionUtils.getFullStackTrace(e)));
                     try {
                         Thread.sleep(10000);
+                        break;
                     } catch (InterruptedException e1) {
                     }
-                    continue;
                 }
 
                 page++;
@@ -102,7 +103,7 @@ public class UserRecentTweetCollector {
                         break;
                 }
 
-                if(total_added==tweetCount)
+                if(total_added==tweetCount||statuses.size()==0)
                     break;
             }
 

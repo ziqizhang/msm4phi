@@ -2,7 +2,6 @@ import functools
 
 import datetime
 import gensim
-import pandas as pd
 from keras.layers import Embedding
 from keras.preprocessing import sequence
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -17,7 +16,6 @@ from classifier import classifier_util as util
 from sklearn.model_selection import GridSearchCV
 import os
 from time import time
-import numpy as np
 from classifier import dnn_util as du
 
 
@@ -53,10 +51,11 @@ def learn_discriminative(cpus, nfold, task, load_model, model, X_train, y_train,
     if (model == "svm-rbf"):
         # tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
         #                     {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
-        tuned_parameters = []
+        tuned_parameters = [{'C': [0.01]},
+                            {'C': [0.01]}]
         print("== SVM, kernel=rbf ...")
         classifier = svm.SVC()
-        classifier = GridSearchCV(classifier, param_grid=tuned_parameters, cv=nfold, n_jobs=cpus)
+        classifier = GridSearchCV(classifier, param_grid=tuned_parameters[0], cv=nfold, n_jobs=cpus)
         model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
 
     best_param = []

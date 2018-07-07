@@ -21,9 +21,9 @@ from classifier import classifier_util
 WITH_SGD = False
 WITH_SLR = False
 WITH_RANDOM_FOREST = False
-WITH_LIBLINEAR_SVM = False
+WITH_LIBLINEAR_SVM = True
 WITH_RBF_SVM = False
-WITH_ANN = True
+WITH_ANN = False
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True
