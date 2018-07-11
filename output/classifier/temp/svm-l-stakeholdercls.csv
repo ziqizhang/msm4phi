@@ -1,134 +1,134 @@
-ngram_from_profilesN-fold results:,,,,
+ngram_from_profilesN-fold results:
 ,precision, recall, f1, support
 Advocates,0.51,0.43,0.46,892
-HPI,0.4,0.41,0.41,365
+HPI,0.40,0.41,0.41,365
 HPO,0.31,0.37,0.34,273
-Other,0.6,0.63,0.61,963
-Patient,0.27,0.32,0.3,274
+Other,0.60,0.63,0.61,963
+Patient,0.27,0.32,0.30,274
 Research,0.47,0.45,0.46,333
 avg,0.43,0.43,0.43,3100
-,,,,
-basicN-fold results:,,,,
+
+basicN-fold results:
 ,precision, recall, f1, support
 Advocates,0.38,0.49,0.43,892
 HPI,0.25,0.11,0.15,365
-HPO,0.2,0.41,0.26,273
-Other,0.61,0.6,0.61,963
+HPO,0.20,0.41,0.26,273
+Other,0.61,0.60,0.61,963
 Patient,0.24,0.08,0.12,274
 Research,0.21,0.11,0.14,333
-avg,0.31,0.3,0.29,3100
-,,,,
-basic - englishN-fold results:,,,,
+avg,0.31,0.30,0.29,3100
+
+basic - englishN-fold results:
 ,precision, recall, f1, support
 Advocates,0.38,0.49,0.43,892
 HPI,0.25,0.11,0.15,365
-HPO,0.2,0.41,0.26,273
-Other,0.61,0.6,0.61,963
+HPO,0.20,0.41,0.26,273
+Other,0.61,0.60,0.61,963
 Patient,0.24,0.08,0.12,274
 Research,0.21,0.11,0.14,333
-avg,0.31,0.3,0.29,3100
-,,,,
-basic+diseases_in_tweetsN-fold results:,,,,
+avg,0.31,0.30,0.29,3100
+
+basic+diseases_in_tweetsN-fold results:
 ,precision, recall, f1, support
-Advocates,0.4,0.5,0.44,892
+Advocates,0.40,0.50,0.44,892
 HPI,0.27,0.12,0.16,365
 HPO,0.21,0.36,0.26,273
-Other,0.62,0.6,0.61,963
-Patient,0.18,0.1,0.13,274
+Other,0.62,0.60,0.61,963
+Patient,0.18,0.10,0.13,274
 Research,0.24,0.21,0.22,333
 avg,0.32,0.31,0.31,3100
-,,,,
-basic+topical_tweetsN-fold results:,,,,
+
+basic+topical_tweetsN-fold results:
 ,precision, recall, f1, support
 Advocates,0.42,0.48,0.45,892
-HPI,0.23,0.2,0.21,365
-HPO,0.19,0.21,0.2,273
-Other,0.55,0.7,0.61,963
-Patient,0.2,0.06,0.09,274
+HPI,0.23,0.20,0.21,365
+HPO,0.19,0.21,0.20,273
+Other,0.55,0.70,0.61,963
+Patient,0.20,0.06,0.09,274
 Research,0.22,0.11,0.14,333
-avg,0.3,0.29,0.29,3100
-,,,,
-basic+manual_dictionaryN-fold results:,,,,
+avg,0.30,0.29,0.29,3100
+
+basic+manual_dictionaryN-fold results:
 ,precision, recall, f1, support
 Advocates,0.54,0.42,0.47,892
-HPI,0.23,0.1,0.14,365
+HPI,0.23,0.10,0.14,365
 HPO,0.41,0.31,0.35,273
 Other,0.52,0.76,0.62,963
 Patient,0.35,0.24,0.28,274
 Research,0.55,0.74,0.63,333
 avg,0.43,0.43,0.42,3100
-,,,,
-basic+manual_dictionary_gN-fold results:,,,,
+
+basic+manual_dictionary_gN-fold results:
 ,precision, recall, f1, support
-Advocates,0.54,0.4,0.46,892
+Advocates,0.54,0.40,0.46,892
 HPI,0.72,0.32,0.45,365
 HPO,0.43,0.24,0.31,273
 Other,0.55,0.77,0.64,963
 Patient,0.29,0.43,0.35,274
 Research,0.57,0.62,0.59,333
 avg,0.52,0.46,0.47,3100
-,,,,
-basic+autocreated_dictN-fold results:,,,,
+
+basic+autocreated_dictN-fold results:
 ,precision, recall, f1, support
 Advocates,0.67,0.51,0.58,892
 HPI,0.52,0.56,0.54,365
 HPO,0.52,0.58,0.55,273
 Other,0.68,0.77,0.72,963
-Patient,0.48,0.53,0.5,274
+Patient,0.48,0.53,0.50,274
 Research,0.66,0.65,0.66,333
-avg,0.59,0.6,0.59,3100
-,,,,
-basic+hashtag_match_profileN-fold results:,,,,
+avg,0.59,0.60,0.59,3100
+
+basic+hashtag_match_profileN-fold results:
 ,precision, recall, f1, support
-Advocates,0.4,0.36,0.37,892
+Advocates,0.40,0.36,0.37,892
 HPI,0.24,0.15,0.18,365
 HPO,0.18,0.49,0.27,273
-Other,0.6,0.64,0.62,963
+Other,0.60,0.64,0.62,963
 Patient,0.23,0.14,0.17,274
 Research,0.19,0.09,0.12,333
 avg,0.31,0.31,0.29,3100
-,,,,
-basic+word_match_profileN-fold results:,,,,
+
+basic+word_match_profileN-fold results:
 ,precision, recall, f1, support
 Advocates,0.39,0.29,0.33,892
 HPI,0.24,0.12,0.16,365
-HPO,0.2,0.48,0.28,273
+HPO,0.20,0.48,0.28,273
 Other,0.57,0.68,0.62,963
 Patient,0.22,0.23,0.23,274
 Research,0.18,0.09,0.12,333
-avg,0.3,0.31,0.29,3100
-,,,,
-basic+generic_dict_match_nameN-fold results:,,,,
+avg,0.30,0.31,0.29,3100
+
+basic+generic_dict_match_nameN-fold results:
 ,precision, recall, f1, support
 Advocates,0.38,0.58,0.46,892
-HPI,0.5,0.19,0.28,365
+HPI,0.50,0.19,0.28,365
 HPO,0.21,0.37,0.27,273
-Other,0.62,0.6,0.61,963
-Patient,0.18,0.07,0.1,274
+Other,0.62,0.60,0.61,963
+Patient,0.18,0.07,0.10,274
 Research,0.21,0.04,0.06,333
-avg,0.35,0.31,0.3,3100
-,,,,
-basic+generic_dict_match_profileN-fold results:,,,,
+avg,0.35,0.31,0.30,3100
+
+basic+generic_dict_match_profileN-fold results:
 ,precision, recall, f1, support
-Advocates,0.4,0.66,0.5,892
+Advocates,0.40,0.66,0.50,892
 HPI,0.41,0.44,0.43,365
 HPO,0.22,0.26,0.24,273
 Other,0.65,0.54,0.59,963
 Patient,0.24,0.04,0.06,274
 Research,0.45,0.12,0.19,333
-avg,0.4,0.34,0.33,3100
-,,,,
-manual_dict_onlyN-fold results:,,,,
+avg,0.40,0.34,0.33,3100
+
+manual_dict_onlyN-fold results:
 ,precision, recall, f1, support
 Advocates,0.52,0.38,0.44,892
-HPI,0,0,0,365
+HPI,0.00,0.00,0.00,365
 HPO,0.41,0.28,0.33,273
 Other,0.45,0.76,0.57,963
 Patient,0.34,0.22,0.27,274
 Research,0.55,0.74,0.63,333
-avg,0.38,0.4,0.37,3100
-,,,,
-autocreated_dict_onlyN-fold results:,,,,
+avg,0.38,0.40,0.37,3100
+
+autocreated_dict_onlyN-fold results:
 ,precision, recall, f1, support
 Advocates,0.67,0.49,0.57,892
 HPI,0.52,0.55,0.53,365
@@ -137,28 +137,28 @@ Other,0.63,0.75,0.69,963
 Patient,0.47,0.51,0.49,274
 Research,0.66,0.63,0.64,333
 avg,0.58,0.58,0.58,3100
-,,,,
-basic + user_urlN-fold results:,,,,
+
+basic + user_urlN-fold results:
 ,precision, recall, f1, support
 Advocates,0.39,0.21,0.28,892
 HPI,0.27,0.07,0.12,365
-HPO,0.19,0.75,0.3,273
+HPO,0.19,0.75,0.30,273
 Other,0.53,0.67,0.59,963
 Patient,0.23,0.08,0.12,274
 Research,0.24,0.08,0.11,333
 avg,0.31,0.31,0.25,3100
-,,,,
-basic + auto_dict+textN-fold results:,,,,
+
+basic + auto_dict+textN-fold results:
 ,precision, recall, f1, support
 Advocates,0.52,0.45,0.49,892
 HPI,0.43,0.44,0.44,365
 HPO,0.35,0.42,0.38,273
 Other,0.65,0.65,0.65,963
 Patient,0.33,0.39,0.36,274
-Research,0.5,0.52,0.51,333
+Research,0.50,0.52,0.51,333
 avg,0.47,0.48,0.47,3100
-,,,,
-PCA from basic + autocreated_dict + manual_dictN-fold results:,,,,
+
+PCA from basic + autocreated_dict + manual_dictN-fold results:
 ,precision, recall, f1, support
 Advocates,0.65,0.48,0.55,892
 HPI,0.49,0.53,0.51,365
@@ -167,73 +167,44 @@ Other,0.69,0.72,0.71,963
 Patient,0.44,0.53,0.48,274
 Research,0.63,0.71,0.67,333
 avg,0.56,0.59,0.57,3100
-,,,,
-LDA from basic + autocreated_dict + manual_dictN-fold results:,,,,
+
+LDA from basic + autocreated_dict + manual_dictN-fold results:
 ,precision, recall, f1, support
-Advocates,0.68,0.53,0.6,892
+Advocates,0.68,0.53,0.60,892
 HPI,0.53,0.53,0.53,365
 HPO,0.58,0.58,0.58,273
 Other,0.66,0.76,0.71,963
 Patient,0.51,0.52,0.52,274
 Research,0.64,0.72,0.68,333
-avg,0.6,0.61,0.6,3100
-,,,,
-PCA allN-fold results:,,,,
+avg,0.60,0.61,0.60,3100
+
+PCA allN-fold results:
 ,precision, recall, f1, support
 Advocates,0.66,0.52,0.58,892
 HPI,0.57,0.57,0.57,365
 HPO,0.51,0.58,0.54,273
-Other,0.7,0.76,0.73,963
+Other,0.70,0.76,0.73,963
 Patient,0.46,0.57,0.51,274
 Research,0.65,0.69,0.67,333
-avg,0.59,0.61,0.6,3100
-,,,,
-LDA allN-fold results:,,,,
+avg,0.59,0.61,0.60,3100
+
+LDA allN-fold results:
 ,precision, recall, f1, support
 Advocates,0.69,0.56,0.62,892
-HPI,0.62,0.59,0.6,365
-HPO,0.58,0.61,0.6,273
+HPI,0.62,0.59,0.60,365
+HPO,0.58,0.61,0.60,273
 Other,0.69,0.81,0.75,963
 Patient,0.55,0.54,0.54,274
 Research,0.64,0.71,0.68,333
 avg,0.63,0.63,0.63,3100
-,,,,
-PCA+LDA allN-fold results:,,,,
+
+PCA+LDA allN-fold results:
 ,precision, recall, f1, support
 Advocates,0.68,0.55,0.61,892
 HPI,0.61,0.58,0.59,365
 HPO,0.53,0.59,0.56,273
 Other,0.69,0.79,0.74,963
 Patient,0.52,0.54,0.53,274
-Research,0.65,0.7,0.67,333
+Research,0.65,0.70,0.67,333
 avg,0.61,0.62,0.62,3100
-,,,,
-PCA text+numericN-fold results:,,,,
-,precision, recall, f1, support
-Advocates,0.64,0.29,0.4,892
-HPI,0.49,0.5,0.49,365
-HPO,0.35,0.51,0.41,273
-Other,0.59,0.83,0.69,963
-Patient,0.4,0.51,0.45,274
-Research,0.46,0.3,0.37,333
-avg,0.49,0.49,0.47,3100
-LDA text+numericN-fold results:
-,precision, recall, f1, support
-Advocates,0.99,0.89,0.94,892
-HPI,0.96,0.85,0.90,365
-HPO,1.00,0.96,0.98,273
-Other,0.97,1.00,0.98,963
-Patient,0.75,1.00,0.86,274
-Research,0.88,0.95,0.91,333
-avg,0.93,0.94,0.93,3100
-
-LDA text+ all_numericN-fold results:
-,precision, recall, f1, support
-Advocates,0.99,0.90,0.94,892
-HPI,0.96,0.85,0.90,365
-HPO,1.00,0.96,0.98,273
-Other,0.97,0.99,0.98,963
-Patient,0.75,1.00,0.86,274
-Research,0.88,0.95,0.91,333
-avg,0.93,0.94,0.93,3100
 
