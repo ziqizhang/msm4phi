@@ -1,62 +1,55 @@
-Acupuncturist
-Physician
-Energy Healer
-Reiki
-Anesthesiologist
-Anesthesiology Fellow
-Anesthetist
-Therapist
-Cardiologist
-Cardiology Fellow
-Chiroprator
-Intensivist
-Neonatologist
-Practitioner
-Dermatologist
-Paramedic
-Medical Technician
-Endocrinologist
-Geriatrician
-Gastroenterologist
-Haematologist
-Phlebotomist
-Nephrologist
-Neurologist
-Pathologist
-Audiologist
-Oncologist
-Ophthalmologist
-Optometrist
-Otolaryngologist
-Pulmonologist
-Pulmonology Fellow
-Internist
-Pharmacist
-Neonatalologist
-Pediatrician
-Surgeon
-Doctor
-Podiatrist
-Psychiatrist
-Psychologist
-Assistant
-Chiropractor
-Biokineticist
-Athletic Trainer
-Yoga Instructor
-Orthopaedic Technologist
-Radiotherapist
-Radiographer
-Radiologist
-Radiographer
-Mammographer
-Neuroradiographer
-Medical Dosimetry Technologist
-Sonographer
-Obstetrician
-Gynaecologist
-Nurse-Midwife
-Midwife
-Lactation consultant
-Neurosurgeon
-Urologist
+acupuncturist
+physician
+healer
+reiki
+anesthesiologist
+anesthetist
+therapist
+cardiologist
+chiroprator
+intensivist
+neonatologist
+practitioner
+dermatologist
+paramedic
+technician
+endocrinologist
+geriatrician
+gastroenterologist
+haematologist
+phlebotomist
+nephrologist
+neurologist
+pathologist
+audiologist
+oncologist
+ophthalmologist
+optometrist
+otolaryngologist
+pulmonologist
+fellow
+internist
+pharmacist
+neonatalologist
+pediatrician
+surgeon
+doctor
+podiatrist
+psychiatrist
+psychologist
+assistant
+chiropractor
+biokineticist
+trainer
+radiotherapist
+radiographer
+radiologist
+radiographer
+mammographer
+neuroradiographer
+sonographer
+obstetrician
+gynaecologist
+midwife
+neurosurgeon
+urologist

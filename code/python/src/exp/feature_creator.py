@@ -1,7 +1,9 @@
 import numpy
 import pandas as pd
 from feature import text_feature_extractor as tfe
-
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 # this is a text based feature loader
 def create_textfeatures_profile(csv_basic_feature):
@@ -90,6 +92,7 @@ def create_basic_and_diseases_in_tweets(csv_basic_feature, folder_other):
 
     return X_new, y
 
+
 def create_basic_and_topical_tweets(csv_basic_feature, folder_other):
     X, y = create_basic(csv_basic_feature)
     csv_topical_tweets = folder_other + \
@@ -106,17 +109,7 @@ def create_basic_and_topical_tweets(csv_basic_feature, folder_other):
     X_2 = df[:, 2:]
     X_2 = X_2.astype(numpy.float32)
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
-
-    # Add disease_hashtag_match
-    # df2 = pd.read_csv(csv_generic_dict_match_profile , header=0, delimiter=",", quoting=0).as_matrix()
-    # X_3 = df2[:, 1:]
-    # X_3 = X_3.astype(numpy.float32)
-    # numpy.nan_to_num(X_3,False)
-    # X_new = numpy.concatenate([X_new, X_3], axis=1)
-
-    #Add
+    X_new = numpy.concatenate([X, X_2], axis=1)
 
     return X_new, y
 
@@ -143,11 +136,13 @@ def create_basic_and_manual_dictionary(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
     return X_new, y
 
+
 def create_basic_and_manual_dictionary_g(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_manual_dict_feature = folder_other + \
                               "/manual_dict_feature_1/features_manual_dict_g.csv"
@@ -159,7 +154,9 @@ def create_basic_and_manual_dictionary_g(csv_basic_feature, folder_other):
 
     return X_2, y
 
+
 def create_basic_and_autocreated_dictionary(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_auto_dict_feature = folder_other + \
                               "/dictionary_feature_1/feature_autocreated_dict_match_profile.csv"
@@ -168,11 +165,13 @@ def create_basic_and_autocreated_dictionary(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
     return X_new, y
 
+
 def create_basic_and_hashtag_match_profile(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_auto_dict_feature = folder_other + \
                             "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
@@ -181,11 +180,13 @@ def create_basic_and_hashtag_match_profile(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
     return X_new, y
 
+
 def create_basic_and_word_match_profile(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_auto_dict_feature = folder_other + \
                             "/dictionary_feature_1/feature_disease_word_match_profile.csv"
@@ -198,7 +199,9 @@ def create_basic_and_word_match_profile(csv_basic_feature, folder_other):
     # remember to call 'astype' like above on them before concatenating
     return X_new, y
 
+
 def create_basic_and_generic_dict_match_name(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_auto_dict_feature = folder_other + \
                             "/dictionary_feature_1/feature_generic_dict_match_name.csv"
@@ -207,11 +210,13 @@ def create_basic_and_generic_dict_match_name(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
     return X_new, y
 
+
 def create_basic_and_generic_dict_match_profile(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
     csv_auto_dict_feature = folder_other + \
                             "/dictionary_feature_1/feature_generic_dict_match_profile.csv"
@@ -220,14 +225,13 @@ def create_basic_and_generic_dict_match_profile(csv_basic_feature, folder_other)
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
     return X_new, y
 
 
-
-
 def create_manual_dict(csv_basic_feature, folder_other):
+
     X, y = create_basic(csv_basic_feature)
 
     csv_manual_dict_feature = folder_other + \
@@ -237,10 +241,9 @@ def create_manual_dict(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    #X_new = numpy.concatenate([X_2, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
 
     return X_2, y
+
 
 def create_autocreated_dict(csv_basic_feature, folder_other):
     X, y = create_basic(csv_basic_feature)
@@ -252,9 +255,74 @@ def create_autocreated_dict(csv_basic_feature, folder_other):
     X_2 = X_2.astype(numpy.float32)
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
-    #X_new = numpy.concatenate([X_2, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
 
     return X_2, y
+
+
+def create_basic_and_user_url(csv_basic_feature):
+    X, y = create_basic(csv_basic_feature)
+    url_column = 23
+
+    df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+    df = df.astype(str)
+    X_2 = df[:, url_column]
+
+    # change nan values to 0 and urls to 1
+    X_2 = numpy.asarray([0 if x == "nan" else 1 for x in X_2])
+    X_2 = X_2.reshape((len(X_2),1))
+    X_2 = X_2.astype(numpy.float32)
+
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
+    return X_new,y
+
+
+def create_basic_auto_dict_and_text(csv_basic_feature, folder_other):
+    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
+
+    X_2, _ = create_textfeatures_profile_and_name(csv_basic_feature)
+
+    X_new = numpy.concatenate([X, X_2], axis=1)
+
+    return X_new,y
+
+
+def create_pca(csv_basic_feature, folder_other, no_dimensions):
+
+    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
+    X_2, _ = create_manual_dict(csv_basic_feature, folder_other)
+
+    X_new = numpy.concatenate([X,X_2], axis=1)
+
+    # standardize the data
+    X_new = StandardScaler().fit_transform(X_new)
+
+    #do PCA
+    pca = PCA(n_components= no_dimensions)
+    X_pca = pca.fit_transform(X_new)
+
+    return X_pca, y
+
+
+def create_lda(csv_basic_feature, folder_other):
+
+    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
+    X_2, _ = create_manual_dict(csv_basic_feature, folder_other)
+
+    X_new = numpy.concatenate([X,X_2], axis=1)
+
+    print(X_new.shape)
+
+    # standardize the data
+    X_new = StandardScaler().fit_transform(X_new)
+
+    #do LDA
+    lda = LDA()
+    X_lda = lda.fit_transform(X_new,y)
+
+    return X_lda, y
+
+
+
 
 

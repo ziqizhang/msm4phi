@@ -119,6 +119,28 @@ if __name__ == "__main__":
     cls = cm.Classifer("stakeholdercls", "autocreated_dict_only", X, y, outfolder)
     cls.run()
 
+    #SETTING14 basic + user_url
+    print(datetime.datetime.now())
+    X,y=fc.create_basic_and_user_url(csv_basic_feature)
+    cls = cm.Classifer("stakeholdercls", "basic + user_url", X, y, outfolder)
+    cls.run()
 
+    #SETTING15 basic + autocreated_dict + tfidf weighted nagram
+    print(datetime.datetime.now())
+    X,y=fc.create_basic_auto_dict_and_text(csv_basic_feature, csv_other_feature)
+    cls = cm.Classifer("stakeholdercls", "basic + auto_dict+text", X, y, outfolder)
+    cls.run()
+
+    #SETTING16 PCA from basic + autocreated_dict + manual_dict
+    print(datetime.datetime.now())
+    X,y=fc.create_pca(csv_basic_feature, csv_other_feature, no_dimensions=30)
+    cls = cm.Classifer("stakeholdercls", "PCA from basic + autocreated_dict + manual_dict", X, y, outfolder)
+    cls.run()
+
+    #SETTING17 LDA from basic + autocreated_dict + manual_dict
+    print(datetime.datetime.now())
+    X,y=fc.create_lda(csv_basic_feature, csv_other_feature)
+    cls = cm.Classifer("stakeholdercls", "LDA from basic + autocreated_dict + manual_dict", X, y, outfolder)
+    cls.run()
 
 
