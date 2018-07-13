@@ -22,9 +22,14 @@ from time import time
 from classifier import dnn_util as du
 
 
-def create_feature_reduction_alg(feature_reduction):
+def create_feature_reduction_alg(feature_reduction, max_feature=None):
     if feature_reduction=="pca":
-        return 'pca', PCA(n_components=100)
+        if max_feature is not None and max_feature>2000:
+            return 'pca', PCA(n_components=1000)
+        elif max_feature is not None and max_feature<2000:
+            return 'pca', PCA(n_components=int(max_feature/2))
+        else:
+            return 'pca', PCA(n_components=1000)
     else:
         return 'lda', LinearDiscriminantAnalysis(n_components=300)
 
@@ -45,7 +50,7 @@ def learn_discriminative(cpus, nfold, task, load_model, model,
         #                      "bootstrap": [True, False],
         #                      "criterion": ["gini", "entropy"]}
         if feature_reduction is not None:
-            fr = create_feature_reduction_alg(feature_reduction)
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
             print("\t using " + str(fr[1]))
             pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
             classifier = pipe
@@ -57,7 +62,7 @@ def learn_discriminative(cpus, nfold, task, load_model, model,
         cls = svm.LinearSVC(class_weight='balanced', C=0.01, penalty='l2', loss='squared_hinge',
                                    multi_class='ovr')
         if feature_reduction is not None:
-            fr = create_feature_reduction_alg(feature_reduction)
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
             print("\t using " + str(fr[1]))
             pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
             classifier = pipe
@@ -71,7 +76,7 @@ def learn_discriminative(cpus, nfold, task, load_model, model,
         print("== SVM, kernel=rbf ...")
         cls = svm.SVC()
         if feature_reduction is not None:
-            fr = create_feature_reduction_alg(feature_reduction)
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
             pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
             print("\t using " + str(fr[1]))
             classifier = pipe
@@ -112,7 +117,7 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
         #               "learning_rate": ["optimal"]}
         cls = SGDClassifier(loss='log', penalty='l2', n_jobs=cpus)
         if feature_reduction is not None:
-            fr = create_feature_reduction_alg(feature_reduction)
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
             print("\t using " + str(fr[1]))
             pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
             classifier = pipe
@@ -124,7 +129,7 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
 
         cls = LogisticRegression(random_state=111)
         if feature_reduction is not None:
-            fr = create_feature_reduction_alg(feature_reduction)
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
             print("\t using " + str(fr[1]))
             pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
             classifier = pipe

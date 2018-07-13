@@ -3,7 +3,7 @@ import pandas as pd
 from feature import text_feature_extractor as tfe
 
 # this is a text based feature loader
-def create_textfeatures_profile(csv_basic_feature):
+def create_textprofile(csv_basic_feature):
     text_col = 22  # 16-names; 22-profiles
     label_col = 40
 
@@ -20,7 +20,7 @@ def create_textfeatures_profile(csv_basic_feature):
     return X_ngram, y
 
 
-def create_textfeatures_profile_and_name(csv_basic_feature):
+def create_textprofileandname(csv_basic_feature):
     profile_col = 22  # 16-names; 22-profiles
     name_col = 15
     label_col = 40
@@ -60,7 +60,8 @@ def create_basic(csv_basic_feature):
     return X, y
 
 
-def create_basic_and_diseases_in_tweets(csv_basic_feature, folder_other):
+'''basic numeric features and tweet based numeric features (disease in tweets, topical tweets)'''
+def create_numeric(csv_basic_feature, folder_other):
     X, y = create_basic(csv_basic_feature)
     csv_diseases_in_tweets = folder_other + \
                                    "/tweet_feature/diseases_in_tweets.csv"
@@ -72,142 +73,13 @@ def create_basic_and_diseases_in_tweets(csv_basic_feature, folder_other):
     X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
     # remember to call 'astype' like above on them before concatenating
 
-    return X_new, y
-
-
-def create_basic_and_topical_tweets(csv_basic_feature, folder_other):
-    X, y = create_basic(csv_basic_feature)
     csv_topical_tweets = folder_other + \
-                                   "/tweet_feature/topical_tweets.csv"
-    # csv_disease_hashtag_match_profile = folder_other + \
-    #                                     "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
-    # csv_disease_word_match_profile = folder_other + \
-    #                                  "/dictionary_feature_1/feature_disease_word_match_profile.csv"
-    # csv_generic_dict_match_name = folder_other + \
-    #                               "/dictionary_feature_1/feature_generic_dict_match_name.csv"
-    # csv_generic_dict_match_profile = folder_other + \
-    #                                  "/dictionary_feature_1/feature_generic_dict_match_profile.csv"
+                         "/tweet_feature/topical_tweets.csv"
     df = pd.read_csv(csv_topical_tweets, header=0, delimiter=",", quoting=0).as_matrix()
     X_2 = df[:, 2:]
     X_2 = X_2.astype(numpy.float32)
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new, y
-
-
-# def create_basic_diseases_and_topical_tweets(csv_basic_feature, folder_other):
-#     X, y = create_basic_and_autocreated_dictionary(csv_basic_feature, folder_other)
-#     csv_autocreated_dict_feature = folder_other + \
-#                                    "/tweet_feature/topical_tweets.csv"
-#     df = pd.read_csv(csv_autocreated_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-#     X_2 = df[:, 2:]
-#     X_2 = X_2.astype(numpy.float32)
-#     X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-#     # remember to call 'astype' like above on them before concatenating
-#
-#     return X_new, y
-
-
-def create_basic_and_manual_dictionary(csv_basic_feature, folder_other):
-    X, y = create_basic(csv_basic_feature)
-    csv_manual_dict_feature = folder_other + \
-                              "/manual_dict_feature_1/feature_manualcreated_dict_match_profile.csv"
-    df = pd.read_csv(csv_manual_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new, y
-
-
-def create_basic_and_manual_dictionary_g(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_manual_dict_feature = folder_other + \
-                              "/manual_dict_feature_1/features_manual_dict_g.csv"
-    df = pd.read_csv(csv_manual_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-
-    return X_2, y
-
-
-def create_basic_and_autocreated_dictionary(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_auto_dict_feature = folder_other + \
-                              "/dictionary_feature_1/feature_autocreated_dict_match_profile.csv"
-    df = pd.read_csv(csv_auto_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new, y
-
-
-def create_basic_and_hashtag_match_profile(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_auto_dict_feature = folder_other + \
-                            "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
-    df = pd.read_csv(csv_auto_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new, y
-
-
-def create_basic_and_word_match_profile(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_auto_dict_feature = folder_other + \
-                            "/dictionary_feature_1/feature_disease_word_match_profile.csv"
-    df = pd.read_csv(csv_auto_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)  # you can keep concatenating other matrices here. but
-    # remember to call 'astype' like above on them before concatenating
-    return X_new, y
-
-
-def create_basic_and_generic_dict_match_name(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_auto_dict_feature = folder_other + \
-                            "/dictionary_feature_1/feature_generic_dict_match_name.csv"
-    df = pd.read_csv(csv_auto_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new, y
-
-
-def create_basic_and_generic_dict_match_profile(csv_basic_feature, folder_other):
-
-    X, y = create_basic(csv_basic_feature)
-    csv_auto_dict_feature = folder_other + \
-                            "/dictionary_feature_1/feature_generic_dict_match_profile.csv"
-    df = pd.read_csv(csv_auto_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    X_2 = df[:, 1:]
-    X_2 = X_2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_2,False)
-    X_new = numpy.concatenate([X, X_2], axis=1)
+    numpy.nan_to_num(X_2, False)
+    X_new = numpy.concatenate([X_new, X_2], axis=1)
 
     return X_new, y
 
@@ -241,6 +113,40 @@ def create_autocreated_dict(csv_basic_feature, folder_other):
     return X_2, y
 
 
+#auto dict, adds hashtags and words matched against profiles
+def create_autocreated_dictext(csv_basic_feature, folder_other):
+    X, y = create_basic(csv_basic_feature)
+
+    csv_autocreated_dict_feature = folder_other + \
+                                   "/dictionary_feature_1/feature_autocreated_dict_match_profile.csv"
+    df = pd.read_csv(csv_autocreated_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
+    X_2 = df[:, 1:]
+    X_2 = X_2.astype(numpy.float32)
+    # replace nan values to 0
+    numpy.nan_to_num(X_2,False)
+
+    csv_tweet_hashtag = folder_other + \
+                        "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
+    df = pd.read_csv(csv_tweet_hashtag, header=0, delimiter=",", quoting=0).as_matrix()
+    X_tweet_hashtag = df[:, 1:]
+    X_tweet_hashtag = X_tweet_hashtag.astype(numpy.float32)
+    # replace nan values to 0
+    numpy.nan_to_num(X_tweet_hashtag, False)
+
+    csv_tweet_word = folder_other + \
+                     "/dictionary_feature_1/feature_disease_word_match_profile.csv"
+    df = pd.read_csv(csv_tweet_word, header=0, delimiter=",", quoting=0).as_matrix()
+    X_tweet_word = df[:, 1:]
+    X_tweet_word = X_tweet_word.astype(numpy.float32)
+    # replace nan values to 0
+    numpy.nan_to_num(X_tweet_word, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_2, X_tweet_hashtag, X_tweet_word], axis=1)
+
+    return X_all, y
+
 def create_basic_and_user_url(csv_basic_feature):
     X, y = create_basic(csv_basic_feature)
     url_column = 23
@@ -253,16 +159,6 @@ def create_basic_and_user_url(csv_basic_feature):
     X_2 = numpy.asarray([0 if x == "nan" else 1 for x in X_2])
     X_2 = X_2.reshape((len(X_2),1))
     X_2 = X_2.astype(numpy.float32)
-
-    X_new = numpy.concatenate([X, X_2], axis=1)
-
-    return X_new,y
-
-
-def create_basic_auto_dict_and_text(csv_basic_feature, folder_other):
-    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
-
-    X_2, _ = create_textfeatures_profile_and_name(csv_basic_feature)
 
     X_new = numpy.concatenate([X, X_2], axis=1)
 
@@ -319,33 +215,91 @@ def get_all_numeric_features(csv_basic_feature, folder_other):
     # replace nan values to 0
     numpy.nan_to_num(X_tweet_word,False)
 
-    csv_tweet_generic_dict1 = folder_other + \
-                              "/dictionary_feature_1/feature_generic_dict_match_name.csv"
-    df = pd.read_csv(csv_tweet_generic_dict1, header=0, delimiter=",", quoting=0).as_matrix()
-    X_tweet_generic_dict1 = df[:, 1:]
-    X_tweet_generic_dict1 = X_tweet_generic_dict1.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_tweet_generic_dict1,False)
-
-    csv_tweet_generic_dict2 = folder_other + \
-                              "/dictionary_feature_1/feature_generic_dict_match_profile.csv"
-    df = pd.read_csv(csv_tweet_generic_dict2, header=0, delimiter=",", quoting=0).as_matrix()
-    X_tweet_generic_dict2 = df[:, 1:]
-    X_tweet_generic_dict2 = X_tweet_generic_dict2.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_tweet_generic_dict2,False)
-
     # concatenate all feature sets
     #basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
     X_all = numpy.concatenate([X_basic, X_manual, X_auto, X_diseases_tweets, X_topical_tweets, X_manual_g,
-                               X_tweet_hashtag, X_tweet_word, X_tweet_generic_dict1, X_tweet_generic_dict2], axis=1)
+                               X_tweet_hashtag, X_tweet_word], axis=1)
     print("Size of the array: ")
     print(X_all.shape)
 
     return X_all, y
 
 
+def create_text_and_numeric(csv_basic_feature, folder_other):
+    X_numeric, y = create_numeric(csv_basic_feature,folder_other)
+    X_text,_ = create_textprofile(csv_basic_feature)
+
+    # replace nan values to 0
+    numpy.nan_to_num(X_numeric, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_numeric], axis=1)
+    print("Size of the array: ")
+    print(X_all.shape)
+
+    return X_all, y
 
 
+def create_text_and_manualdict(csv_basic_feature, folder_other):
+    X_manualdict, y = create_manual_dict(csv_basic_feature, folder_other)
+    X_text, _ = create_textprofile(csv_basic_feature)
+
+    # replace nan values to 0
+    numpy.nan_to_num(X_manualdict, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_manualdict], axis=1)
+    print("Size of the array: ")
+    print(X_all.shape)
+
+    return X_all, y
 
 
+def create_text_and_autodict(csv_basic_feature, folder_other):
+    X_autodict, y = create_autocreated_dict(csv_basic_feature, folder_other)
+    X_text, _ = create_textprofile(csv_basic_feature)
+
+    # replace nan values to 0
+    numpy.nan_to_num(X_autodict, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_autodict], axis=1)
+    print("Size of the array: ")
+    print(X_all.shape)
+
+    return X_all, y
+
+def create_text_and_autodictext(csv_basic_feature, folder_other):
+    X_autodictext, y = create_autocreated_dictext(csv_basic_feature, folder_other)
+    X_text, _ = create_textprofile(csv_basic_feature)
+
+    # replace nan values to 0
+    numpy.nan_to_num(X_autodictext, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_autodictext], axis=1)
+    print("Size of the array: ")
+    print(X_all.shape)
+
+    return X_all, y
+
+
+def create_text_and_numeric_and_autodictext(csv_basic_feature, folder_other):
+    X_numeric, y = create_numeric(csv_basic_feature, folder_other)
+    X_autodictext, _ = create_autocreated_dictext(csv_basic_feature, folder_other)
+    X_text, _ = create_textprofile(csv_basic_feature)
+
+    # replace nan values to 0
+    numpy.nan_to_num(X_autodictext, False)
+
+    # concatenate all feature sets
+    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_numeric,X_autodictext], axis=1)
+    print("Size of the array: ")
+    print(X_all.shape)
+
+    return X_all, y

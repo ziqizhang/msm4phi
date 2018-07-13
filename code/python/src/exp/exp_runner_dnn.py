@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     # SETTING1 dnn applied to profile, with numeric features
     print(datetime.datetime.now())
-    X, y = fc.create_basic_and_autocreated_dictionary(csv_basic_feature, csv_other_feature)
+    X, y = fc.create_basic_and_autodict(csv_basic_feature, csv_other_feature)
     df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
     df.astype(str)
     profiles = df[:, 22]

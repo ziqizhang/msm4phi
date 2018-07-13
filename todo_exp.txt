@@ -1,13 +1,26 @@
-text
-text+lda
-text+lda, then auto dict,
-text+lda, then manual dict,
-text+lda, then auto dict, then basic numeric, and other numeric
-text+lda, then manual dict, then basic numeric, and other numeric
+try text on profiles only
+try non empty profiles only
+try filled profiles
+try different top N for auto dict
+try different features for different classes (1 vs all)
+try P and R balance
 
+
+text
+text+pca
+text+pca, then auto dict,
+text+pca, then manual dict,
+text+pca, then auto dict, then basic numeric, and other numeric
+text+pca, then manual dict, then basic numeric, and other numeric
+
+text, then auto dict,
+text, then manual dict,
+text, then auto dict, then basic numeric, and other numeric
+text, then manual dict, then basic numeric, and other numeric
 
 DNN
-text 
+text 	x (CNN) todo: skipped CNN, LSTM
+	
 text+auto dict
 text+manual dict,
 text+auto dict, then basic numeric, and other numeric
