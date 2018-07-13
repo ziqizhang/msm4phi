@@ -26,7 +26,6 @@ if __name__ == "__main__":
     X, y = fc.create_textfeatures_profile_and_name(csv_basic_feature)
     cls = cm.Classifer("stakeholdercls", "_text(p+n)_", X, y, outfolder)
     cls.run()
-    exit(0)
 
     #SETTING2 basic features
     print(datetime.datetime.now())
@@ -132,50 +131,3 @@ if __name__ == "__main__":
     cls = cm.Classifer("stakeholdercls", "_basic + auto_dict+text(p+n)_", X, y, outfolder)
     cls.run()
 
-    #SETTING16 PCA from basic + autocreated_dict + manual_dict
-    print(datetime.datetime.now())
-    X,y=fc.create_pca(csv_basic_feature, csv_other_feature, no_dimensions=30)
-    cls = cm.Classifer("stakeholdercls", "_PCA from: basic + autocreated_dict + manual_dict_", X, y, outfolder)
-    cls.run()
-
-    #SETTING17 LDA from basic + autocreated_dict + manual_dict
-    print(datetime.datetime.now())
-    X,y=fc.create_lda_auto_manual_dict_and_basic(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_LDA from: basic + autocreated_dict + manual_dict_", X, y, outfolder)
-    cls.run()
-
-    #SETTING18 PCA on all numeric features
-    print(datetime.datetime.now())
-    X,y=fc.create_pca_all(csv_basic_feature, csv_other_feature, 30)
-    cls = cm.Classifer("stakeholdercls", "_PCA all numeric_", X, y, outfolder)
-    cls.run()
-
-    #SETTING19 LDA on all numeric features
-    print(datetime.datetime.now())
-    X,y=fc.create_lda_all(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_LDA all numeric_", X, y, outfolder)
-    cls.run()
-
-    #SETTING20 PCA+LDA on all numeric features
-    print(datetime.datetime.now())
-    X,y=fc.create_pca_and_lda_all(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_PCA+LDA all numeric_", X, y, outfolder)
-    cls.run()
-
-    #SETTING21 PCA on text+numeric
-    print(datetime.datetime.now())
-    X,y=fc.create_pca_text_and_autodict(csv_basic_feature, csv_other_feature, 20)
-    cls = cm.Classifer("stakeholdercls", "_PCA: text+auto dict_", X, y, outfolder)
-    cls.run()
-
-    #SETTING22 LDA on text+numeric
-    print(datetime.datetime.now())
-    X,y=fc.create_lda_text_and_autodict(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_LDA: text+numeric_", X, y, outfolder)
-    cls.run()
-
-    #SETTING23 LDA on text+ all numeric
-    print(datetime.datetime.now())
-    X,y=fc.create_lda_text_and_numeric_all(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_LDA: text+ all_numeric_", X, y, outfolder)
-    cls.run()

@@ -1,9 +1,6 @@
 import numpy
 import pandas as pd
 from feature import text_feature_extractor as tfe
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 # this is a text based feature loader
 def create_textfeatures_profile(csv_basic_feature):
@@ -46,21 +43,6 @@ def create_textfeatures_profile_and_name(csv_basic_feature):
     X_ngram = numpy.concatenate([name_ngram, profile_ngram], axis=1)
 
     return X_ngram, y
-
-
-def create_textfeatures_name(csv_basic_feature):
-    text_col = 16  # 16-names; 23-profiles
-    label_col = 40
-
-    df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    y = df[:, label_col]
-
-    texts = df[:, text_col]
-    # Convert feature vectors to float64 type
-    X_ngram, vocab = tfe.get_ngram_tfidf(texts)
-
-    return X_ngram, y
-
 
 # this is the basic feature loader, using only the stats from indexed data.
 def create_basic(csv_basic_feature):
@@ -287,42 +269,6 @@ def create_basic_auto_dict_and_text(csv_basic_feature, folder_other):
     return X_new,y
 
 
-def create_pca(csv_basic_feature, folder_other, no_dimensions):
-
-    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
-    X_2, _ = create_manual_dict(csv_basic_feature, folder_other)
-
-    X_new = numpy.concatenate([X,X_2], axis=1)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_new)
-
-    #do PCA
-    pca = PCA(n_components= no_dimensions)
-    X_pca = pca.fit_transform(X_new)
-
-    return X_pca, y
-
-
-def create_lda_auto_manual_dict_and_basic(csv_basic_feature, folder_other):
-
-    X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
-    X_2, _ = create_manual_dict(csv_basic_feature, folder_other)
-
-    X_new = numpy.concatenate([X,X_2], axis=1)
-
-    print(X_new.shape)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_new)
-
-    #do LDA
-    lda = LDA()
-    X_lda = lda.fit_transform(X_new,y)
-
-    return X_lda, y
-
-
 def get_all_numeric_features(csv_basic_feature, folder_other):
 
     # get all numeric features
@@ -398,97 +344,7 @@ def get_all_numeric_features(csv_basic_feature, folder_other):
 
     return X_all, y
 
-def create_pca_all(csv_basic_feature, folder_other, no_dimensions):
 
-    X_all, y = get_all_numeric_features(csv_basic_feature, folder_other)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_all)
-
-    #do PCA
-    pca = PCA(n_components= no_dimensions)
-    X_pca = pca.fit_transform(X_new)
-
-    return X_pca, y
-
-
-def create_lda_all(csv_basic_feature, folder_other):
-
-    X_all, y = get_all_numeric_features(csv_basic_feature, folder_other)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_all)
-
-    #do LDA
-    lda = LDA()
-    X_lda = lda.fit_transform(X_new,y)
-
-    return X_lda, y
-
-def create_pca_and_lda_all(csv_basic_feature, folder_other):
-
-    X_all, y = get_all_numeric_features(csv_basic_feature, folder_other)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_all)
-
-    #do PCA
-    pca = PCA(n_components= 50)
-    X_pca = pca.fit_transform(X_new)
-
-    #do LDA
-    lda = LDA()
-    X_lda = lda.fit_transform(X_pca,y)
-
-    return X_lda,y
-
-
-def create_pca_text_and_autodict(csv_basic_feature, folder_other, no_dimensions):
-
-    X, y = create_basic_auto_dict_and_text(csv_basic_feature, folder_other)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X)
-
-    #do PCA
-    pca = PCA(n_components= no_dimensions)
-    X_pca = pca.fit_transform(X_new)
-
-    return X_pca, y
-
-def create_lda_text_and_autodict(csv_basic_feature, folder_other):
-
-    X, y = create_basic_auto_dict_and_text(csv_basic_feature, folder_other)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X)
-
-    #do LDA
-    print("before LDA:")
-    print(X_new.shape)
-    lda = LDA()
-    X_lda = lda.fit_transform(X_new,y)
-
-    return X_lda, y
-
-def create_lda_text_and_numeric_all(csv_basic_feature, folder_other):
-
-    X, y = create_textfeatures_profile_and_name(csv_basic_feature)
-
-    X_2, _ = create_lda_all(csv_basic_feature, folder_other)
-
-    X_new = numpy.concatenate([X,X_2], axis=1)
-
-    # standardize the data
-    X_new = StandardScaler().fit_transform(X_new)
-
-    #do LDA
-    print("before LDA:")
-    print(X_new.shape)
-    lda = LDA()
-    X_lda = lda.fit_transform(X_new,y)
-
-    return X_lda, y
 
 
 
