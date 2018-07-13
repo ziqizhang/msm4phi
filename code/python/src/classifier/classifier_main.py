@@ -25,15 +25,11 @@ WITH_LIBLINEAR_SVM = True
 WITH_RBF_SVM = False
 WITH_ANN = False
 
+FEATURE_REDUCTION=None #pca or lda or None
+
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True
 SCALING = True
-# feature scaling with bound [0,1] is ncessarily for MNB model
-SCALING_STRATEGY_MIN_MAX = 0
-# MEAN and Standard Deviation scaling is the standard feature scaling method
-SCALING_STRATEGY_MEAN_STD = 1
-SCALING_STRATEGY = SCALING_STRATEGY_MEAN_STD
-
 # DIRECTLY LOAD PRE-TRAINED MODEL FOR PREDICTION
 # ENABLE THIS VARIABLE TO TEST NEW TEST SET WITHOUT TRAINING
 LOAD_MODEL_FROM_FILE = False
@@ -66,17 +62,16 @@ class Classifer(object):
     identifier = None
     outfolder = None
 
-
     def __init__(self, task, identifier, data_X, data_y,
                  outfolder, text_data=None, dnn_embedding_file=None):
-        self.test_data=None
+        self.test_data = None
         self.training_data = data_X
         self.training_label = data_y
         self.text_data = text_data
         self.identifier = identifier
         self.task_name = task
         self.outfolder = outfolder
-        self.dnn_embedding_file=dnn_embedding_file
+        self.dnn_embedding_file = dnn_embedding_file
 
     def load_testing_data(self, data_test_X):
         self.test_data = data_test_X
@@ -103,37 +98,43 @@ class Classifer(object):
         if WITH_SGD:
             cl.learn_generative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "sgd", X_train,
                                 y_train,
-                                X_test, y_test, self.identifier, self.outfolder)
+                                X_test, y_test, self.identifier, self.outfolder,
+                                FEATURE_REDUCTION)
 
         ######################### Stochastic Logistic Regression#######################
         if WITH_SLR:
             cl.learn_generative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "lr", X_train,
                                 y_train,
-                                X_test, y_test, self.identifier, self.outfolder)
+                                X_test, y_test, self.identifier, self.outfolder,
+                                FEATURE_REDUCTION)
 
         ######################### Random Forest Classifier #######################
         if WITH_RANDOM_FOREST:
             cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "rf", X_train,
                                     y_train,
-                                    X_test, y_test, self.identifier, self.outfolder)
+                                    X_test, y_test, self.identifier, self.outfolder,
+                                    FEATURE_REDUCTION)
 
         ###################  liblinear SVM ##############################
         if WITH_LIBLINEAR_SVM:
             cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "svm-l", X_train,
-                                    y_train, X_test, y_test, self.identifier, self.outfolder)
+                                    y_train, X_test, y_test, self.identifier, self.outfolder,
+                                    FEATURE_REDUCTION)
 
         ##################### RBF svm #####################
         if WITH_RBF_SVM:
             cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "svm-rbf",
                                     X_train,
-                                    y_train, X_test, y_test, self.identifier, self.outfolder)
+                                    y_train, X_test, y_test, self.identifier, self.outfolder,
+                                    FEATURE_REDUCTION)
 
         ################# Artificial Neural Network #################
         if WITH_ANN:
             cl.learn_dnn(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
                          self.dnn_embedding_file, self.text_data,
                          X_train,
-                         y_train, X_test, y_test, self.identifier, self.outfolder)
+                         y_train, X_test, y_test, self.identifier, self.outfolder,
+                         FEATURE_REDUCTION)
 
         print("complete!")
 
@@ -228,31 +229,26 @@ class Classifer(object):
 
         # ============== feature scaling =====================
         if SCALING:
-            print("feature scaling method: [%s]" % SCALING_STRATEGY)
+            print("feature scaling method: standard dev")
 
-            if SCALING_STRATEGY == SCALING_STRATEGY_MEAN_STD:
-                self.training_data = classifier_util.feature_scaling_mean_std(self.training_data)
-                if self.test_data is not None:
-                    self.test_data = classifier_util.feature_scaling_mean_std(self.test_data)
-            elif SCALING_STRATEGY == SCALING_STRATEGY_MIN_MAX:
-                self.training_data = classifier_util.feature_scaling_min_max(self.test_data)
-                if self.test_data is not None:
-                    self.test_data = classifier_util.feature_scaling_min_max(self.test_data)
-            else:
-                raise ArithmeticError("SCALING STRATEGY IS NOT SET CORRECTLY!")
+            self.training_data = classifier_util.feature_scaling_mean_std(self.training_data)
+            if self.test_data is not None:
+                self.test_data = classifier_util.feature_scaling_mean_std(self.test_data)
 
-                # print("example training data after scaling:", classifier.training_data[0])
+            # print("example training data after scaling:", classifier.training_data[0])
+
         else:
             print("training without feature scaling!")
 
-        # ============= random sampling =================================
-        # print("training data size before resampling:", len(classifier.training_data))
-        # X_resampled, y_resampled = classifier.under_sampling(classifier.training_data,                                                         classifier.training_label)
-        # print("training data size after resampling:", len(X_resampled))
-        # enable this line to visualise the data
-        # classifier.training_data = X_resampled
-        # classifier.training_label = y_resampled
 
-        # start the n-fold testing.
+# ============= random sampling =================================
+# print("training data size before resampling:", len(classifier.training_data))
+# X_resampled, y_resampled = classifier.under_sampling(classifier.training_data,                                                         classifier.training_label)
+# print("training data size after resampling:", len(X_resampled))
+# enable this line to visualise the data
+# classifier.training_data = X_resampled
+# classifier.training_label = y_resampled
+
+# start the n-fold testing.
         self.training()
-        # classifier.testing()
+# classifier.testing()

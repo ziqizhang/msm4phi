@@ -1,0 +1,10 @@
+_text(p+n)_N-fold results:
+,precision, recall, f1, support
+Advocates,0.36,0.28,0.31,892
+HPI,0.23,0.21,0.22,365
+HPO,0.22,0.16,0.19,273
+Other,0.50,0.46,0.48,963
+Patient,0.13,0.30,0.18,274
+Research,0.23,0.26,0.24,333
+avg,0.28,0.28,0.27,3100
+

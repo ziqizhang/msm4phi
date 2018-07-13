@@ -6,11 +6,14 @@ from keras.layers import Embedding
 from keras.preprocessing import sequence
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn import svm
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import cross_val_predict
+from sklearn.pipeline import Pipeline
 
 from classifier import classifier_util as util
 from sklearn.model_selection import GridSearchCV
@@ -19,65 +22,76 @@ from time import time
 from classifier import dnn_util as du
 
 
-def learn_discriminative(cpus, nfold, task, load_model, model, X_train, y_train, X_test, y_test,
-                         identifier, outfolder):
+def create_feature_reduction_alg(feature_reduction):
+    if feature_reduction=="pca":
+        return 'pca', PCA()
+    else:
+        return 'lda', LinearDiscriminantAnalysis()
+
+
+def learn_discriminative(cpus, nfold, task, load_model, model,
+                         X_train, y_train, X_test, y_test,
+                         identifier, outfolder,feature_reduction=None):
     classifier = None
     model_file = None
 
     if (model == "rf"):
         print("== Random Forest ...")
-        classifier = RandomForestClassifier(n_estimators=20, n_jobs=cpus)
+        cls = RandomForestClassifier(n_estimators=20, n_jobs=cpus)
         # rfc_tuning_params = {"max_depth": [3, 5, None],
         #                      "max_features": [1, 3, 5, 7, 10],
         #                      "min_samples_split": [2, 5, 10],
         #                      "min_samples_leaf": [1, 3, 10],
         #                      "bootstrap": [True, False],
         #                      "criterion": ["gini", "entropy"]}
-        rfc_tuning_params = {}
-        classifier = GridSearchCV(classifier, param_grid=rfc_tuning_params, cv=nfold,
-                                  n_jobs=cpus)
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction)
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
         model_file = os.path.join(outfolder, "random-forest_classifier-%s.m" % task)
     if (model == "svm-l"):
-        tuned_parameters = [{'C': [0.01]},
-                            {'C': [0.01]}]
-        # tuned_parameters = [{'C': [0.01]}]
-
         print("== SVM, kernel=linear ...")
-        classifier = svm.LinearSVC(class_weight='balanced', C=0.01, penalty='l2', loss='squared_hinge',
+        cls = svm.LinearSVC(class_weight='balanced', C=0.01, penalty='l2', loss='squared_hinge',
                                    multi_class='ovr')
-        classifier = GridSearchCV(classifier, tuned_parameters[0], cv=nfold, n_jobs=cpus)
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction)
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
         model_file = os.path.join(outfolder, "liblinear-svm-linear-%s.m" % task)
 
     if (model == "svm-rbf"):
         # tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
         #                     {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
-        tuned_parameters = [{'C': [0.01]},
-                            {'C': [0.01]}]
         print("== SVM, kernel=rbf ...")
-        classifier = svm.SVC()
-        classifier = GridSearchCV(classifier, param_grid=tuned_parameters[0], cv=nfold, n_jobs=cpus)
+        cls = svm.SVC()
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction)
+            pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
+            print("\t using " + str(fr[1]))
+            classifier = pipe
+        else:
+            classifier = cls
         model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
 
-    best_param = []
-    cv_score = 0
-    best_estimator = None
     nfold_predictions = None
 
     t0 = time()
     if load_model:
         print("model is loaded from [%s]" % str(model_file))
-        best_estimator = util.load_classifier_model(model_file)
+        classifier = util.load_classifier_model(model_file)
     else:
-        classifier.fit(X_train, y_train)
-        nfold_predictions = cross_val_predict(classifier.best_estimator_, X_train, y_train, cv=nfold)
-
-        best_estimator = classifier.best_estimator_
-        best_param = classifier.best_params_
-        cv_score = classifier.best_score_
-        util.save_classifier_model(best_estimator, model_file)
+        #classifier.fit(X_train, y_train)
+        nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
+        util.save_classifier_model(classifier, model_file)
 
     if (X_test is not None):
-        heldout_predictions_final = best_estimator.predict(X_test)
+        heldout_predictions_final = classifier.predict(X_test)
         util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task,
                          identifier, 2, outfolder)
     else:
@@ -86,55 +100,53 @@ def learn_discriminative(cpus, nfold, task, load_model, model, X_train, y_train,
 
 
 def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_test, y_test,
-                     identifier, outfolder):
+                     identifier, outfolder,feature_reduction=None):
     classifier = None
     model_file = None
     if (model == "sgd"):
         print("== SGD ...")
-        sgd_params = {}
         # "loss": ["log", "modified_huber", "squared_hinge", 'squared_loss'],
         #               "penalty": ['l2', 'l1'],
         #               "alpha": [0.0001, 0.001, 0.01, 0.03, 0.05, 0.1],
         #               "n_iter": [1000],
         #               "learning_rate": ["optimal"]}
-        classifier = SGDClassifier(loss='log', penalty='l2', n_jobs=cpus)
-
-        classifier = GridSearchCV(classifier, param_grid=sgd_params, cv=nfold,
-                                  n_jobs=cpus)
+        cls = SGDClassifier(loss='log', penalty='l2', n_jobs=cpus)
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction)
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
         model_file = os.path.join(outfolder, "sgd-classifier-%s.m" % task)
     if (model == "lr"):
         print("== Stochastic Logistic Regression ...")
-        slr_params = {"penalty": ['l2'],
-                      "solver": ['liblinear'],
-                      # "C": list(np.power(10.0, np.arange(-10, 10))),
-                      "max_iter": [10000]}
-        classifier = LogisticRegression(random_state=111)
-        classifier = GridSearchCV(classifier, param_grid=slr_params, cv=nfold,
-                                  n_jobs=cpus)
+
+        cls = LogisticRegression(random_state=111)
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction)
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0],fr[1]),('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
         model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
 
-    best_param = []
-    cv_score = 0
-    best_estimator = None
     nfold_predictions = None
 
     if load_model:
         print("model is loaded from [%s]" % str(model_file))
-        best_estimator = util.load_classifier_model(model_file)
+        classifier = util.load_classifier_model(model_file)
     else:
         print(y_train.shape)
 
-        classifier.fit(X_train, y_train)
-        nfold_predictions = cross_val_predict(classifier.best_estimator_, X_train, y_train, cv=nfold)
+        nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
 
-        best_estimator = classifier.best_estimator_
-        best_param = classifier.best_params_
-        cv_score = classifier.best_score_
-        util.save_classifier_model(best_estimator, model_file)
-    classes = classifier.best_estimator_.classes_
+        util.save_classifier_model(classifier, model_file)
+    classes = classifier.classes_
 
     if (X_test is not None):
-        heldout_predictions = best_estimator.predict_proba(X_test)
+        heldout_predictions = classifier.predict_proba(X_test)
         heldout_predictions_final = [classes[util.index_max(list(probs))] for probs in heldout_predictions]
         util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task,
                          identifier, 2, outfolder)
@@ -145,7 +157,7 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
 def learn_dnn(cpus, nfold, task, load_model,
               embedding_model_file,
               text_data, X_train, y_train, X_test, y_test,
-              identifier, outfolder):
+              identifier, outfolder,feature_reduction=None):
     print("== Perform ANN ...")  # create model
 
     M = du.get_word_vocab(text_data, 1)

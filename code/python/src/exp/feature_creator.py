@@ -304,7 +304,7 @@ def create_pca(csv_basic_feature, folder_other, no_dimensions):
     return X_pca, y
 
 
-def create_lda(csv_basic_feature, folder_other):
+def create_lda_auto_manual_dict_and_basic(csv_basic_feature, folder_other):
 
     X, y = create_basic_and_autocreated_dictionary(csv_basic_feature,folder_other)
     X_2, _ = create_manual_dict(csv_basic_feature, folder_other)
@@ -443,7 +443,7 @@ def create_pca_and_lda_all(csv_basic_feature, folder_other):
     return X_lda,y
 
 
-def create_pca_text_and_numeric(csv_basic_feature, folder_other, no_dimensions):
+def create_pca_text_and_autodict(csv_basic_feature, folder_other, no_dimensions):
 
     X, y = create_basic_auto_dict_and_text(csv_basic_feature, folder_other)
 
@@ -456,7 +456,7 @@ def create_pca_text_and_numeric(csv_basic_feature, folder_other, no_dimensions):
 
     return X_pca, y
 
-def create_lda_text_and_numeric(csv_basic_feature, folder_other):
+def create_lda_text_and_autodict(csv_basic_feature, folder_other):
 
     X, y = create_basic_auto_dict_and_text(csv_basic_feature, folder_other)
 
