@@ -24,9 +24,9 @@ from classifier import dnn_util as du
 
 def create_feature_reduction_alg(feature_reduction):
     if feature_reduction=="pca":
-        return 'pca', PCA()
+        return 'pca', PCA(n_components=100)
     else:
-        return 'lda', LinearDiscriminantAnalysis()
+        return 'lda', LinearDiscriminantAnalysis(n_components=300)
 
 
 def learn_discriminative(cpus, nfold, task, load_model, model,

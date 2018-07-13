@@ -25,7 +25,7 @@ WITH_LIBLINEAR_SVM = True
 WITH_RBF_SVM = False
 WITH_ANN = False
 
-FEATURE_REDUCTION=None #pca or lda or None
+FEATURE_REDUCTION="pca" #str pca or lda or None
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True

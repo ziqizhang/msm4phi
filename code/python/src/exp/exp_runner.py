@@ -26,6 +26,7 @@ if __name__ == "__main__":
     X, y = fc.create_textfeatures_profile_and_name(csv_basic_feature)
     cls = cm.Classifer("stakeholdercls", "_text(p+n)_", X, y, outfolder)
     cls.run()
+    exit(0)
 
     #SETTING2 basic features
     print(datetime.datetime.now())
