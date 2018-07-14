@@ -1,9 +1,10 @@
 import functools
 
 import datetime
+
 import gensim
-from keras.layers import Embedding
 from keras.preprocessing import sequence
+from keras.utils import plot_model
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn import svm
 from sklearn.decomposition import PCA
@@ -12,15 +13,14 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
-from sklearn.model_selection import cross_val_predict
+from sklearn.model_selection import cross_val_predict, StratifiedKFold
 from sklearn.pipeline import Pipeline
 
 from classifier import classifier_util as util
-from sklearn.model_selection import GridSearchCV
 import os
 from time import time
-from classifier import dnn_util as du
-
+from classifier import dnn_model_creator as dmc
+RANDOM_SEED=1
 
 def create_feature_reduction_alg(feature_reduction, max_feature=None):
     if feature_reduction=="pca":
@@ -159,15 +159,16 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
         util.save_scores(nfold_predictions, y_train, None, y_test, model, task, identifier, 2, outfolder)
 
 
-def learn_dnn(cpus, nfold, task, load_model,
-              embedding_model_file,
-              text_data, X_train, y_train, X_test, y_test,
-              identifier, outfolder,feature_reduction=None):
+def learn_dnn_textonly(cpus, nfold, task, load_model,
+                       embedding_model_file,
+                       text_data, X_train, y_train, X_test, y_test,
+                       identifier, outfolder, feature_reduction=None):
     print("== Perform ANN ...")  # create model
 
-    M = du.get_word_vocab(text_data, 1)
+    M = dmc.get_word_vocab(text_data, 1)
     text_based_features=M[0]
-    text_based_features = sequence.pad_sequences(text_based_features, maxlen=100)
+    text_based_features = sequence.pad_sequences(text_based_features,
+                                                 dmc.DNN_MAX_SEQUENCE_LENGTH)
 
     gensimFormat = ".gensim" in embedding_model_file
     if gensimFormat:
@@ -176,46 +177,31 @@ def learn_dnn(cpus, nfold, task, load_model,
         pretrained_embedding_models=gensim.models.KeyedVectors. \
                           load_word2vec_format(embedding_model_file, binary=True)
 
-    pretrained_word_matrix = du.build_pretrained_embedding_matrix(M[1],
+    pretrained_word_matrix = dmc.build_pretrained_embedding_matrix(M[1],
                                                                pretrained_embedding_models,
-                                                               300,
+                                                               dmc.DNN_EMBEDDING_DIM,
                                                                0)
 
     create_model_with_args = \
-        functools.partial(create_model, max_index=len(M[1]),
-                          wemb_matrix=pretrained_word_matrix,
+        functools.partial(dmc.create_model, max_index=len(M[1]),
+                          wemb_matrix=pretrained_word_matrix, word_embedding_dim=dmc.DNN_EMBEDDING_DIM,
+                          max_sequence_length=dmc.DNN_MAX_SEQUENCE_LENGTH,
                           append_feature_matrix=None,
-                          model_descriptor="f_sub_conv[1,2,3](conv1d=100),maxpooling1d=4,flatten,dense=6-softmax")
-    model = KerasClassifier(build_fn=create_model_with_args, verbose=0)
+                          model_descriptor=dmc.DNN_MODEL_DESCRIPTOR)
 
-    # model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=100,
-    #                         nb_epoch=10)
-    #
-    # nfold_predictions = cross_val_predict(model, X_train, y_train, cv=nfold)
+    model = KerasClassifier(build_fn=create_model_with_args, verbose=0,batch_size=100, epochs=10)
+    nfold_predictions = cross_val_predict(model,
+                                          text_based_features,
+                                          y_train,
+                                          cv=nfold)
 
-    # define the grid search parameters
-    batch_size = [100]
-    epochs = [10]
-    param_grid = dict(batch_size=batch_size, nb_epoch=epochs)
-    grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=cpus,
-                        cv=nfold)
-
-    t0 = time()
-    cv_score_ann = 0
-    best_param_ann = []
     ann_model_file = os.path.join(outfolder, "ann-%s.m" % task)
-    nfold_predictions = None
 
     if load_model:
         print("model is loaded from [%s]" % str(ann_model_file))
         best_estimator = util.load_classifier_model(ann_model_file)
     else:
-        grid.fit(text_based_features, y_train)
-        nfold_predictions = cross_val_predict(grid.best_estimator_, text_based_features, y_train, cv=nfold)
-
-        cv_score_ann = grid.best_score_
-        best_param_ann = grid.best_params_
-        best_estimator = grid.best_estimator_
+        best_estimator = model
 
         # self.save_classifier_model(best_estimator, ann_model_file)
 
@@ -234,44 +220,67 @@ def learn_dnn(cpus, nfold, task, load_model,
     #                       time_ann_train, y_test)
 
 
-def create_model(model_descriptor: str, max_index=100, wemb_matrix=None, append_feature_matrix=None):
-    '''A model that uses word embeddings'''
-    word_embedding_dim_output = 300
-    max_sequence_length_profile = 100
-    if wemb_matrix is None:
-        if append_feature_matrix is not None:
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim_output,
-                                          input_length=max_sequence_length_profile),
-                                Embedding(input_dim=max_index, output_dim=len(append_feature_matrix[0]),
-                                          weights=[append_feature_matrix],
-                                          input_length=max_sequence_length_profile,
-                                          trainable=False)]
-        else:
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim_output,
-                                          input_length=max_sequence_length_profile)]
+def learn_dnn_textandmeta(cpus, nfold, task, load_model,
+                          embedding_model_file,
+                          text_data, X_train_metafeature, y_train, X_test, y_test,
+                          identifier, outfolder, prediction_targets):
+    print("== Perform ANN ...")  # create model
+
+    M = dmc.get_word_vocab(text_data, 1)
+    text_based_features=M[0]
+    text_based_features = sequence.pad_sequences(text_based_features,
+                                                 dmc.DNN_MAX_SEQUENCE_LENGTH)
+
+    gensimFormat = ".gensim" in embedding_model_file
+    if gensimFormat:
+        pretrained_embedding_models=gensim.models.KeyedVectors.load(embedding_model_file, mmap='r')
+    else:
+        pretrained_embedding_models=gensim.models.KeyedVectors. \
+                          load_word2vec_format(embedding_model_file, binary=True)
+
+    pretrained_word_matrix = dmc.build_pretrained_embedding_matrix(M[1],
+                                                               pretrained_embedding_models,
+                                                               dmc.DNN_EMBEDDING_DIM,
+                                                               2)
+
+    model_embedding=dmc.create_test_embedding_model(prediction_targets,len(M[1]),
+                                    dmc.DNN_EMBEDDING_DIM,dmc.DNN_MAX_SEQUENCE_LENGTH,
+                                          pretrained_word_matrix)
+    plot_model(model_embedding, to_file='test_model_embedding.png')
+    #model_embedding.fit(text_data, y_train)
+    model_non_embedding = dmc.create_test_nonembedding_model(len(X_train_metafeature[0]),prediction_targets)
+    plot_model(model_non_embedding, to_file='test_model_non_embedding.png')
+    #model_non_embedding.fit(text_data, y_train)
+
+    exit(0)
+
+    model = KerasClassifier(build_fn=None, verbose=0,batch_size=100, epochs=10)
+    nfold_predictions = cross_val_predict(model,
+                                          text_based_features,
+                                          y_train,
+                                          cv=nfold)
+
+    ann_model_file = os.path.join(outfolder, "ann-%s.m" % task)
+
+    if load_model:
+        print("model is loaded from [%s]" % str(ann_model_file))
+        best_estimator = util.load_classifier_model(ann_model_file)
+    else:
+        best_estimator = model
+
+        # self.save_classifier_model(best_estimator, ann_model_file)
+
+    print(datetime.datetime.now())
+    print("testing on development set ....")
+    if (X_test is not None):
+        heldout_predictions_final = best_estimator.predict(X_test)
+        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task, identifier, 2,
+                         outfolder)
 
     else:
-        if append_feature_matrix is not None:
-            concat_matrices = du.concat_matrices(wemb_matrix, append_feature_matrix)
-            # load pre-trained word embeddings into an Embedding layer
-            # note that we set trainable = False so as to keep the embeddings fixed
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(concat_matrices[0]),
-                                          weights=[concat_matrices],
-                                          input_length=max_sequence_length_profile,
-                                          trainable=False)]
-        else:
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(wemb_matrix[0]),
-                                          weights=[wemb_matrix],
-                                          input_length=max_sequence_length_profile,
-                                          trainable=False)]
+        util.save_scores(nfold_predictions, y_train, None,y_test,"dnn", task, identifier, 2, outfolder)
 
-    #if model_descriptor.startswith("b_"):
-    model_descriptor = model_descriptor[2:].strip()
-    model = du.create_model_with_branch(embedding_layers, model_descriptor)
+    # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
+    #                       time_ann_predict_dev,
+    #                       time_ann_train, y_test)
 
-    #model = du.create_final_model_with_concat_cnn(embedding_layers, model_descriptor)
-
-    # create_model_conv_lstm_multi_filter(embedding_layer)
-
-    # logger.info("New run started at {}\n{}".format(datetime.datetime.now(), model.summary()))
-    return model

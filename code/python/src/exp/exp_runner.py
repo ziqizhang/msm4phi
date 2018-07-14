@@ -22,10 +22,10 @@ if __name__ == "__main__":
     # SETTING1 tfidf weighted nagram (text only. see code how features are
     # concatenated. You can do the same for text+other numeric) features
 
-    print(datetime.datetime.now())
-    X, y = fc.create_textprofile(csv_basic_feature)
-    cls = cm.Classifer("stakeholdercls", "_text_only_", X, y, outfolder)
-    cls.run()
+    # print(datetime.datetime.now())
+    # X, y = fc.create_textprofile(csv_basic_feature)
+    # cls = cm.Classifer("stakeholdercls", "_text_only_", X, y, outfolder)
+    # cls.run()
 
 
     #SETTING2 basic features + tweet_feature/diseases_in_tweets.csv

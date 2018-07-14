@@ -8,23 +8,23 @@ import os
 from sklearn.linear_model import LogisticRegression
 from classifier import classifier_learn as cl
 from classifier import classifier_tag as ct
-from classifier import dataset_loader as dl
-import numpy
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.cross_validation import StratifiedKFold
 import numpy as np
-import pandas as pd
 from classifier import classifier_util
 
 # Model selection
 WITH_SGD = False
 WITH_SLR = False
 WITH_RANDOM_FOREST = False
-WITH_LIBLINEAR_SVM = True
+WITH_LIBLINEAR_SVM = False
 WITH_RBF_SVM = False
 WITH_ANN = False
+WITH_ANN_COMPLEX = True
 
+
+PREDICTION_TARGETS=6
 FEATURE_REDUCTION=None #str pca or lda or None
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
@@ -130,11 +130,18 @@ class Classifer(object):
 
         ################# Artificial Neural Network #################
         if WITH_ANN:
-            cl.learn_dnn(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
-                         self.dnn_embedding_file, self.text_data,
-                         X_train,
-                         y_train, X_test, y_test, self.identifier, self.outfolder,
-                         FEATURE_REDUCTION)
+            cl.learn_dnn_textonly(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
+                                  self.dnn_embedding_file, self.text_data,
+                                  X_train,
+                                  y_train, X_test, y_test, self.identifier, self.outfolder,
+                                  FEATURE_REDUCTION)
+
+        if WITH_ANN_COMPLEX:
+            cl.learn_dnn_textandmeta(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
+                                  self.dnn_embedding_file, self.text_data,
+                                  X_train,
+                                  y_train, X_test, y_test, self.identifier, self.outfolder,
+                                     PREDICTION_TARGETS)
 
         print("complete!")
 

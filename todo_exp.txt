@@ -1,6 +1,8 @@
-try text on profiles only
-try non empty profiles only
-try filled profiles
+try twitter embeddings
+
+try text on profiles only	x
+try non empty profiles only	x
+try filled profiles		x
 try different top N for auto dict
 try different features for different classes (1 vs all)
 try P and R balance
