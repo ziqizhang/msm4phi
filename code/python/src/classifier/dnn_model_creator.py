@@ -1,6 +1,6 @@
 import functools
 
-from keras.layers import Embedding
+from keras.layers import Embedding, concatenate
 import numpy
 from keras import Model, Sequential, Input
 from keras.layers import Concatenate, Dropout, LSTM, GRU, Bidirectional, Conv1D, MaxPooling1D, GlobalMaxPooling1D, \
@@ -38,11 +38,11 @@ lstm examples:
 
 DNN_EMBEDDING_DIM=300
 DNN_MAX_SEQUENCE_LENGTH=100
-DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
+#DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="lstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="bilstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
-#DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
+DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 
 def create_model(model_descriptor: str, max_index=100, word_embedding_dim=DNN_EMBEDDING_DIM,
                  max_sequence_length=DNN_MAX_SEQUENCE_LENGTH, wemb_matrix=None, append_feature_matrix=None):
@@ -101,7 +101,7 @@ def parse_model_descriptor(embedding_layers, model_descriptor:str):
                 cnns.append(create_sequential_model(cnn_components,
                                                 embedding_layers=embedding_layers))
             else:
-                for mod in create_skipped_cnn_layers(cnn_components,embedding_layers, int(w)):
+                for mod in create_skipped_cnn_submodels(cnn_components, embedding_layers, int(w)):
                     cnns.append(mod)
 
     else: #assuming a sequential model
@@ -204,7 +204,7 @@ def create_sequential_model(layer_descriptors:list(), model:Sequential=None,embe
             model.add(Flatten())
     return model
 
-def create_skipped_cnn_layers(layer_descriptors, embedding_layers, cnn_ks):
+def create_skipped_cnn_submodels(layer_descriptors, embedding_layers, cnn_ks):
     if cnn_ks > 5:
         raise ValueError('Skip cnn window of >5 is not supported.')
     models = []
@@ -214,62 +214,7 @@ def create_skipped_cnn_layers(layer_descriptors, embedding_layers, cnn_ks):
     filter = int(conv1d_desc.split("=")[1].split("-")[0])
     layer_descriptors.pop(0)
 
-    if cnn_ks < 3:
-        conv1d_3 = Conv1D(filters=filter, kernel_size=cnn_ks, padding='same', activation='relu')
-        conv_layers.append(conv1d_3)
-    elif cnn_ks == 3:
-        conv1d_3 = Conv1D(filters=filter, kernel_size=3, padding='same', activation='relu')
-        conv_layers.append(conv1d_3)
-
-        # 2skip1
-        ks_and_masks = generate_ks_and_masks(2, 1)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-
-    elif cnn_ks == 4:
-        conv1d_4 = Conv1D(filters=filter, kernel_size=4, padding='same', activation='relu')
-        conv_layers.append(conv1d_4)
-
-        # 2skip2
-        ks_and_masks = generate_ks_and_masks(2, 2)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-        # 3skip1
-        ks_and_masks = generate_ks_and_masks(3, 1)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-
-    elif cnn_ks == 5:
-        conv1d_5 = Conv1D(filters=filter, kernel_size=5, padding='same', activation='relu')
-        conv_layers.append(conv1d_5)
-        # 2skip3
-        ks_and_masks = generate_ks_and_masks(2, 3)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-        # 3skip2
-        ks_and_masks = generate_ks_and_masks(3, 2)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-        # 4skip1
-        ks_and_masks = generate_ks_and_masks(4, 1)
-        for mask in ks_and_masks[1]:
-            conv_layers.append(SkipConv1D(filters=filter,
-                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
-                                          padding='same', activation='relu'))
-        # 3dilate1
-        conv_layers.append(Conv1D(filters=filter,
-                                  kernel_size=3, dilation_rate=1,
-                                  padding='same', activation='relu'))
+    create_skipped_cnn_layers(cnn_ks,filter,conv_layers)
 
     for conv_layer in conv_layers:
         model = Sequential()
@@ -283,6 +228,64 @@ def create_skipped_cnn_layers(layer_descriptors, embedding_layers, cnn_ks):
         models.append(model)
 
     return models
+
+def create_skipped_cnn_layers(cnn_ks, filter:int, conv_layers:list, layer=None):
+    if cnn_ks < 3:
+        if layer is None:
+            conv1d_3 = Conv1D(filters=filter, kernel_size=cnn_ks, padding='same', activation='relu')
+        else:
+            conv1d_3 = Conv1D(filters=filter, kernel_size=cnn_ks, padding='same', activation='relu')(layer)
+        conv_layers.append(conv1d_3)
+    elif cnn_ks == 3:
+        if layer is None:
+            conv1d_3 = Conv1D(filters=filter, kernel_size=3, padding='same', activation='relu')
+        else:
+            conv1d_3 = Conv1D(filters=filter, kernel_size=3, padding='same', activation='relu')(layer)
+        conv_layers.append(conv1d_3)
+
+        # 2skip1
+        ks_and_masks = generate_ks_and_masks(2, 1)
+        for mask in ks_and_masks[1]:
+            if layer is None:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                          padding='same', activation='relu'))
+            else:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                              kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                              padding='same', activation='relu')(layer))
+
+    elif cnn_ks == 4:
+        if layer is None:
+            conv1d_4 = Conv1D(filters=filter, kernel_size=4, padding='same', activation='relu')
+        else:
+            conv1d_4 = Conv1D(filters=filter, kernel_size=4, padding='same', activation='relu')(layer)
+        conv_layers.append(conv1d_4)
+
+        # 2skip2
+        ks_and_masks = generate_ks_and_masks(2, 2)
+        for mask in ks_and_masks[1]:
+            if layer is None:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                          padding='same', activation='relu'))
+            else:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                              kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                              padding='same', activation='relu')(layer))
+        # 3skip1
+        ks_and_masks = generate_ks_and_masks(3, 1)
+        for mask in ks_and_masks[1]:
+            if layer is None:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                          kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                          padding='same', activation='relu'))
+            else:
+                conv_layers.append(SkipConv1D(filters=filter,
+                                              kernel_size=int(ks_and_masks[0]), validGrams=mask,
+                                              padding='same', activation='relu')(layer))
+
+
 
 def generate_ks_and_masks(target_cnn_ks, skip):
     masks=[]
@@ -399,22 +402,89 @@ def get_word_vocab(tweets, normalize_option):
         word_embedding_input.append(tweet_vocab)
     return word_embedding_input, vocab
 
-def create_test_nonembedding_model(targets,dim):
-    input_features = Input(shape=(dim,))
-    flat1 = Flatten()(input_features)
-    hidden = Dense(targets, activation="softmax")(input_features)
-    model = Model(inputs=input_features, outputs=hidden)
-    return model
+def create_submodel_metafeature(inputs, dim):
+    #flat1 = Flatten()(input_features)
+    #hidden = Dense(dim)(inputs)
+    #model = Model(inputs=input_features, outputs=hidden)
+    #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return inputs
 
 
-def create_test_embedding_model(targets, vocab_size, embedding_dim, max_seq_length, weights):
-    deep_inputs = Input(shape=(max_seq_length,))
+#model_option:
+# 0= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
+# 1="lstm=100-False|dense=6-softmax|glv"
+# 2="bilstm=100-False|dense=6-softmax|glv"
+# 3="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
+# 4="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
+
+def create_submodel_textfeature(
+                                inputs,
+                                vocab_size, embedding_dim, max_seq_length, weights,
+                                model_option):
+
     embedding = Embedding(vocab_size, embedding_dim, input_length=max_seq_length,
-                          weights=weights, trainable=False)(deep_inputs)
-    hidden = Dense(targets, activation="softmax")(embedding)
-    model = Model(inputs=deep_inputs, outputs=hidden)
-    return model
-
+                          weights=[weights], trainable=False)(inputs)
+    if model_option.startswith("cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax"):
+        conv1d_2=Conv1D(filters=100,
+               kernel_size=2, padding='same', activation='relu')(embedding)
+        conv1d_3 = Conv1D(filters=100,
+                          kernel_size=3, padding='same', activation='relu')(embedding)
+        conv1d_4 = Conv1D(filters=100,
+                          kernel_size=4, padding='same', activation='relu')(embedding)
+        merge = concatenate([conv1d_2, conv1d_3,conv1d_4])
+        pool=MaxPooling1D(pool_size=4)(merge)
+        flat=Flatten()(pool)
+        #final = Dense(targets, activation="softmax")(pool)
+        #model = Model(inputs=deep_inputs, outputs=final)
+        return flat
+    elif model_option.startswith("lstm=100-False|dense=6-softmax"):
+        lstm=LSTM(units=100, return_sequences=False)(embedding)
+        #final = Dense(targets, activation="softmax")(lstm)
+        #model = Model(inputs=deep_inputs, outputs=final)
+        #flat = Flatten()(lstm)
+        return lstm
+    elif model_option.startswith("bilstm=100-False|dense=6-softmax"):
+        lstm=Bidirectional(LSTM(units=100, return_sequences=False))(embedding)
+        #final = Dense(targets, activation="softmax")(lstm)
+        #model = Model(inputs=deep_inputs, outputs=final)
+        #flat = Flatten()(lstm)
+        return lstm
+    elif model_option.startswith("scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax"):
+        start=model_option.index("[")+1
+        end=model_option.index("]")
+        window_str = model_option[start:end]
+        dropout=Dropout(0.2)(embedding)
+        conv_layers_with_pooling=[]
+        for i in window_str.split(","):
+            ws=int(i)
+            conv_layers=[]
+            create_skipped_cnn_layers(ws, 100, conv_layers, dropout)
+            for conv in conv_layers:
+                conv_layers_with_pooling.append(MaxPooling1D(4)(conv))
+        merge=concatenate(conv_layers_with_pooling)
+        pool=MaxPooling1D(pool_size=4)(merge)
+        #final = Dense(targets, activation="softmax")(pool)
+        #model = Model(inputs=deep_inputs, outputs=final)
+        flat = Flatten()(pool)
+        return flat
+    elif model_option.startswith("scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax"):
+        start=model_option.index("[")+1
+        end=model_option.index("]")
+        window_str = model_option[start:end]
+        dropout=Dropout(0.2)(embedding)
+        conv_layers = []
+        for i in window_str.split(","):
+            ws=int(i)
+            create_skipped_cnn_layers(ws, 100, conv_layers, dropout)
+        merge=concatenate(conv_layers)
+        pool=MaxPooling1D(pool_size=4)(merge)
+        #final = Dense(targets, activation="softmax")(pool)
+        #model = Model(inputs=deep_inputs, outputs=final)
+        flat = Flatten()(pool)
+        return flat
+    else:
+        raise ValueError("model option not supported: %s"%model_option)
+    return None
 
 #a 1D convolution that skips some entries
 class SkipConv1D(Conv1D):

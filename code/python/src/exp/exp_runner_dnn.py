@@ -1,12 +1,13 @@
 import sys
 
 import datetime
-from random import seed
+from numpy.random import seed
 
 from exp import feature_creator as fc
 from classifier import classifier_main as cm
 import pandas as pd
 seed(1)
+
 if __name__ == "__main__":
     #this is the file pointing to the basic features, i.e., just the numeric values
     #msm4phi/paper2/data/training_data/basic_features.csv
