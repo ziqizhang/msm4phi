@@ -38,6 +38,8 @@ lstm examples:
 
 DNN_EMBEDDING_DIM=300
 DNN_MAX_SEQUENCE_LENGTH=100
+DNN_EPOCHES=10
+DNN_BATCH_SIZE=10
 #DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="lstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="bilstm=100-False|dense=6-softmax|glv"

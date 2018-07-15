@@ -3,6 +3,7 @@ import functools
 import datetime
 
 import gensim
+import numpy
 from keras import Input, Model
 from keras.layers import concatenate, Dense
 from keras.preprocessing import sequence
@@ -22,7 +23,7 @@ from sklearn.preprocessing import LabelBinarizer
 from classifier import classifier_util as util
 import os
 from time import time
-from classifier import dnn_model_creator as dmc
+from classifier import dnn_util as dmc
 
 RANDOM_SEED = 1
 
@@ -270,20 +271,33 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     kfold = StratifiedKFold(n_splits=nfold, shuffle=True)
-    train1_splits, test1_splits  = kfold.split(X_train_textfeature, y_train_int)
-    train2_splits, test2_splits =kfold.split(X_train_metafeature, y_train_int)
+    X_merge=numpy.concatenate([X_train_textfeature, X_train_metafeature],axis=1)
+
+    splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
+
     nfold_predictions = []
-    for split in range(0, len(train1_splits)):
+    for k in range(0, len(splits)):
         # Fit the model
-        train1_split=train1_splits[split]
-        train2_split = train2_splits[split]
-        test1_split = test1_splits[split]
-        test2_split = test2_splits[split]
-        model.fit([X_train_textfeature[train1_split], X_train_metafeature[train2_split]],
-                  y_train_int[train1_split], epochs=100, batch_size=10, verbose=2)
+        X_train_index=splits[k][1][0]
+        X_test_index = splits[k][1][1]
+
+        X_train_merge_=X_merge[X_train_index]
+        X_test_merge_=X_merge[X_test_index]
+        y_train=y_train_int[X_train_index]
+
+
+        X_train_text_feature= X_train_merge_[:, 0:len(X_train_textfeature[0])]
+        X_train_meta_feature=X_train_merge_[:, len(X_train_text_feature[0]):]
+
+        y_test = y_train_int[X_test_index]
+        X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
+        X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
+
+        model.fit([X_train_text_feature, X_train_meta_feature],
+                  y_train, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
 
         # evaluate the model
-        predictions = model.predict([X_train_textfeature[test1_split], X_train_metafeature[test2_split]], y_train_int[test1_split], verbose=2)
+        predictions = model.predict([X_test_text_feature,X_test_meta_feature], y_test, verbose=2)
         nfold_predictions.extend(predictions)
 
         # self.save_classifier_model(best_estimator, ann_model_file)
