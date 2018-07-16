@@ -7,7 +7,7 @@ import numpy
 from keras import Input, Model
 from keras.layers import concatenate, Dense
 from keras.preprocessing import sequence
-from keras.utils import plot_model
+from keras.utils import plot_model, np_utils
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn import svm
 from sklearn.decomposition import PCA
@@ -275,7 +275,7 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
 
     splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
 
-    nfold_predictions = []
+    nfold_predictions = dict()
     for k in range(0, len(splits)):
         # Fit the model
         X_train_index=splits[k][1][0]
@@ -283,26 +283,35 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
 
         X_train_merge_=X_merge[X_train_index]
         X_test_merge_=X_merge[X_test_index]
-        y_train=y_train_int[X_train_index]
+        y_train_=y_train_int[X_train_index]
 
 
         X_train_text_feature= X_train_merge_[:, 0:len(X_train_textfeature[0])]
         X_train_meta_feature=X_train_merge_[:, len(X_train_text_feature[0]):]
 
-        y_test = y_train_int[X_test_index]
+        #y_test = y_train[X_test_index]
         X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
         X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
 
         model.fit([X_train_text_feature, X_train_meta_feature],
-                  y_train, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+                  y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
 
         # evaluate the model
-        predictions = model.predict([X_test_text_feature,X_test_meta_feature], y_test, verbose=2)
-        nfold_predictions.extend(predictions)
+        prediction_prob = model.predict([X_test_text_feature,X_test_meta_feature])
+        predictions = prediction_prob.argmax(axis=-1)
+
+        for i, l in zip(X_test_index, predictions):
+            nfold_predictions[i]=l
 
         # self.save_classifier_model(best_estimator, ann_model_file)
-        util.save_scores(nfold_predictions, y_train, None, None, "dnn", task, identifier, 2, outfolder)
 
+    indexes = sorted(list(nfold_predictions.keys()))
+    predicted_labels=[]
+    for i in indexes:
+        predicted_labels.append(nfold_predictions[i])
+    util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, identifier, 2, outfolder)
+
+    model=None
     # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
     #                       time_ann_predict_dev,
     #                       time_ann_train, y_test)

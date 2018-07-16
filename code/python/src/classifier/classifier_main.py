@@ -4,6 +4,10 @@
 from __future__ import print_function
 
 import os
+# os.environ['PYTHONHASHSEED'] = '0'
+# os.environ['THEANO_FLAGS'] = "floatX=float64,device=cpu,openmp=True"
+# # os.environ['THEANO_FLAGS']="openmp=True"
+# os.environ['OMP_NUM_THREADS'] = '16'
 
 from sklearn.linear_model import LogisticRegression
 from classifier import classifier_learn as cl

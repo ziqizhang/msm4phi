@@ -20,10 +20,32 @@ text, then manual dict,
 text, then auto dict, then basic numeric, and other numeric
 text, then manual dict, then basic numeric, and other numeric
 
-DNN
-text 	x (CNN) todo: skipped CNN, LSTM
-	
-text+auto dict
-text+manual dict,
-text+auto dict, then basic numeric, and other numeric
-text+manual dict, then basic numeric, and other numeric
+DNN (text only)
+		empty_filled	empty_removed
+- cnn					x
+- cnn skip 1
+- cnn skip 2
+
+DNN (text + basic numeric)
+		empty_filled	empty_removed
+- cnn					x
+- cnn skip 1
+- cnn skip 2
+
+DNN (text + all numeric)
+		empty_filled	empty_removed
+- cnn					x
+- cnn skip 1
+- cnn skip 2
+
+DNN (text + auto dict)
+		empty_filled	empty_removed
+- cnn					x
+- cnn skip 1
+- cnn skip 2
+
+DNN (text + all)
+		empty_filled	empty_removed
+- cnn					x
+- cnn skip 1
+- cnn skip 2
