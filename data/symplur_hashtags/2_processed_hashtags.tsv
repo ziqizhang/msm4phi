@@ -1,0 +1,380 @@
+#ACNE	#ACNE	
+#ADHD	#ADHD	
+#ADPKD	#ADPKD	
+#ARDS45	#ARDS45	
+#AcuteCoronarySyndrome	#AcuteCoronarySyndrome	
+#Adhesions	#Adhesions	
+#AllergicRhinitis	#AllergicRhinitis	
+#Amyloidosis	#Amyloidosis	
+#Anaphylaxis	#Anaphylaxis	
+#Andropause	#Andropause	
+#Angina	#Angina	
+#Angiosarcoma	#Angiosarcoma	
+#AnorexiaNervosa	#AnorexiaNervosa	
+#AnosmiaHope	#AnosmiaHope	
+#AnxietyDisorder	#AnxietyDisorder	
+#AorticDissection	#AorticDissection	
+#Arachnoiditis	#Arachnoiditis	
+#Asbestosis	#Asbestosis	
+#Aspergers	#Aspergers	
+#Ataxia	#Ataxia	
+#Atherosclerosis	#Atherosclerosis	
+#Autism	#Autism|	#autismspectrum|
+#Autoimmune	#Autoimmune	
+#BMFSM	#BMFSM	
+#BPD	#BPD	
+#BacterialVaginosis	#BacterialVaginosis	
+#BattenDisease	#BattenDisease	
+#Bedwetting	#Bedwetting	
+#BirdFlu	#BirdFlu	
+#BloodCancer	#BloodCancer	
+#BloodClot	#BloodClot	
+#BodyDysmorphicDisorder	#BodyDysmorphicDisorder	
+#BowelCancer	#BowelCancer	
+#BrainAneurysm	#BrainAneurysm	
+#BrainCancer	#BrainCancer	
+#BrainInjury	#BrainInjury	
+#Bronchitis	#Bronchitis	
+#Bulimia	#Bulimia	
+#Bursitis	#Bursitis	
+#CGRP	#CGRP	
+#CIDP	#CIDP	
+#CLL	#CLL	
+#Cachexia	#Cachexia	
+#Candidiasis	#Candidiasis	
+#Carcinoid	#Carcinoid	
+#Carcinoma	#Carcinoma	
+#Cardiomyopathy	#Cardiomyopathy	
+#CarpalTunnelSyndrome	#CarpalTunnelSyndrome	
+#CaudaEquina	#CaudaEquina	
+#Cerebral	#Cerebral	
+#CervicalCancer	#CervicalCancer	
+#CharcotMarieTooth	#CharcotMarieTooth	
+#Chiari	#Chiari	
+#Chikungunya	#Chikungunya	
+#Cholera	#Cholera	
+#Cholesteatoma	#Cholesteatoma	
+#ChronicMigraine	#ChronicMigraine	
+#ChurgStrauss	#ChurgStrauss	
+#Cirrhosis	#Cirrhosis	
+#Colitis	#Colitis	
+#Coronavirus	#Coronavirus	
+#CowdensSyndrome	#CowdensSyndrome	
+unknown-#CryoGroup	#Cryoglobulinemia|	#CryoGroup|
+#CryptogenicStroke	#CryptogenicStroke	
+#Cushings	#Cushings	
+#CyclicVomitingSyndrome	#CyclicVomitingSyndrome	
+#Deafness	#Deafness	
+#Dementia	#Dementia|	#DementiaChallengers|
+#Dengue	#Dengue	
+#Dermatomyositis	#Dermatomyositis	
+#DeviatedSeptum	#DeviatedSeptum	
+#Dialysis	#Dialysis	
+#Diverticulitis	#Diverticulitis	
+#DownSyndrome	#DownSyndrome	
+#Duchenne	#Duchenne	
+#Dysautonomia	#Dysautonomia	
+#Dyslexia	#Dyslexia	
+#EColi	#EColi	
+#EDS	#EDS	
+#ESRD	#ESRD	
+#Ebola	#Ebola|#EbolaVirus|	#EbolaOutbreak|#EbolaResearch|#EbolaWatch|
+#Eclampsia	#Eclampsia	
+#Eczema	#Eczema	
+#EhlersDanlos	#EhlersDanlos	
+#EmanuelSyndrome	#EmanuelSyndrome	
+#Encephalitis	#Encephalitis	
+#Endometriosis	#Endometriosis	
+#Enterovirus68	#Enterovirus68	
+#EpidermolysisBullosa	#EpidermolysisBullosa|	#cureEB|
+#Epilepsy	#Epilepsy	
+#EyeCancer	#EyeCancer	
+#FGID	#FGID	
+#FacialDisfigurement	#FacialDisfigurement	
+#GERD	#GERD	
+#Gallbladder	#Gallbladder	
+#Gastroparesis	#Gastroparesis	
+#GaucherDisease	#GaucherDisease	
+unknown-#GenCSM		#GenCSM
+#Gestationaldiabetes	#Gestationaldiabetes	
+#Gout	#Gout	
+#GvHD	#GvHD	
+#HPV	#HPV	
+#Haemochromatosis	#Haemochromatosis	
+#Halitosis	#Halitosis	
+#Hantavirus	#Hantavirus	
+#HearingLoss	#HearingLoss	
+#HeartDisease	#HeartDisease	
+#HeartFailure	#HeartFailure	
+#HeatStroke	#HeatStroke	
+#HemiplegicMigraine	#HemiplegicMigraine	
+#HendraVirus	#HendraVirus	
+#Hernia	#Hernia	
+#Herpes	#Herpes	
+#Hidradenitis	#Hidradenitis	
+#Hives	#Hives	
+#HoFH	#HoFH	
+#Huntingtonsdisease	#Huntingtonsdisease	
+#Hyperglycemia	#Hyperglycemia	
+#Hypermobility	#Hypermobility	
+#Hypochondria	#Hypochondria	
+#Hypothyroidism	#Hypothyroidism|	#ThyroidAwareness|
+#IBD	#IBD	
+#IBS	#IBS	
+#IIH	#IIH	
+#Ichthyosis	#Ichthyosis	
+#Incontinence	#Incontinence	
+#Infertility	#Infertility	
+#IntestinalFailure	#IntestinalFailure	
+#KawasakiDisease	#KawasakiDisease	
+#KeratosisPilaris	#KeratosisPilaris	
+#KidneyCancer	#KidneyCancer	
+#KidneyDisease	#KidneyDisease	
+#KidneyStones	#KidneyStones	
+#Legionnaires	#Legionnaires	
+#Leprosy	#Leprosy	
+#Leptospirosis	#Leptospirosis	
+#LiFraumeni	#LiFraumeni	
+#Listeriosis	#Listeriosis	
+#LiverCancer	#LiverCancer	
+#LiverDisease	#LiverDisease	
+unknown-#BetterLCLives	#LungCancer|	#BetterLCLives|#WhipLungCancer|#lungcancer101|
+#LymeDisease	#LymeDisease	
+#LynchSyndrome	#LynchSyndrome	
+#MERS	#MERS	
+#MRKH	#MRKH	
+#MacularDegeneration	#MacularDegeneration	
+unknown-#Endmalaria	#Malaria|	#Endmalaria|
+#Marfan	#Marfan	
+#Mastocytosis	#Mastocytosis	
+#MdrTB	#MdrTB	
+#Melanoma	#Melanoma	#euromelanoma17|
+#MemoryLoss	#MemoryLoss	
+#Menieres	#Menieres	
+#Meningitis	#Meningitis	
+#Mesothelioma	#Mesothelioma	
+#Migraine	#Migraine	
+#MoebiusSyndrome	#MoebiusSyndrome	
+#Moyamoya	#Moyamoya	
+#MultipleEndocrineNeoplasia	#MultipleEndocrineNeoplasia	
+#MuscularDystrophy	#MuscularDystrophy	
+#MyalgicE	#MyalgicE|#NeuroME|#pwme|	
+#MyastheniaGravis	#MyastheniaGravis	
+#Myositis	#Myositis	
+#NCDs	#NCDs	
+#Narcolepsy	#Narcolepsy	
+#Neuroblastoma	#Neuroblastoma	
+#NeuroendocrineCancer	#NeuroendocrineCancer	
+#NeuroendocrineTumors	#NeuroendocrineTumors	
+#Neuropathy	#Neuropathy	
+#Nocturia	#Nocturia	
+#OCD	#OCD	
+#Obesity	#Obesity|#ChildhoodObesity|	
+#Osteoarthritis	#Osteoarthritis	
+#OsteogenesisImperfecta	#OsteogenesisImperfecta	
+#Osteoporosis	#Osteoporosis	
+#Osteosarcoma	#Osteosarcoma	
+#PCOS	#PCOS	
+#PMDD	#PMDD	
+#PTSD	#PTSD	
+#Paget	#Paget	
+#PainSomnia	#PainSomnia	
+#Parkinsons	#Parkinsons	
+#PeanutAllergy	#PeanutAllergy	
+#PediatricCancer	#PediatricCancer	
+#PediatricStroke	#PediatricStroke	
+#PlantarFascitis	#PlantarFascitis	
+#Pneumonia	#Pneumonia	
+#Polio	#Polio	
+#PolycysticOvarianSyndrome	#PolycysticOvarianSyndrome|	#pcosaa|
+#Polymyalgia	#Polymyalgia	
+#Pompe	#Pompe	
+#Preeclampsia	#Preeclampsia	
+#Progeria	#Progeria	
+unknown-#PCSM	#ProstateCancer|	#PCSM|
+#Psoriasis	#Psoriasis|#deseosxpsoriasis|	
+#PsoriaticArthritis	#PsoriaticArthritis	
+#PulmonaryEmbolism	#PulmonaryEmbolism	
+#PulmonaryHypertension	#PulmonaryHypertension	
+#Raynauds	#Raynauds	
+#RectalCancer	#RectalCancer	
+#RenalFailure	#RenalFailure	
+#Restenosis	#Restenosis	
+#Retinoblastoma	#Retinoblastoma	
+#RettSyndrome	#RettSyndrome	
+#Rhabdomyosarcoma	#Rhabdomyosarcoma	
+#Rhinitis	#Rhinitis|#Resfriado|#Congestionnasal|	
+#RiftValleyFever	#RiftValleyFever	
+#SARS	#SARS	
+#SCADheart	#SCADheart	
+#SIDS	#SIDS	
+#SLE	#SLE	
+#STD	#STD	
+#STEMI	#STEMI	
+#Sarcoidosis	#Sarcoidosis	
+#Sarcopenia	#Sarcopenia	
+#Sciatica	#Sciatica	
+#Scoliosis	#Scoliosis	
+#SecondaryInfertility	#SecondaryInfertility	
+#Seizures	#Seizures	
+#Sepsis	#Sepsis	
+#ShakenBabyFacts	#ShakenBabyFacts	
+#Shingles	#Shingles	
+#SkinCancer	#SkinCancer	
+#SleepApnea	#SleepApnea	
+#SleepDisorder	#SleepDisorder	
+#Spondylitis	#Spondylitis|	#TeamSpondy|
+#StevensJohnsonSyndrome	#StevensJohnsonSyndrome	
+#StiffPersonSyndrome	#StiffPersonSyndrome	
+unknown-#ESUSaware	#Stroke|ESUS|	#ESUSaware|
+#Synesthesia	#Synesthesia	
+#SystemicSclerosis	#SystemicSclerosis	
+#TBI	#TBI	
+#TNBC	#TNBC	
+#TSComplex	#TSComplex	
+#TennisElbow	#TennisElbow	
+#Thalassemia	#Thalassemia	
+#ThroatCancer	#ThroatCancer	
+#Tinnitus	#Tinnitus	
+#TransverseMyelitis	#TransverseMyelitis	
+#Trichotillomania	#Trichotillomania	
+#TrigeminalNeuralgia	#TrigeminalNeuralgia	
+#Triglycerides	#Triglycerides	
+#Tuberculosis	#Tuberculosis	
+#UTI	#UTI	
+#Urticaria	#Urticaria	
+#Varicose	#Varicose	
+#VascularDisease	#VascularDisease	
+#Vasculitis	#Vasculitis	
+#VisualSnow	#VisualSnow	
+#YeastInfection	#YeastInfection	
+#YellowFever	#YellowFever	
+#aHUS	#aHUS	
+#acousticneuroma	#acousticneuroma	
+#adenomyosis	#adenomyosis	
+#ankylosingspondylitis	#ankylosingspondylitis	
+#appendicitis	#appendicitis	
+#basalcellcarcinoma	#basalcellcarcinoma	
+#brucellosis	#brucellosis	
+#chickenpox	#chickenpox	
+#colic	#colic	
+#curesma	#curesma	
+#delirium	#delirium	
+#devlangdis	#devlangdis	
+#dupuytrens	#dupuytrens	
+#enuresis	#enuresis	
+#eosinophilicesophagitis	#eosinophilicesophagitis	
+#erectiledysfunction	#erectiledysfunction	
+unknown-#esocsm		#esocsm
+#fracture	#fracture	
+#fragileX	#fragileX	
+#giardia	#giardia	
+#glaucoma	#glaucoma	
+#hayfever	#hayfever	
+#headandneckcancer	#headandneckcancer	
+#hidradenitissuppurativa	#hidradenitissuppurativa	
+unknown-#hncsm		#hncsm
+#hydrocephalus	#hydrocephalus	
+#hypertrophiccardiomyopathy	#hypertrophiccardiomyopathy	
+#hypophosphatasia	#hypophosphatasia	
+#hypospadias	#hypospadias	
+#impotence	#impotence	
+#irondeficiency	#irondeficiency	
+unknown-#MenHaveBreastsToo	#malebreastcancer|	#MenHaveBreastsToo|
+#meningococcal	#meningococcal	
+#merkelcellcarcinoma	#merkelcellcarcinoma	
+#microcephaly	#microcephaly	
+unknown-#mpnsm		#mpnsm
+#myocarditis	#myocarditis	
+#myopiacontrol	#myopiacontrol	
+#neurofibromatosis	#neurofibromatosis	
+#nonhodgkinslymphoma	#nonhodgkinslymphoma	
+#osteonecrosis	#osteonecrosis	
+#pancreatitis	#pancreatitis	
+#peripheralarterydisease	#peripheralarterydisease	
+#pleuralEffusion	#pleuralEffusion	
+#porphyria	#porphyria	
+#praderwilli	#praderwilli	
+#preventaccreta	#preventaccreta	
+#problemgambling	#problemgambling	
+#prostatitis	#prostatitis	
+#pseudobulbar	#pseudobulbar	
+#ringworm	#ringworm	
+#sjogrens	#sjogrens	
+#skintag	#skintag	
+#takotsubo	#takotsubo	
+unknown-#thmcsm		#thmcsm
+#thyca	#thyca	
+#trachoma	#trachoma	
+#uterinecancer	#uterinecancer	
+#varicella	#varicella	
+#varicocele	#varicocele	
+#wombcancer	#wombcancer	
+#A2ZCOPD	#A2ZCOPD|#COPD|	
+#AFib	#AFib|#AtrialFibrillation|	
+#AIDS	#AIDS|#HIV|	#HIVBC|#HIVCan|#HIV_chat|#hivcure|
+#ALS	#ALS|#MND|	
+#Alopecia	#Alopecia|#AlopeciaAreata|#Baldness|#HairLoss|	
+#Alzheimer	#Alzheimer|#Alzheimers|	#EndAlz|
+#Arthritis	#Arthritis|#Artritis|	
+#BRCA	#BRCA|#BRCA1|#BRCA2|#BRCAmutation|	
+#Bipolar	#Bipolar|#BipolarDisorder|#trastornobipolar|	
+#BladderCancer	#BladderCancer|	#LCSM|#blcsm|
+#BleedingDisorder	#BleedingDisorder|#BleedingDisorders|	
+unknown-#BTSM	#BrainTumor|#braintumors|#braintumour|	#BTSM|
+unknown-#BCD2020	#BCPEA|#BCmets|#BreastCancer|#advancedBC|#metastaticBC|	#BCD2020|#BCSM|#PinkIsNotACure|#mBCSM|
+#CFLN	#CFLN|#CysticFibrosis|	
+#CHD	#CHD|#CoronaryArteryDisease|#CoronaryHeartDisease|	
+#CHF	#CHF|#CongestiveHeartFailure|	
+#Celiac	#Celiac|#CeliacDisease|	
+#CleftLip	#CleftLip|#CleftPalate|	
+unknown-#CRCSM	#ColonCancer|#colorectal|#HCCD|	#CRCSM|
+#Crohns	#Crohns|#CrohnsDisease|	
+#DVT	#DVT|#DeepVeinThrombosis|	
+#Diabesity	#Diabesity|#Diabetes|#Prediabetes|#T1D|#diabete|#type2diabetes|	#DiabetesEd4All|#DiabetesEmpowered|#DiabetesLA|#Diabetesen1click|#Diabetesmonth|#Diabetic|#Diabetics|#IwishPeopleknewThatDiabetes|#LivingwithDiabetes|#SmashDiabetes|#dblog|#diabetESP|#diabetesandme|#typenone|
+#EatingDisorder	#EatingDisorder|#EatingDisorders|	#EndEd|
+#FattyLiver	#FattyLiver|#NAFLD|	
+#FMD	#FMD|#Fibro|#Fibromyalgia|	#FMDaware|
+#Fibroid	#Fibroid|#Fibroids|	
+#Flu	#Flu|#H1N1|#Influenza|	#PreventingTheFlu|#StockportFluFighting|
+#Haemophilia	#Haemophilia|#Hemophilia|#HemophiliaA|#HemophiliaB|#Hemophiliac|	#HemoAM|#HemoChat|
+#HepB	#HepB|#HepC|#Hepatitis|#HepatitisA|#HepatitisE|	#HepPartners|
+#HighBloodPressure	#HighBloodPressure|#Hypertension|	
+#HighCholesterol	#HighCholesterol|#HyperCholesterol|	
+#Hodgkin	#Hodgkin|#Lymphoma|#Lyphoma|	
+#HunterSyndrome	#HunterSyndrome|#MPSII|	
+#LQTS	#LQTS|#LongQT|	
+#Leukaemia	#Leukaemia|#Leukemia|#XMRV|	#leusm|
+#Lupus	#Lupus|#MayoLupus|	#LupusFeelsLike|#LupusTaughtMe|#lupuswarrior|
+#Lymphoedema	#Lymphoedema|#lymphedema|	#lymsm|
+#MCAM	#MCAM|#OralCancer|	
+unknown-#MMSM	#Myeloma|	#MMSM|
+#MultScler	#MultScler|#MultipleSclerosis|	#StateofMS|#WeHaveMS|
+unknown-#OCAMChat	#OVCA|#OvarianCancer|	#OCAMChat|
+#PanCan	#PanCan|#PancreaticCancer|	#PancSM|
+#Pemphigus	#Pemphigus|#pemphigusvulgaris|	
+#Peyronies	#Peyronies|#PeyroniesDisease|	
+#Rheum	#Rheum|#RheumatoidArthritis|	
+#Schizofrenie	#Schizofrenie|#Schizophrenia|	
+#SickleCell	#SickleCell|#sicklecelldisease|	
+#SpinalCordInjury	#SpinalCordInjury|#SpinalInjury|	
+unknown-#TCisNoJoke	#TesticularCancer|	#TCisNoJoke|#tscsm|
+#Thrombosis	#Thrombosis|#trombosis|	
+#ThyroidCancer	#ThyroidCancer|	#thycsm|
+#Viruszika	#Viruszika|#Zika|#ZikaVirus|	
+#analcancer	#analcancer|	#ancsm|
+#Asthma	#Asthma|#asma|	
+#IOMCardiacArrest	#IOMCardiacArrest|#cardiacarrest|	
+#ClusterHeadaches	#ClusterHeadaches|#clusterheadache|	
+#Hypoglycemia	#Hypoglycemia|#hypoglycaemia|	
+#Lipoedema	#Lipoedema|#lipedema|	
+unknown-#PNDChat	#PPD|#postpartumdepression|	#PNDChat|#PPDchat|#bePNDaware|
+#sarcoma	#sarcoma|	#scmsm|
+unknown-#stcsm	#stomachcancer|	#stcsm|
+unknown-#GPFAD2013		#GPFAD2013
+unknown-#KnowFH		#KnowFH
+#MRSA	#MRSA	
+#PTEN	#PTEN	
+#antiNMDAr	#antiNMDAr	
+unknown-#hpbcsm		#hpbcsm
+#CancerChat		#CancerFreeMe|#CancerSurvivors|#ChildhoodCancer|#CancerChat|

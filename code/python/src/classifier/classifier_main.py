@@ -29,7 +29,7 @@ WITH_ANN_COMPLEX = True
 
 
 PREDICTION_TARGETS=6
-FEATURE_REDUCTION=None #str pca or lda or None
+FEATURE_REDUCTION="pca" #str pca or lda or None
 
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
 N_FOLD_VALIDATION_ONLY = True

@@ -7,45 +7,62 @@ try different top N for auto dict
 try different features for different classes (1 vs all)
 try P and R balance
 
+SVM (text only)
+		empty_filled	empty_removed	full
+- raw		x		x		x
+- pca		x		x		x
 
-text
-text+pca
-text+pca, then auto dict,
-text+pca, then manual dict,
-text+pca, then auto dict, then basic numeric, and other numeric
-text+pca, then manual dict, then basic numeric, and other numeric
+SVM (text + basic numeric)
+		empty_filled	empty_removed	full
+- raw		x		x		x
+- pca		x		x		x
 
-text, then auto dict,
-text, then manual dict,
-text, then auto dict, then basic numeric, and other numeric
-text, then manual dict, then basic numeric, and other numeric
+SVM (text + all numeric)
+		empty_filled	empty_removed	full
+- raw		x		x		x
+- pca		x		x		x
+
+SVM (text + auto dict)
+		empty_filled	empty_removed	full
+- raw		x		x		x
+- pca		x		x		x
+
+SVM (auto dict)
+		empty_filled	empty_removed	full
+- raw		x		x		x
+- pca		x		x		x
+
+
+
+
+
 
 DNN (text only)
-		empty_filled	empty_removed
-- cnn					x
+		empty_filled	empty_removed	full
+- cnn					
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + basic numeric)
-		empty_filled	empty_removed
-- cnn					x
+		empty_filled	empty_removed	full
+- cnn			x		x	x
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + all numeric)
-		empty_filled	empty_removed
-- cnn					x
+		empty_filled	empty_removed	full
+- cnn			x		x	x
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + auto dict)
-		empty_filled	empty_removed
-- cnn					x
+		empty_filled	empty_removed	full
+- cnn			x		x	x
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + all)
-		empty_filled	empty_removed
-- cnn					x
+		empty_filled	empty_removed	full
+- cnn			x		x	x
 - cnn skip 1
 - cnn skip 2

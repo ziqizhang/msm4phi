@@ -22,17 +22,17 @@ if __name__ == "__main__":
     # SETTING1 tfidf weighted nagram (text only. see code how features are
     # concatenated. You can do the same for text+other numeric) features
 
-    # print(datetime.datetime.now())
-    # X, y = fc.create_textprofile(csv_basic_feature)
-    # cls = cm.Classifer("stakeholdercls", "_text_only_", X, y, outfolder)
-    # cls.run()
+    print(datetime.datetime.now())
+    X, y = fc.create_textprofile(csv_basic_feature)
+    cls = cm.Classifer("stakeholdercls", "_text_only_", X, y, outfolder)
+    cls.run()
 
 
     #SETTING2 basic features + tweet_feature/diseases_in_tweets.csv
-    print(datetime.datetime.now())
-    X,y=fc.create_numeric(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_numeric_only_", X, y, outfolder)
-    cls.run()
+    # print(datetime.datetime.now())
+    # X,y=fc.create_numeric(csv_basic_feature, csv_other_feature)
+    # cls = cm.Classifer("stakeholdercls", "_numeric_only_", X, y, outfolder)
+    # cls.run()
 
 
     #SETTING3 manual_dictionary only
@@ -47,17 +47,37 @@ if __name__ == "__main__":
     # cls = cm.Classifer("stakeholdercls", "_autodict_only_", X, y, outfolder)
     # cls.run()
 
+    # Setting 6 text+numeric
+    print(datetime.datetime.now())
+    X, y = fc.create_text_and_numeric(csv_basic_feature, csv_other_feature)
+    cls = cm.Classifer("stakeholdercls", "_text+numeric_", X, y, outfolder)
+    cls.run()
+
+    # Setting 9 text+autocreated_dictext
+    print(datetime.datetime.now())
+    X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
+    cls = cm.Classifer("stakeholdercls", "_text+autodictext_", X, y, outfolder)
+    cls.run()
+
+    # SETTING15 basic + autocreated_dict + tfidf weighted nagram
+    # print(datetime.datetime.now())
+    # X,y=fc.create_basic_auto_dict_and_text(csv_basic_feature, csv_other_feature)
+    # cls = cm.Classifer("stakeholdercls", "_basic + autodict+text(p+n)_", X, y, outfolder)
+    # cls.run()
+
+    # setting 10 text+autodict_ext+numeric
+    print(datetime.datetime.now())
+    X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
+    cls = cm.Classifer("stakeholdercls", "_text+numeric+autodictext_", X, y, outfolder)
+    cls.run()
+
     #SETTING5 autocreated_dict extended only
     print(datetime.datetime.now())
     X, y = fc.create_autocreated_dictext(csv_basic_feature, csv_other_feature)
     cls = cm.Classifer("stakeholdercls", "_autodictext_only_", X, y, outfolder)
     cls.run()
 
-    #Setting 6 text+numeric
-    print(datetime.datetime.now())
-    X, y = fc.create_text_and_numeric(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_text+numeric_", X, y, outfolder)
-    cls.run()
+
 
     #Setting 7 text+manual_dictionary
     # print(datetime.datetime.now())
@@ -69,20 +89,3 @@ if __name__ == "__main__":
     # X, y = fc.create_text_and_autodict(csv_basic_feature, csv_other_feature)
     # cls = cm.Classifer("stakeholdercls", "_text+autodict_", X, y, outfolder)
     # cls.run()
-    #Setting 9 text+autocreated_dictext
-    print(datetime.datetime.now())
-    X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_text+autodictext_", X, y, outfolder)
-    cls.run()
-
-    #SETTING15 basic + autocreated_dict + tfidf weighted nagram
-    # print(datetime.datetime.now())
-    # X,y=fc.create_basic_auto_dict_and_text(csv_basic_feature, csv_other_feature)
-    # cls = cm.Classifer("stakeholdercls", "_basic + autodict+text(p+n)_", X, y, outfolder)
-    # cls.run()
-
-    #setting 10 text+autodict_ext+numeric
-    print(datetime.datetime.now())
-    X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
-    cls = cm.Classifer("stakeholdercls", "_text+numeric+autodictext_", X, y, outfolder)
-    cls.run()

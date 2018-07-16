@@ -195,7 +195,8 @@ def learn_dnn_textonly(cpus, nfold, task, load_model,
                           append_feature_matrix=None,
                           model_descriptor=dmc.DNN_MODEL_DESCRIPTOR)
 
-    model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=100, epochs=10)
+    model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=dmc.DNN_BATCH_SIZE,
+                            epochs=dmc.DNN_EPOCHES)
     nfold_predictions = cross_val_predict(model,
                                           text_based_features,
                                           y_train,
