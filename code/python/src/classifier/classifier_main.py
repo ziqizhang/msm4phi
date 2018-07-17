@@ -12,27 +12,12 @@ import os
 from sklearn.linear_model import LogisticRegression
 from classifier import classifier_learn as cl
 from classifier import classifier_tag as ct
-from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.cross_validation import StratifiedKFold
 import numpy as np
 from classifier import classifier_util
 
-# Model selection
-WITH_SGD = False
-WITH_SLR = False
-WITH_RANDOM_FOREST = False
-WITH_LIBLINEAR_SVM = False
-WITH_RBF_SVM = False
-WITH_ANN = False
-WITH_ANN_COMPLEX = True
-
-
-PREDICTION_TARGETS=6
-FEATURE_REDUCTION="pca" #str pca or lda or None
-
 # Random Forest model(or any tree-based model) do not ncessarily need feature scaling
-N_FOLD_VALIDATION_ONLY = True
 SCALING = True
 # DIRECTLY LOAD PRE-TRAINED MODEL FOR PREDICTION
 # ENABLE THIS VARIABLE TO TEST NEW TEST SET WITHOUT TRAINING
@@ -43,15 +28,6 @@ AUTO_FEATURE_SELECTION = False
 FEATURE_SELECTION_WITH_MAX_ENT_CLASSIFIER = False
 FEATURE_SELECTION_WITH_EXTRA_TREES_CLASSIFIER = True
 FEATURE_SELECTION_MANUAL_SETTING = False
-# set manually selected feature index list here
-# check random forest setting when changing this variable
-MANUAL_SELECTED_FEATURES = []
-
-# The number of CPUs to use to do the computation. -1 means 'all CPUs'
-NUM_CPU = -1
-
-N_FOLD_VALIDATION = 5
-
 
 #####################################################
 
@@ -66,117 +42,144 @@ class Classifer(object):
     identifier = None
     outfolder = None
 
+    '''
+    text_data=text content per instance. must have the same number of rows as data_X.
+                if provided, features will be extracted for these text, and 
+                concatenated with data_X
+     
+    dnn_embedding_file=if dnn model is used, this must be a file pointing to the embedding model
+    dnn_descriptor=if dnn model is used, this must be a text description of the model
+                    see dnn_util.py. There are only a limited set of descriptors that can be
+                    parsed
+    *algorithms=sgd,svm_l,svm_rbf,rf,lr,dnn_text (which uses only text data), dnn (which concatenates
+                features from text with meta features). For both dnn and dnn_text, text_data
+                must not be None. For others, if 'pca-' is added as prefix (e.g., pca-sgd), 
+                PCA will be applied for the feature space before the algorithm runs
+    '''
+
     def __init__(self, task, identifier, data_X, data_y,
-                 outfolder, text_data=None, dnn_embedding_file=None):
+                 outfolder, categorical_targets, algorithms:list,
+                 nfold=10, text_data=None,
+                 dnn_embedding_file=None,
+                 dnn_descriptor=None, ):
         self.test_data = None
         self.training_data = data_X
         self.training_label = data_y
+        self.nfold = nfold
+        self.categorical_targets = categorical_targets
         self.text_data = text_data
         self.identifier = identifier
         self.task_name = task
         self.outfolder = outfolder
         self.dnn_embedding_file = dnn_embedding_file
+        self.dnn_descriptor = dnn_descriptor
+        self.algorithms = algorithms
 
     def load_testing_data(self, data_test_X):
         self.test_data = data_test_X
 
     def training(self):
         print("training data size:", len(self.training_data))
-        print("train with CPU cores: [%s]" % NUM_CPU)
         # X_resampled, y_resampled = self.under_sampling(self.training_data, self.training_label)
         # Tuning hyper-parameters for precision
 
         # split the dataset into two parts, 0.75 for train and 0.25 for testing
-        X_train = None
+        X_train = self.training_data
+        y_train = self.training_label
         X_test = None
-        y_train = None
         y_test = None
-        if N_FOLD_VALIDATION_ONLY:
-            X_train = self.training_data
-            y_train = self.training_label
-        else:
-            X_train, X_test, y_train, y_test = train_test_split(self.training_data, self.training_label, test_size=0.25,
-                                                                random_state=42)
 
         ######################### SGDClassifier #######################
-        if WITH_SGD:
-            cl.learn_generative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "sgd", X_train,
+        if "sgd" in self.algorithms:
+            cl.learn_generative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "sgd", X_train,
                                 y_train,
-                                X_test, y_test, self.identifier, self.outfolder,
-                                FEATURE_REDUCTION)
+                                X_test, y_test, self.identifier, self.outfolder)
+        if "pca-sgd" in self.algorithms:
+            cl.learn_generative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "sgd", X_train,
+                                y_train,
+                                X_test, y_test, self.identifier, self.outfolder, "pca")
 
         ######################### Stochastic Logistic Regression#######################
-        if WITH_SLR:
-            cl.learn_generative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "lr", X_train,
+        if "lr" in self.algorithms:
+            cl.learn_generative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "lr", X_train,
                                 y_train,
-                                X_test, y_test, self.identifier, self.outfolder,
-                                FEATURE_REDUCTION)
+                                X_test, y_test, self.identifier, self.outfolder)
+        if "pca-lr" in self.algorithms:
+            cl.learn_generative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "lr", X_train,
+                                y_train,
+                                X_test, y_test, self.identifier, self.outfolder, "pca")
 
         ######################### Random Forest Classifier #######################
-        if WITH_RANDOM_FOREST:
-            cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "rf", X_train,
+        if "rf" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "rf", X_train,
                                     y_train,
-                                    X_test, y_test, self.identifier, self.outfolder,
-                                    FEATURE_REDUCTION)
+                                    X_test, y_test, self.identifier, self.outfolder)
+        if "pca-rf" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "rf", X_train,
+                                    y_train,
+                                    X_test, y_test, self.identifier, self.outfolder,"pca")
 
         ###################  liblinear SVM ##############################
-        if WITH_LIBLINEAR_SVM:
-            cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "svm-l", X_train,
-                                    y_train, X_test, y_test, self.identifier, self.outfolder,
-                                    FEATURE_REDUCTION)
+        if "svm_l" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "svm-l", X_train,
+                                    y_train, X_test, y_test, self.identifier, self.outfolder)
+        if "pca-svm_l" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "svm-l", X_train,
+                                    y_train, X_test, y_test, self.identifier, self.outfolder, "pca")
 
         ##################### RBF svm #####################
-        if WITH_RBF_SVM:
-            cl.learn_discriminative(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE, "svm-rbf",
+        if "svm_rbf" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "svm-rbf",
                                     X_train,
-                                    y_train, X_test, y_test, self.identifier, self.outfolder,
-                                    FEATURE_REDUCTION)
+                                    y_train, X_test, y_test, self.identifier, self.outfolder)
+        if "pca-svm_rbf" in self.algorithms:
+            cl.learn_discriminative(-1, self.nfold, self.task_name, LOAD_MODEL_FROM_FILE, "svm-rbf",
+                                    X_train,
+                                    y_train, X_test, y_test, self.identifier, self.outfolder, "pca")
 
         ################# Artificial Neural Network #################
-        if WITH_ANN:
-            cl.learn_dnn_textonly(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
+        if "dnn_text" in self.algorithms:
+            cl.learn_dnn_textonly(self.nfold, self.task_name, LOAD_MODEL_FROM_FILE,
                                   self.dnn_embedding_file, self.text_data,
                                   X_train,
-                                  y_train, X_test, y_test, self.identifier, self.outfolder,
-                                  FEATURE_REDUCTION)
+                                  y_train, X_test, y_test, self.dnn_descriptor, self.outfolder)
 
-        if WITH_ANN_COMPLEX:
-            cl.learn_dnn_textandmeta(NUM_CPU, N_FOLD_VALIDATION, self.task_name, LOAD_MODEL_FROM_FILE,
-                                  self.dnn_embedding_file, self.text_data,
-                                  X_train,
-                                  y_train, X_test, y_test, self.identifier, self.outfolder,
-                                     PREDICTION_TARGETS)
+        if "dnn" in self.algorithms:
+            cl.learn_dnn_textandmeta(self.nfold, self.task_name, LOAD_MODEL_FROM_FILE,
+                                     self.dnn_embedding_file, self.text_data,
+                                     X_train,
+                                     y_train, X_test, y_test, self.dnn_descriptor, self.outfolder,
+                                     prediction_targets=self.categorical_targets)
 
         print("complete!")
 
     def testing(self):
         print("start testing stage :: testing data size:", len(self.test_data))
-        print("test with CPU cores: [%s]" % NUM_CPU)
 
         ######################### SGDClassifier #######################
-        if WITH_SGD:
-            ct.tag(NUM_CPU, "sgd", self.task_name, self.test_data)
+        if "sgd" in self.algorithms:
+            ct.tag(-1, "sgd", self.task_name, self.test_data)
 
         ######################### Stochastic Logistic Regression#######################
-        if WITH_SLR:
-            ct.tag(NUM_CPU, "lr", self.task_name, self.test_data)
+        if "lr" in self.algorithms:
+            ct.tag(-1, "lr", self.task_name, self.test_data)
 
         ######################### Random Forest Classifier #######################
-        if WITH_RANDOM_FOREST:
-            ct.tag(NUM_CPU, "rf", self.task_name, self.test_data)
+        if "rf" in self.algorithms:
+            ct.tag(-1, "rf", self.task_name, self.test_data)
 
         ###################  liblinear SVM ##############################
-        if WITH_LIBLINEAR_SVM:
-            ct.tag(NUM_CPU, "svm-l", self.task_name, self.test_data)
+        if "svm-l" in self.algorithms:
+            ct.tag(-1, "svm-l", self.task_name, self.test_data)
         ##################### RBF svm #####################
-        if WITH_RBF_SVM:
-            ct.tag(NUM_CPU, "svm-rbf", self.task_name, self.test_data)
+        if "svm-rbf" in self.algorithms:
+            ct.tag(-1, "svm-rbf", self.task_name, self.test_data)
         print("complete!")
 
     def feature_selection_with_max_entropy_classifier(self):
         print("automatic feature selection by maxEnt classifier ...")
         rfe = RFECV(estimator=LogisticRegression(class_weight='auto'),
-                    cv=StratifiedKFold(self.training_label, 10), scoring='roc_auc', n_jobs=NUM_CPU)
+                    cv=StratifiedKFold(self.training_label, 10), scoring='roc_auc', n_jobs=-1)
         rfe.fit(self.training_data, self.training_label)
 
         self.training_data = rfe.transform(self.training_data)
@@ -201,15 +204,6 @@ class Classifer(object):
 
         print("Optimal number of features : %s" % str(features_selected))
 
-    def feature_selection_with_manual_setting(self):
-        print("feature selection with manual setting ...")
-        if MANUAL_SELECTED_FEATURES is None or len(MANUAL_SELECTED_FEATURES) == 0:
-            raise ArithmeticError("Manual selected feature is NOT set correctly!")
-
-        self.training_data = self.training_data[:, MANUAL_SELECTED_FEATURES]
-
-        print("Optimal number of features : %s" % str(MANUAL_SELECTED_FEATURES))
-
     def saveOutput(self, prediction, model_name):
         filename = os.path.join(os.path.dirname(__file__), "prediction-%s-%s.csv" % (model_name, self.task_name))
         file = open(filename, "w")
@@ -233,8 +227,6 @@ class Classifer(object):
                 self.feature_selection_with_extra_tree_classifier()
             elif FEATURE_SELECTION_WITH_MAX_ENT_CLASSIFIER:
                 self.feature_selection_with_max_entropy_classifier()
-            elif FEATURE_SELECTION_MANUAL_SETTING:
-                self.feature_selection_with_manual_setting()
             else:
                 raise ArithmeticError("Feature selection method IS NOT SET CORRECTLY!")
 
@@ -251,15 +243,4 @@ class Classifer(object):
         else:
             print("training without feature scaling!")
 
-
-# ============= random sampling =================================
-# print("training data size before resampling:", len(classifier.training_data))
-# X_resampled, y_resampled = classifier.under_sampling(classifier.training_data,                                                         classifier.training_label)
-# print("training data size after resampling:", len(X_resampled))
-# enable this line to visualise the data
-# classifier.training_data = X_resampled
-# classifier.training_label = y_resampled
-
-# start the n-fold testing.
         self.training()
-# classifier.testing()

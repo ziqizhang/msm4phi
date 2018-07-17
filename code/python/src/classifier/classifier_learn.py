@@ -7,7 +7,7 @@ import numpy
 from keras import Input, Model
 from keras.layers import concatenate, Dense
 from keras.preprocessing import sequence
-from keras.utils import plot_model, np_utils
+from keras.utils import plot_model
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn import svm
 from sklearn.decomposition import PCA
@@ -26,6 +26,7 @@ from time import time
 from classifier import dnn_util as dmc
 
 RANDOM_SEED = 1
+RANDOM_STATE = 42
 
 
 def create_feature_reduction_alg(feature_reduction, max_feature=None):
@@ -165,10 +166,10 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
         util.save_scores(nfold_predictions, y_train, None, y_test, model, task, identifier, 2, outfolder)
 
 
-def learn_dnn_textonly(cpus, nfold, task, load_model,
+def learn_dnn_textonly(nfold, task, load_model,
                        embedding_model_file,
                        text_data, X_train, y_train, X_test, y_test,
-                       identifier, outfolder, feature_reduction=None):
+                       model_descriptor, outfolder):
     print("== Perform ANN ...")  # create model
 
     M = dmc.get_word_vocab(text_data, 1)
@@ -193,14 +194,15 @@ def learn_dnn_textonly(cpus, nfold, task, load_model,
                           wemb_matrix=pretrained_word_matrix, word_embedding_dim=dmc.DNN_EMBEDDING_DIM,
                           max_sequence_length=dmc.DNN_MAX_SEQUENCE_LENGTH,
                           append_feature_matrix=None,
-                          model_descriptor=dmc.DNN_MODEL_DESCRIPTOR)
+                          model_descriptor=model_descriptor)
 
     model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=dmc.DNN_BATCH_SIZE,
                             epochs=dmc.DNN_EPOCHES)
+    skf = StratifiedKFold(nfold, random_state=RANDOM_STATE)
     nfold_predictions = cross_val_predict(model,
                                           text_based_features,
                                           y_train,
-                                          cv=nfold)
+                                          cv=skf)
 
     ann_model_file = os.path.join(outfolder, "ann-%s.m" % task)
 
@@ -216,21 +218,22 @@ def learn_dnn_textonly(cpus, nfold, task, load_model,
     print("testing on development set ....")
     if (X_test is not None):
         heldout_predictions_final = best_estimator.predict(X_test)
-        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task, identifier, 2,
+        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task, model_descriptor,
+                         2,
                          outfolder)
 
     else:
-        util.save_scores(nfold_predictions, y_train, None, y_test, "dnn", task, identifier, 2, outfolder)
+        util.save_scores(nfold_predictions, y_train, None, y_test, "dnn", task, model_descriptor, 2, outfolder)
 
     # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
     #                       time_ann_predict_dev,
     #                       time_ann_train, y_test)
 
 
-def learn_dnn_textandmeta(cpus, nfold, task, load_model,
+def learn_dnn_textandmeta(nfold, task, load_model,
                           embedding_model_file,
                           text_data, X_train_metafeature, y_train, X_test, y_test,
-                          identifier, outfolder, prediction_targets):
+                          model_descriptor, outfolder, prediction_targets):
     print("== Perform ANN ...")  # create model
 
     M = dmc.get_word_vocab(text_data, 1)
@@ -255,12 +258,12 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
 
     model_text_inputs = Input(shape=(dmc.DNN_MAX_SEQUENCE_LENGTH,))
     model_text = dmc.create_submodel_textfeature(
-                                                 model_text_inputs,
-                                                 len(M[1]),
-                                                 dmc.DNN_EMBEDDING_DIM, dmc.DNN_MAX_SEQUENCE_LENGTH,
-                                                 pretrained_word_matrix,
-                                                 dmc.DNN_MODEL_DESCRIPTOR)
-    model_metafeature_inputs=Input(shape=(len(X_train_metafeature[0]),))
+        model_text_inputs,
+        len(M[1]),
+        dmc.DNN_EMBEDDING_DIM, dmc.DNN_MAX_SEQUENCE_LENGTH,
+        pretrained_word_matrix,
+        model_descriptor)
+    model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
     model_metafeature = \
         dmc.create_submodel_metafeature(model_metafeature_inputs, 50)
 
@@ -268,29 +271,28 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
     final = Dense(prediction_targets, activation="softmax")(merge)
     model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
 
-    plot_model(model,to_file="model.png")
+    plot_model(model, to_file="model.png")
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    kfold = StratifiedKFold(n_splits=nfold, shuffle=True)
-    X_merge=numpy.concatenate([X_train_textfeature, X_train_metafeature],axis=1)
+    kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
+    X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
 
     splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
 
     nfold_predictions = dict()
     for k in range(0, len(splits)):
         # Fit the model
-        X_train_index=splits[k][1][0]
+        X_train_index = splits[k][1][0]
         X_test_index = splits[k][1][1]
 
-        X_train_merge_=X_merge[X_train_index]
-        X_test_merge_=X_merge[X_test_index]
-        y_train_=y_train_int[X_train_index]
+        X_train_merge_ = X_merge[X_train_index]
+        X_test_merge_ = X_merge[X_test_index]
+        y_train_ = y_train_int[X_train_index]
 
+        X_train_text_feature = X_train_merge_[:, 0:len(X_train_textfeature[0])]
+        X_train_meta_feature = X_train_merge_[:, len(X_train_text_feature[0]):]
 
-        X_train_text_feature= X_train_merge_[:, 0:len(X_train_textfeature[0])]
-        X_train_meta_feature=X_train_merge_[:, len(X_train_text_feature[0]):]
-
-        #y_test = y_train[X_test_index]
+        # y_test = y_train[X_test_index]
         X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
         X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
 
@@ -298,21 +300,21 @@ def learn_dnn_textandmeta(cpus, nfold, task, load_model,
                   y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
 
         # evaluate the model
-        prediction_prob = model.predict([X_test_text_feature,X_test_meta_feature])
+        prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
         predictions = prediction_prob.argmax(axis=-1)
 
         for i, l in zip(X_test_index, predictions):
-            nfold_predictions[i]=l
+            nfold_predictions[i] = l
 
         # self.save_classifier_model(best_estimator, ann_model_file)
 
     indexes = sorted(list(nfold_predictions.keys()))
-    predicted_labels=[]
+    predicted_labels = []
     for i in indexes:
         predicted_labels.append(nfold_predictions[i])
-    util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, identifier, 2, outfolder)
+    util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, model_descriptor, 2, outfolder)
 
-    model=None
+    model = None
     # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
     #                       time_ann_predict_dev,
     #                       time_ann_train, y_test)
