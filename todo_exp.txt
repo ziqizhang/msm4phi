@@ -45,24 +45,24 @@ DNN (text only)
 
 DNN (text + basic numeric)
 		empty_filled	empty_removed	full
-- cnn			x		x	x
+- cnn						
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + all numeric)
 		empty_filled	empty_removed	full
-- cnn			x		x	x
+- cnn						
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + auto dict)
 		empty_filled	empty_removed	full
-- cnn			x		x	x
+- cnn						
 - cnn skip 1
 - cnn skip 2
 
 DNN (text + all)
 		empty_filled	empty_removed	full
-- cnn			x		x	x
+- cnn						
 - cnn skip 1
 - cnn skip 2

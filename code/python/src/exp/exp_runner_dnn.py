@@ -29,10 +29,10 @@ if __name__ == "__main__":
     n_fold = 10
 
     datafeatures = {}
-    datafeatures["full_"] = (csv_basic_feature_folder + "/basic_features.csv",
-                             csv_other_feature_folder + "/full")
-    datafeatures["emtpyremoved_"] = (csv_basic_feature_folder + "/basic_features_empty_profile_removed.csv",
-                                     csv_other_feature_folder + "/empty_profile_removed")
+    # datafeatures["full_"] = (csv_basic_feature_folder + "/basic_features.csv",
+    #                          csv_other_feature_folder + "/full")
+    # datafeatures["emtpyremoved_"] = (csv_basic_feature_folder + "/basic_features_empty_profile_removed.csv",
+    #                                  csv_other_feature_folder + "/empty_profile_removed")
     datafeatures["emptyfilled_"] = (csv_basic_feature_folder + "/basic_features_empty_profile_filled.csv",
                                     csv_other_feature_folder + "/empty_profile_filled")
 
