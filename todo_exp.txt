@@ -39,9 +39,9 @@ SVM (auto dict)
 
 DNN (text only)
 		empty_filled	empty_removed	full
-- cnn					
-- cnn skip 1
-- cnn skip 2
+- cnn					x	x
+- cnn skip 1				x	x
+- cnn skip 2				x	x
 
 DNN (text + basic numeric)
 		empty_filled	empty_removed	full
