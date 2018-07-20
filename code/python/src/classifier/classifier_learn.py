@@ -22,7 +22,6 @@ from sklearn.preprocessing import LabelBinarizer
 
 from classifier import classifier_util as util
 import os
-from time import time
 from classifier import dnn_util as dmc
 
 RANDOM_SEED = 1
@@ -40,10 +39,12 @@ def create_feature_reduction_alg(feature_reduction, max_feature=None):
     else:
         return 'lda', LinearDiscriminantAnalysis(n_components=300)
 
-
-def learn_discriminative(cpus, nfold, task, load_model, model,
-                         X_train, y_train, X_test, y_test,
-                         identifier, outfolder, feature_reduction=None):
+'''if nfold is none, the method will fit on the entire X_train data and a model file
+will be saved. If nfold is an integer, the model will perform cross fold valiation and 
+results will be saved'''
+def learn_discriminative(cpus, task, model,
+                         X_train, y_train,
+                         identifier, outfolder, nfold=None,feature_reduction=None):
     classifier = None
     model_file = None
 
@@ -91,31 +92,21 @@ def learn_discriminative(cpus, nfold, task, load_model, model,
             classifier = cls
         model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
 
-    nfold_predictions = None
-
-    t0 = time()
-    if load_model:
-        print("model is loaded from [%s]" % str(model_file))
-        classifier = util.load_classifier_model(model_file)
-    else:
-        # classifier.fit(X_train, y_train)
+    if nfold is not None:
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
         util.save_classifier_model(classifier, model_file)
-
-    if (X_test is not None):
-        heldout_predictions_final = classifier.predict(X_test)
-        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task,
+        util.save_scores(nfold_predictions, y_train, None, None, model, task,
                          identifier, 2, outfolder)
     else:
-        util.save_scores(nfold_predictions, y_train, None, y_test, model, task,
-                         identifier, 2, outfolder)
+        classifier.fit(X_train, y_train)
+        util.save_classifier_model(classifier, model_file)
 
 
-def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_test, y_test,
-                     identifier, outfolder, feature_reduction=None):
+def learn_generative(cpus, task, model_flag, X_train, y_train,
+                     identifier, outfolder, nfold=None, feature_reduction=None):
     classifier = None
     model_file = None
-    if (model == "sgd"):
+    if (model_flag == "sgd"):
         print("== SGD ...")
         # "loss": ["log", "modified_huber", "squared_hinge", 'squared_loss'],
         #               "penalty": ['l2', 'l1'],
@@ -131,7 +122,7 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
         else:
             classifier = cls
         model_file = os.path.join(outfolder, "sgd-classifier-%s.m" % task)
-    if (model == "lr"):
+    if (model_flag == "lr"):
         print("== Stochastic Logistic Regression ...")
 
         cls = LogisticRegression(random_state=111)
@@ -144,31 +135,17 @@ def learn_generative(cpus, nfold, task, load_model, model, X_train, y_train, X_t
             classifier = cls
         model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
 
-    nfold_predictions = None
-
-    if load_model:
-        print("model is loaded from [%s]" % str(model_file))
-        classifier = util.load_classifier_model(model_file)
-    else:
+    if nfold is not None:
         print(y_train.shape)
-
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
-
-        util.save_classifier_model(classifier, model_file)
-    classes = classifier.classes_
-
-    if (X_test is not None):
-        heldout_predictions = classifier.predict_proba(X_test)
-        heldout_predictions_final = [classes[util.index_max(list(probs))] for probs in heldout_predictions]
-        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task,
-                         identifier, 2, outfolder)
+        util.save_scores(nfold_predictions, y_train, None, None, model_flag, task, identifier, 2, outfolder)
     else:
-        util.save_scores(nfold_predictions, y_train, None, y_test, model, task, identifier, 2, outfolder)
+        classifier.fit(X_train,y_train)
+        util.save_classifier_model(classifier, model_file)
 
-
-def learn_dnn_textonly(nfold, task, load_model,
+def learn_dnn_textonly(nfold, task,
                        embedding_model_file,
-                       text_data, X_train, y_train, X_test, y_test,
+                       text_data, y_train,
                        model_descriptor, outfolder):
     print("== Perform ANN ...")  # create model
 
@@ -188,7 +165,6 @@ def learn_dnn_textonly(nfold, task, load_model,
                                                                    pretrained_embedding_models,
                                                                    dmc.DNN_EMBEDDING_DIM,
                                                                    0)
-
     create_model_with_args = \
         functools.partial(dmc.create_model, max_index=len(M[1]),
                           wemb_matrix=pretrained_word_matrix, word_embedding_dim=dmc.DNN_EMBEDDING_DIM,
@@ -198,41 +174,23 @@ def learn_dnn_textonly(nfold, task, load_model,
 
     model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=dmc.DNN_BATCH_SIZE,
                             epochs=dmc.DNN_EPOCHES)
-    skf = StratifiedKFold(nfold, random_state=RANDOM_STATE)
-    nfold_predictions = cross_val_predict(model,
-                                          text_based_features,
-                                          y_train,
-                                          cv=skf)
+    model_file = os.path.join(outfolder, "ann-%s.m" % task)
+    if nfold is not None:
+        skf = StratifiedKFold(nfold, random_state=RANDOM_STATE)
+        nfold_predictions = cross_val_predict(model,
+                                              text_based_features,
+                                              y_train,
+                                              cv=skf)
 
-    ann_model_file = os.path.join(outfolder, "ann-%s.m" % task)
-
-    if load_model:
-        print("model is loaded from [%s]" % str(ann_model_file))
-        best_estimator = util.load_classifier_model(ann_model_file)
+        print(datetime.datetime.now())
+        util.save_scores(nfold_predictions, y_train, None, None, "dnn", task, model_descriptor, 2, outfolder)
     else:
-        best_estimator = model
+        model.fit(text_based_features,y_train)
+        util.save_classifier_model(model, model_file)
 
-        # self.save_classifier_model(best_estimator, ann_model_file)
-
-    print(datetime.datetime.now())
-    print("testing on development set ....")
-    if (X_test is not None):
-        heldout_predictions_final = best_estimator.predict(X_test)
-        util.save_scores(nfold_predictions, y_train, heldout_predictions_final, y_test, model, task, model_descriptor,
-                         2,
-                         outfolder)
-
-    else:
-        util.save_scores(nfold_predictions, y_train, None, y_test, "dnn", task, model_descriptor, 2, outfolder)
-
-    # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
-    #                       time_ann_predict_dev,
-    #                       time_ann_train, y_test)
-
-
-def learn_dnn_textandmeta(nfold, task, load_model,
+def learn_dnn_textandmeta(nfold, task,
                           embedding_model_file,
-                          text_data, X_train_metafeature, y_train, X_test, y_test,
+                          text_data, X_train_metafeature, y_train,
                           model_descriptor, outfolder, prediction_targets):
     print("== Perform ANN ...")  # create model
 
@@ -274,47 +232,47 @@ def learn_dnn_textandmeta(nfold, task, load_model,
     plot_model(model, to_file="model.png")
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
+    model_file = os.path.join(outfolder, "ann-%s.m" % task)
     X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
+    if nfold is not None:
+        kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
+        splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
 
-    splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
+        nfold_predictions = dict()
+        for k in range(0, len(splits)):
+            # Fit the model
+            X_train_index = splits[k][1][0]
+            X_test_index = splits[k][1][1]
 
-    nfold_predictions = dict()
-    for k in range(0, len(splits)):
-        # Fit the model
-        X_train_index = splits[k][1][0]
-        X_test_index = splits[k][1][1]
+            X_train_merge_ = X_merge[X_train_index]
+            X_test_merge_ = X_merge[X_test_index]
+            y_train_ = y_train_int[X_train_index]
 
-        X_train_merge_ = X_merge[X_train_index]
-        X_test_merge_ = X_merge[X_test_index]
-        y_train_ = y_train_int[X_train_index]
+            X_train_text_feature = X_train_merge_[:, 0:len(X_train_textfeature[0])]
+            X_train_meta_feature = X_train_merge_[:, len(X_train_text_feature[0]):]
 
-        X_train_text_feature = X_train_merge_[:, 0:len(X_train_textfeature[0])]
-        X_train_meta_feature = X_train_merge_[:, len(X_train_text_feature[0]):]
+            # y_test = y_train[X_test_index]
+            X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
+            X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
 
-        # y_test = y_train[X_test_index]
-        X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
-        X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
+            model.fit([X_train_text_feature, X_train_meta_feature],
+                      y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
 
-        model.fit([X_train_text_feature, X_train_meta_feature],
-                  y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+            # evaluate the model
+            prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
+            predictions = prediction_prob.argmax(axis=-1)
 
-        # evaluate the model
-        prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
-        predictions = prediction_prob.argmax(axis=-1)
+            for i, l in zip(X_test_index, predictions):
+                nfold_predictions[i] = l
 
-        for i, l in zip(X_test_index, predictions):
-            nfold_predictions[i] = l
+            # self.save_classifier_model(best_estimator, ann_model_file)
 
-        # self.save_classifier_model(best_estimator, ann_model_file)
-
-    indexes = sorted(list(nfold_predictions.keys()))
-    predicted_labels = []
-    for i in indexes:
-        predicted_labels.append(nfold_predictions[i])
-    util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, model_descriptor, 2, outfolder)
-
-    model = None
-    # util.print_eval_report(best_param_ann, cv_score_ann, dev_data_prediction_ann,
-    #                       time_ann_predict_dev,
-    #                       time_ann_train, y_test)
+        indexes = sorted(list(nfold_predictions.keys()))
+        predicted_labels = []
+        for i in indexes:
+            predicted_labels.append(nfold_predictions[i])
+        util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, model_descriptor, 2, outfolder)
+    else:
+        model.fit([X_train_textfeature, X_train_metafeature],
+                  y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+        util.save_classifier_model(model, model_file)
