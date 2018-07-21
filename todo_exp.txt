@@ -1,63 +1,6 @@
-try twitter embeddings
+test functional api, only text feature
+try functional, dense
 
-try text on profiles only	x
-try non empty profiles only	x
-try filled profiles		x
-try different top N for auto dict
-try different features for different classes (1 vs all)
-try P and R balance
+test fit/predict, load model
 
-SVM (text only)
-		empty_filled	empty_removed	full
-- raw		x		x		x
-- pca		x		x		x
-
-SVM (text + basic numeric)
-		empty_filled	empty_removed	full
-- raw		x		x		x
-- pca		x		x		x
-
-SVM (text + all numeric)
-		empty_filled	empty_removed	full
-- raw		x		x		x
-- pca		x		x		x
-
-SVM (text + auto dict)
-		empty_filled	empty_removed	full
-- raw		x		x		x
-- pca		x		x		x
-
-SVM (auto dict)
-		empty_filled	empty_removed	full
-- raw		x		x		x
-- pca		x		x		x
-
-
-
-
-
-
-DNN (text only)
-		empty_filled	empty_removed	full
-- cnn		x			x	x
-- cnn skip 1	x			x	x
-- cnn skip 2	x			x	x
-
-
-DNN (text + all numeric)
-		empty_filled	empty_removed	full
-- cnn		x			x	x	
-- cnn skip 1	x			x	x
-- cnn skip 2	x			x	x
-
-DNN (text + auto dict)
-		empty_filled	empty_removed	full
-- cnn						
-- cnn skip 1
-- cnn skip 2
-
-DNN (text + all)
-		empty_filled	empty_removed	full
-- cnn						
-- cnn skip 1
-- cnn skip 2
+Users= 452144, emptyProfiles= 64363

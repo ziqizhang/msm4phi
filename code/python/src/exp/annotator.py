@@ -2,7 +2,6 @@
 it then updates the solr index with the annotations'''
 
 def create_features():
-    #get profiles from index, generate basic_features.csv, and
     #generate correspondingly other numeric and dictionary features
     pass
 

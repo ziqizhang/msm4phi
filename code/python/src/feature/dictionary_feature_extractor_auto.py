@@ -2,6 +2,7 @@
 # this code processes it further to extract different kinds of features based on dictionaries
 import csv
 import re
+import os
 
 import pandas as pd
 from feature import dictionary_extractor as de
@@ -240,15 +241,13 @@ if __name__=="__main__":
     #folder containing the dictionaries
     dictionary_folder="/home/zz/Work/msm4phi/resources/dictionary"
     #original feature csv file containing at least the text fields to be matched, and user id
-    csv_input_feature_file= "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
-
-
 
     #dict1-dictionary created based on lemmatisation; dict2-based on stemming
     #therefore also change the value'text_normalization_option = 0' in dictionary_extractor to use corresponding normalisation on text
     dict_lemstem_option="dict1"
     # output folder to save dictionary features
     outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/full/dictionary_feature_1"
+    csv_feature_input = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
 
     # column id of the target text field
     target_text_cols = 22  # 22=profile text; 15=name field
@@ -256,46 +255,46 @@ if __name__=="__main__":
     col_id=0
     #how many entries from each dictionary should be selected for matching(top n). Changing this param will generate
     #different features, so perhaps influencing classification results
-    topN_of_dict=200
+    topN_of_dict=100
 
-    #load auto extracted dictionaries, match to 'profile'
-    postype_dictionaries = \
-        de.load_extracted_dictionary(dictionary_folder+"/auto_created/profile/"+dict_lemstem_option+"/frequency_pass2",
-                                     topN_of_dict, "verb", "noun")
-    extracted_dictionaries = flatten_dictionary(postype_dictionaries)
-    match_extracted_dictionary(extracted_dictionaries, csv_input_feature_file,
-                               col_id, outfolder+"/feature_autocreated_dict_match"+target_text_name_suffix+".csv",
-                               target_text_cols)
+    for file in os.listdir(csv_feature_input):
+        #load auto extracted dictionaries, match to 'profile'
+        postype_dictionaries = \
+            de.load_extracted_dictionary(dictionary_folder+"/auto_created/profile/"+dict_lemstem_option+"/frequency_pass2",
+                                         topN_of_dict, "verb", "noun")
+        extracted_dictionaries = flatten_dictionary(postype_dictionaries)
+        match_extracted_dictionary(extracted_dictionaries, file,
+                                   col_id, outfolder +"/feature_autocreated_dict_match" + target_text_name_suffix +".csv",
+                                   target_text_cols)
 
-    #load hashtag dictionaries
-    hashtag_dictionary = dedh.load_disease_hashtag_dictionary(
-        dictionary_folder+"/hashtag_dict/dictionary_hashtag_disease.csv"
-    )
-    match_extracted_healthconditions(hashtag_dictionary, csv_input_feature_file, col_id,
-                                     outfolder+"/feature_disease_hashtag_match"+target_text_name_suffix+".csv",
-                                      target_text_cols)
+        #load hashtag dictionaries
+        hashtag_dictionary = dedh.load_disease_hashtag_dictionary(
+            dictionary_folder+"/hashtag_dict/dictionary_hashtag_disease.csv"
+        )
+        match_extracted_healthconditions(hashtag_dictionary, file, col_id,
+                                         outfolder +"/feature_disease_hashtag_match" + target_text_name_suffix +".csv",
+                                         target_text_cols)
 
-    disease_word_dictionary=dedh.load_disease_hashtag_dictionary(
-        dictionary_folder+"/hashtag_dict/dictionary_word_disease.csv"
-    )
-    match_extracted_healthconditions(disease_word_dictionary, csv_input_feature_file, col_id,
-                                     outfolder + "/feature_disease_word_match"+target_text_name_suffix+".csv",
-                                     target_text_cols)
+        disease_word_dictionary=dedh.load_disease_hashtag_dictionary(
+            dictionary_folder+"/hashtag_dict/dictionary_word_disease.csv"
+        )
+        match_extracted_healthconditions(disease_word_dictionary, file, col_id,
+                                         outfolder + "/feature_disease_word_match" + target_text_name_suffix +".csv",
+                                         target_text_cols)
 
-
-    #load other generic dictionaries
-    #person name
-    #person_name_dict=load_generic_dictionary(dictionary_folder+"/name/person_names.txt")
-    #person title
-    person_title_dict = load_generic_dictionary(dictionary_folder+"/manually_created/generic/person_titles.txt")
-    #profession
-    person_profession_dict = load_generic_dictionary(dictionary_folder+"/manually_created/generic/person_professions.txt")
-    generic_dict={}
-    #person name should only be used to match against the 'name' fields
-    #generic_dict["person_name"]=person_name_dict
-    generic_dict["person_title"]=person_title_dict
-    generic_dict["person_profession"]=person_profession_dict
-    match_generic_gazetteer(generic_dict,csv_input_feature_file,
-                             col_id, outfolder+"/feature_generic_dict_match"+target_text_name_suffix+".csv",
-                             target_text_cols)
+        #load other generic dictionaries
+        #person name
+        #person_name_dict=load_generic_dictionary(dictionary_folder+"/name/person_names.txt")
+        #person title
+        person_title_dict = load_generic_dictionary(dictionary_folder+"/manually_created/generic/person_titles.txt")
+        #profession
+        person_profession_dict = load_generic_dictionary(dictionary_folder+"/manually_created/generic/person_professions.txt")
+        generic_dict={}
+        #person name should only be used to match against the 'name' fields
+        #generic_dict["person_name"]=person_name_dict
+        generic_dict["person_title"]=person_title_dict
+        generic_dict["person_profession"]=person_profession_dict
+        # match_generic_gazetteer(generic_dict,csv_input_feature_file,
+        #                          col_id, outfolder+"/feature_generic_dict_match"+target_text_name_suffix+".csv",
+        #                          target_text_cols)
 

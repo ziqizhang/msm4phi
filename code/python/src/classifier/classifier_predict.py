@@ -1,39 +1,69 @@
+import gensim
+import keras
+from keras.models import model_from_yaml
+from keras.preprocessing import sequence
+
 from classifier import classifier_util as util
 import os
+from classifier import dnn_util as dmc
 
-'''this file loads a pre-trained model and classify new data'''
+'''this file loads a pre-trained model and classify new data. currently
+for non-DNN models, only non-text features are supported.'''
 
-def predict(model_flag, task, test_data, outfolder):
-    print("start prediction stage :: data size:", len(test_data))
+def predict(model_flag, task, model_file,test_features, text_data,outfolder):
+    print("start prediction stage :: data size:", len(test_features))
 
-    ######################### SGDClassifier #######################
-    model_file=None
-    if model_flag== "sgd":
-        # SGD doesn't work so well with only a few samples, but is (much more) performant with larger data
-        # At n_iter=1000, SGD should converge on most datasets
-        print("Using SGD ...")
-        model_file = os.path.join(outfolder, "sgd-classifier-%s.m" % task)
+    if model_flag.startswith("dnn"):
+        M = dmc.get_word_vocab(text_data, 1)
+        text_based_features = M[0]
+        text_based_features = sequence.pad_sequences(text_based_features,
+                                                     dmc.DNN_MAX_SEQUENCE_LENGTH)
 
-    ######################### Stochastic Logistic Regression#######################
-    if model_flag== "lr":
-        print("Using Stochastic Logistic Regression ...")
-        model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
+        if model_flag=="dnn":
+            yaml_file = open(model_file+'.yaml', 'r')
+            loaded_model_yaml = yaml_file.read()
+            yaml_file.close()
+            model = model_from_yaml(loaded_model_yaml)
+            # load weights into new model
+            model.load_weights(model_file+".h5")
+            print("Loaded model from disk")
 
-    ######################### Random Forest Classifier #######################
-    if model_flag== "rf":
-        print("Using Random Forest ...")
-        model_file = os.path.join(outfolder, "random-forest_classifier-%s.m" % task)
+            # evaluate loaded model on test data
+        else:
+            model=keras.models.load_model(model_file+".h5")
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        predictions=model.predict(text_based_features)
 
-    ###################  liblinear SVM ##############################
-    if model_flag== "svm_l":
-        print("Using SVM, kernel=linear ...")
-        model_file = os.path.join(outfolder, "liblinear-svm-linear-%s.m" % task)
+    else:
 
-    ##################### RBF svm #####################
-    if model_flag== "svm_rbf":
-        print("Using SVM, kernel=rbf ....")
-        model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
+        ######################### SGDClassifier #######################
+        if model_flag== "sgd":
+            # SGD doesn't work so well with only a few samples, but is (much more) performant with larger data
+            # At n_iter=1000, SGD should converge on most datasets
+            print("Using SGD ...")
+            model_file = os.path.join(outfolder, "sgd-classifier-%s.m" % task)
 
-    model = util.load_classifier_model(model_file)
-    predictions = model.predict_proba(test_data)
+        ######################### Stochastic Logistic Regression#######################
+        if model_flag== "lr":
+            print("Using Stochastic Logistic Regression ...")
+            model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
+
+        ######################### Random Forest Classifier #######################
+        if model_flag== "rf":
+            print("Using Random Forest ...")
+            model_file = os.path.join(outfolder, "random-forest_classifier-%s.m" % task)
+
+        ###################  liblinear SVM ##############################
+        if model_flag== "svm_l":
+            print("Using SVM, kernel=linear ...")
+            model_file = os.path.join(outfolder, "liblinear-svm-linear-%s.m" % task)
+
+        ##################### RBF svm #####################
+        if model_flag== "svm_rbf":
+            print("Using SVM, kernel=rbf ....")
+            model_file = os.path.join(outfolder, "liblinear-svm-rbf-%s.m" % task)
+        model = util.load_classifier_model(model_file)
+
+        predictions = model.predict_proba(test_features)
+
     util.saveOutput(predictions, model_flag, task, outfolder)

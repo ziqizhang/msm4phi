@@ -13,7 +13,7 @@ public class AppUserFeatureExport{
         SolrClient solrClient =
                 Util.getSolrClient(Paths.get(args[0]), "users");
         UserFeatureExporter exporter = new UserFeatureExporter();
-        exporter.process(10000, args[1], solrClient);
+        exporter.process(Integer.MAX_VALUE, args[1], solrClient);
         solrClient.close();
     }
 

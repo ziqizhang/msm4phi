@@ -17,15 +17,15 @@ def load_classifier_model(classifier_pickled=None):
             classifier = pickle.load(model)
         return classifier
 
-def outputFalsePredictions(pred, truth, model_name, task,outfolder):
-    filename = os.path.join(outfolder, "false_nfold_pred-%s-%s.csv" % (model_name, task))
+def outputPredictions(pred, truth, model_name, task, outfolder):
+    filename = os.path.join(outfolder, "predictions-%s-%s.csv" % (model_name, task))
     file = open(filename, "w")
     for p, t in zip(pred, truth):
         if p==t:
-            line=str(p)+",ok\n"
+            line=str(p)+","+str(t)+",ok\n"
             file.write(line)
         else:
-            line=str(p)+",wrong\n"
+            line=str(p)+","+str(t)+",wrong\n"
             file.write(line)
     file.close()
 
@@ -63,29 +63,21 @@ def prepare_score_string(p, r, f1, s, labels, target_names, digits):
     string += '{0}'.format(np.sum(s))+"\n\n"
     return string
 
-def save_scores(nfold_predictions, y_train, heldout_predictions, y_test, model_name, task_name,
+def save_scores(nfold_predictions, y_train, model_name, task_name,
                 identifier, digits, outfolder):
-    #outputFalsePredictions(nfold_predictions, x_test, model_name, task_name,outfolder)
+    outputPredictions(nfold_predictions, y_train, model_name, task_name, outfolder)
     filename = os.path.join(outfolder, "%s-%s.csv" % (model_name, task_name))
     file = open(filename, "a+")
     file.write(identifier)
-    if nfold_predictions is not None:
-        file.write("N-fold results:\n")
-        labels = unique_labels(y_train, nfold_predictions)
-        target_names = ['%s' % l for l in labels]
-        p, r, f1, s = precision_recall_fscore_support(y_train, nfold_predictions,
-                                                      labels=labels)
-        line=prepare_score_string(p,r,f1,s,labels,target_names,digits)
-        file.write(line)
 
-    if(heldout_predictions is not None):
-        file.write("Heldout results:\n")
-        labels = unique_labels(y_test, heldout_predictions)
-        target_names = ['%s' % l for l in labels]
-        p, r, f1, s = precision_recall_fscore_support(y_test, heldout_predictions,
+    file.write("N-fold results:\n")
+    labels = unique_labels(y_train, nfold_predictions)
+    target_names = ['%s' % l for l in labels]
+    p, r, f1, s = precision_recall_fscore_support(y_train, nfold_predictions,
                                                       labels=labels)
-        line=prepare_score_string(p,r,f1,s,labels,target_names,digits)
-        file.write(line)
+    line=prepare_score_string(p,r,f1,s,labels,target_names,digits)
+    file.write(line)
+
     file.close()
 
 
@@ -137,8 +129,11 @@ def validate_training_set(training_set):
 
 
 def feature_scaling_mean_std(feature_set):
-    scaler = StandardScaler(with_mean=True, with_std=True)
-    return scaler.fit_transform(feature_set)
+    if feature_set is not None:
+        scaler = StandardScaler(with_mean=True, with_std=True)
+        return scaler.fit_transform(feature_set)
+    else:
+        return feature_set
 
 
 def feature_scaling_min_max(feature_set):

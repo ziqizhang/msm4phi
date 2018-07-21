@@ -52,17 +52,16 @@ if __name__ == "__main__":
             print("\t"+model_descriptor)
 
             # SETTING0 dnn applied to profile only
-            # X, y = fc.create_basic(csv_basic_feature)
-            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            # df.astype(str)
-            # profiles = df[:, 22]
-            # profiles = ["" if type(x) is float else x for x in profiles]
-            # cls = cm.Classifer("stakeholdercls", "_dnn_text_", X, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn_text"],
-            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
-
+            X, y = fc.create_basic(csv_basic_feature)
+            df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+            df.astype(str)
+            profiles = df[:, 22]
+            profiles = ["" if type(x) is float else x for x in profiles]
+            cls = cm.Classifer("stakeholdercls", "_dnn_text_", None, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
 
             #
             # print(datetime.datetime.now())
@@ -77,27 +76,27 @@ if __name__ == "__main__":
             #                    dnn_descriptor=model_descriptor)
             # cls.run()
 
-            print(datetime.datetime.now())
-            X, y = fc.create_autocreated_dictext(csv_basic_feature, csv_other_feature)
-            df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            df.astype(str)
-            profiles = df[:, 22]
-            profiles = ["" if type(x) is float else x for x in profiles]
-            cls = cm.Classifer("stakeholdercls", "_dnn_text+autodictext_", X, y, outfolder,
-                               categorical_targets=6, algorithms=["dnn"],
-                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-                               dnn_descriptor=model_descriptor)
-            cls.run()
-
-            print(datetime.datetime.now())
-            X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
-            df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            df.astype(str)
-            profiles = df[:, 22]
-            profiles = ["" if type(x) is float else x for x in profiles]
-            cls = cm.Classifer("stakeholdercls", "_dnn_text+numeric+autodictext_", X, y, outfolder,
-                               categorical_targets=6, algorithms=["dnn"],
-                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-                               dnn_descriptor=model_descriptor)
-            cls.run()
+            # print(datetime.datetime.now())
+            # X, y = fc.create_autocreated_dictext(csv_basic_feature, csv_other_feature)
+            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+            # df.astype(str)
+            # profiles = df[:, 22]
+            # profiles = ["" if type(x) is float else x for x in profiles]
+            # cls = cm.Classifer("stakeholdercls", "_dnn_text+autodictext_", X, y, outfolder,
+            #                    categorical_targets=6, algorithms=["dnn"],
+            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+            #                    dnn_descriptor=model_descriptor)
+            # cls.run()
+            #
+            # print(datetime.datetime.now())
+            # X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
+            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+            # df.astype(str)
+            # profiles = df[:, 22]
+            # profiles = ["" if type(x) is float else x for x in profiles]
+            # cls = cm.Classifer("stakeholdercls", "_dnn_text+numeric+autodictext_", X, y, outfolder,
+            #                    categorical_targets=6, algorithms=["dnn"],
+            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+            #                    dnn_descriptor=model_descriptor)
+            # cls.run()
 

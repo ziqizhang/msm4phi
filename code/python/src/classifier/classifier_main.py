@@ -56,7 +56,7 @@ class Classifer(object):
 
     def __init__(self, task, identifier, data_X, data_y,
                  outfolder, categorical_targets, algorithms:list,
-                 nfold=10, text_data=None,
+                 nfold=None, text_data=None,
                  dnn_embedding_file=None,
                  dnn_descriptor=None):
         self.dataX = data_X
@@ -71,9 +71,7 @@ class Classifer(object):
         self.dnn_descriptor = dnn_descriptor
         self.algorithms = algorithms
 
-
     def train(self):
-        print("training data size:", len(self.dataX))
         # X_resampled, y_resampled = self.under_sampling(self.training_data, self.training_label)
         # Tuning hyper-parameters for precision
 
@@ -127,43 +125,48 @@ class Classifer(object):
                                     y_train, self.identifier, self.outfolder, feature_reduction="pca",nfold=self.nfold)
 
         ################# Artificial Neural Network #################
-        if "dnn_text" in self.algorithms:
-            cl.learn_dnn_textonly(self.nfold, self.task_name,
-                                  self.dnn_embedding_file, self.text_data,
-                                  y_train, self.dnn_descriptor, self.outfolder)
+        # if "dnn_text" in self.algorithms:
+        #     cl.learn_dnn_textonly(self.nfold, self.task_name,
+        #                           self.dnn_embedding_file, self.text_data,
+        #                           y_train, self.dnn_descriptor, self.outfolder)
 
         if "dnn" in self.algorithms:
-            cl.learn_dnn_textandmeta(self.nfold, self.task_name,
-                                     self.dnn_embedding_file, self.text_data,
-                                     X_train,
-                                     y_train, self.dnn_descriptor, self.outfolder,
-                                     prediction_targets=self.categorical_targets)
+            cl.learn_dnn(self.nfold, self.task_name,
+                         self.dnn_embedding_file, self.text_data,
+                         X_train,
+                         y_train, self.dnn_descriptor, self.outfolder,
+                         prediction_targets=self.categorical_targets)
 
         print("complete!")
 
-    def predict(self):
+    def predict(self, model_file):
         print("start predicting stage:", len(self.dataX))
 
         ######################### SGDClassifier #######################
         if "sgd" in self.algorithms:
-            ct.predict("sgd", self.task_name, self.dataX, self.outfolder)
+            ct.predict("sgd", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
 
         ######################### Stochastic Logistic Regression#######################
         if "lr" in self.algorithms:
-            ct.predict("lr", self.task_name, self.dataX, self.outfolder)
+            ct.predict("lr", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
 
         ######################### Random Forest Classifier #######################
         if "rf" in self.algorithms:
-            ct.predict("rf", self.task_name, self.dataX, self.outfolder)
+            ct.predict("rf", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
 
         ###################  liblinear SVM ##############################
         if "svm-l" in self.algorithms:
-            ct.predict("svm_l", self.task_name, self.dataX, self.outfolder)
+            ct.predict("svm_l", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
         ##################### RBF svm #####################
         if "svm-rbf" in self.algorithms:
-            ct.predict("svm_rbf", self.task_name, self.dataX, self.outfolder)
+            ct.predict("svm_rbf", self.task_name, model_file,self.dataX,self.text_data, self.outfolder)
+        # if "dnn_text" in self.algorithms:
+        #     ct.predict("dnn_text", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
+        #                )
+        if "dnn" in self.algorithms:
+            ct.predict("dnn", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
+                       )
         print("complete!")
-
 
 
     def feature_selection_with_max_entropy_classifier(self):
@@ -210,7 +213,8 @@ class Classifer(object):
 
     def run(self):
         # classifier.load_testing_data(DATA_ORG)
-        classifier_util.validate_training_set(self.dataX)
+        if self.dataX is not None:
+            classifier_util.validate_training_set(self.dataX)
 
         if AUTO_FEATURE_SELECTION:  # this is false by default
             if FEATURE_SELECTION_WITH_EXTRA_TREES_CLASSIFIER:

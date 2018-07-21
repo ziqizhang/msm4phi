@@ -5,6 +5,7 @@ import datetime
 import gensim
 import numpy
 from keras import Input, Model
+from keras.callbacks import ModelCheckpoint
 from keras.layers import concatenate, Dense
 from keras.preprocessing import sequence
 from keras.utils import plot_model
@@ -39,12 +40,15 @@ def create_feature_reduction_alg(feature_reduction, max_feature=None):
     else:
         return 'lda', LinearDiscriminantAnalysis(n_components=300)
 
+
 '''if nfold is none, the method will fit on the entire X_train data and a model file
 will be saved. If nfold is an integer, the model will perform cross fold valiation and 
 results will be saved'''
+
+
 def learn_discriminative(cpus, task, model,
                          X_train, y_train,
-                         identifier, outfolder, nfold=None,feature_reduction=None):
+                         identifier, outfolder, nfold=None, feature_reduction=None):
     classifier = None
     model_file = None
 
@@ -95,7 +99,7 @@ def learn_discriminative(cpus, task, model,
     if nfold is not None:
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
         util.save_classifier_model(classifier, model_file)
-        util.save_scores(nfold_predictions, y_train, None, None, model, task,
+        util.save_scores(nfold_predictions, y_train, model, task,
                          identifier, 2, outfolder)
     else:
         classifier.fit(X_train, y_train)
@@ -138,11 +142,19 @@ def learn_generative(cpus, task, model_flag, X_train, y_train,
     if nfold is not None:
         print(y_train.shape)
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
-        util.save_scores(nfold_predictions, y_train, None, None, model_flag, task, identifier, 2, outfolder)
+        util.save_scores(nfold_predictions, y_train, model_flag, task, identifier, 2, outfolder)
     else:
-        classifier.fit(X_train,y_train)
+        classifier.fit(X_train, y_train)
         util.save_classifier_model(classifier, model_file)
 
+
+'''WARNING: 
+1) the fit and model saving function of this method is untested
+2) this method uses the sequential model. Although it builds parallel CNNs, it seems
+that the model performance is inferior to a same model built using the functional API
+(see the method 'learn_dnn' below). So it is recommended that the 'learn_dnn' method
+is used instead of this one.
+'''
 def learn_dnn_textonly(nfold, task,
                        embedding_model_file,
                        text_data, y_train,
@@ -183,15 +195,19 @@ def learn_dnn_textonly(nfold, task,
                                               cv=skf)
 
         print(datetime.datetime.now())
-        util.save_scores(nfold_predictions, y_train, None, None, "dnn", task, model_descriptor, 2, outfolder)
+        util.save_scores(nfold_predictions, y_train, "dnn", task, model_descriptor, 2, outfolder)
     else:
-        model.fit(text_based_features,y_train)
-        util.save_classifier_model(model, model_file)
+        chk = ModelCheckpoint(model_file + ".h5", monitor='val_loss', save_best_only=False)
+        model.fit(text_based_features, y_train, callbacks=[chk])
 
-def learn_dnn_textandmeta(nfold, task,
-                          embedding_model_file,
-                          text_data, X_train_metafeature, y_train,
-                          model_descriptor, outfolder, prediction_targets):
+    util.save_classifier_model(model, model_file)
+
+
+'''when X_train_metafeature is None, only text data are processed to extract features'''
+def learn_dnn(nfold, task,
+              embedding_model_file,
+              text_data, X_train_metafeature, y_train,
+              model_descriptor, outfolder, prediction_targets):
     print("== Perform ANN ...")  # create model
 
     M = dmc.get_word_vocab(text_data, 1)
@@ -221,19 +237,26 @@ def learn_dnn_textandmeta(nfold, task,
         dmc.DNN_EMBEDDING_DIM, dmc.DNN_MAX_SEQUENCE_LENGTH,
         pretrained_word_matrix,
         model_descriptor)
-    model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
-    model_metafeature = \
-        dmc.create_submodel_metafeature(model_metafeature_inputs, 50)
 
-    merge = concatenate([model_text, model_metafeature])
-    final = Dense(prediction_targets, activation="softmax")(merge)
-    model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
+    if X_train_metafeature is not None:
+        model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
+        model_metafeature = \
+            dmc.create_submodel_metafeature(model_metafeature_inputs, 50)
+        merge = concatenate([model_text, model_metafeature])
+        final = Dense(prediction_targets, activation="softmax")(merge)
+        model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
+        X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
+    else:
+        print("--- using text features only ---")
+        final = Dense(prediction_targets, activation="softmax")(model_text)
+        model = Model(inputs=model_text_inputs, outputs=final)
+        X_merge = X_train_textfeature
 
     plot_model(model, to_file="model.png")
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     model_file = os.path.join(outfolder, "ann-%s.m" % task)
-    X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
+
     if nfold is not None:
         kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
         splits = list(enumerate(kfold.split(X_merge, y_train_int.argmax(1))))
@@ -255,11 +278,17 @@ def learn_dnn_textandmeta(nfold, task,
             X_test_text_feature = X_test_merge_[:, 0:len(X_train_textfeature[0])]
             X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
 
-            model.fit([X_train_text_feature, X_train_meta_feature],
-                      y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+            if X_train_metafeature is not None:
+                model.fit([X_train_text_feature, X_train_meta_feature],
+                          y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+                prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
 
+            else:
+                model.fit(X_train_text_feature,
+                          y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+                prediction_prob = model.predict(X_test_text_feature)
             # evaluate the model
-            prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
+            #
             predictions = prediction_prob.argmax(axis=-1)
 
             for i, l in zip(X_test_index, predictions):
@@ -271,8 +300,20 @@ def learn_dnn_textandmeta(nfold, task,
         predicted_labels = []
         for i in indexes:
             predicted_labels.append(nfold_predictions[i])
-        util.save_scores(predicted_labels, y_train_int.argmax(1), None, None, "dnn", task, model_descriptor, 2, outfolder)
+        util.save_scores(predicted_labels, y_train_int.argmax(1), "dnn", task, model_descriptor, 2,
+                         outfolder)
     else:
-        model.fit([X_train_textfeature, X_train_metafeature],
+        if X_train_metafeature is not None:
+            model.fit([X_train_textfeature, X_train_metafeature],
                   y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
-        util.save_classifier_model(model, model_file)
+        else:
+            model.fit(X_train_textfeature,
+                      y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+
+        # serialize model to YAML
+        model_yaml = model.to_yaml()
+        with open(model_file + ".yaml", "w") as yaml_file:
+            yaml_file.write(model_yaml)
+        # serialize weights to HDF5
+        model.save_weights(model_file + ".h5")
+        # util.save_classifier_model(model, model_file)

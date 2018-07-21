@@ -16,9 +16,10 @@ import java.util.*;
 public class UserFeatureExporter {
 
     private static final int resultBatchSize = 10000;
+    private static final int maxLinesPerFile=10000;
     private static final Logger LOG = Logger.getLogger(UserFeatureExporter.class.getName());
 
-    public void process(int sampleSize, String outFile,
+    public void process(int sampleSize, String outFolder,
                         SolrClient userCore) throws IOException, SolrServerException {
         LOG.info("Counting users ...");
         List<String> userIDs = new ArrayList<>();
@@ -48,8 +49,8 @@ public class UserFeatureExporter {
                     if (retweets!=null)
                         total+=Integer.valueOf(retweets.toString());
 
-                    if (total>9)
-                        userIDs.add(username.toString());
+                    //if (total>9)
+                    userIDs.add(username.toString());
                 }
             } catch (Exception e) {
                 LOG.warn(String.format("\t\tquery %s caused an exception: \n\t %s \n\t trying for the next query...",
@@ -66,37 +67,45 @@ public class UserFeatureExporter {
 
         Collections.shuffle(userIDs);
 
-        String[] header = new String[27];
+        String[] header = new String[17];
         header[0] = "twitter_id";
-        header[1] = "user_screen_name";
-        header[2] = "user_name";
-        header[3] = "user_statuses_count";
-        header[4] = "user_friends_count";
-        header[5] = "user_followers_count";
-        header[6] = "user_listed_count";
-        header[7] = "user_location";
-        header[8] = "user_favorites_count";
-        header[9] = "user_desc";
-        header[10] = "user_url";
-        header[11] = "profile_background_image_url";
-        header[12] = "profile_image_url";
-        header[13] = "user_newtweet_count";
-        header[14] = "user_retweet_count";
-        header[15] = "user_reply_count";
-        header[16] = "user_quote_count";
-        header[17] = "user_favorited_count";
-        header[18] = "user_retweeted_count";
-        header[19] = "user_quoted_count";
-        header[20] = "user_replied_count";
-        header[21] = "user_entities_hashtag";
-        header[22] = "user_entities_symbol";
-        header[23] = "user_entities_url";
-        header[24] = "user_entities_user_mention";
-        header[25] = "user_entities_media_url";
-        header[26] = "user_entities_media_type";
+        //header[1] = "user_screen_name";
+        //header[2] = "user_name";
+        header[1] = "user_statuses_count";
+        header[2] = "user_friends_count";
+        header[3] = "user_favorites_count";
+        header[4] = "user_retweeted_count";
+        header[5] = "user_retweet_count";
+        header[6] = "user_followers_count";
+        header[7] = "user_listed_count";
+        header[8] = "user_newtweet_count";
+        header[9] = "user_favorited_count";
+        header[10] = "user_entities_hashtag";
+        header[11] = "user_entities_url";
+        header[12] = "user_entities_user_mention";
+        header[13] = "user_entities_media_url";
 
-        CSVWriter csvWriter = Util.createCSVWriter(outFile);
+        header[14] = "user_screen_name";
+        header[15] = "user_name";
+        header[16] = "user_desc";
+
+        //header[7] = "user_location";
+        //header[8] = "user_favorites_count";
+        //header[10] = "user_url";
+        //header[11] = "profile_background_image_url";
+        //header[12] = "profile_image_url";
+        //header[15] = "user_reply_count";
+        //header[16] = "user_quote_count";
+        //header[19] = "user_quoted_count";
+        //header[20] = "user_replied_count";
+        //header[22] = "user_entities_symbol";
+        //header[26] = "user_entities_media_type";
+
+        int fileCounter=0, emptyProfiles=0;
+        CSVWriter csvWriter =
+                Util.createCSVWriter(outFolder+"/basic_features_"+fileCounter+".csv");
         csvWriter.writeNext(header);
+
         for (int i = 0; i < sampleSize && i < userIDs.size(); i++) {
             String targetID = userIDs.get(i);
             query = new SolrQuery();
@@ -110,37 +119,48 @@ public class UserFeatureExporter {
             if (username.equalsIgnoreCase("null"))
                 continue;
             values[0] = "https://twitter.com/" +username;
-            values[1] = getValue(doc.getFieldValue("user_screen_name"));
-            values[2] = getValue(doc.getFieldValue("user_name"));
-            values[3] = getValue(doc.getFieldValue("user_statuses_count"));
-            values[4] = getValue(doc.getFieldValue("user_friends_count"));
-            values[5] = getValue(doc.getFieldValue("user_followers_count"));
-            values[6] = getValue(doc.getFieldValue("user_listed_count"));
-            values[7] = getValue(doc.getFieldValue("user_location"));
-            values[8] = getValue(doc.getFieldValue("user_favorites_count"));
-            values[9] = getValue(doc.getFieldValue("user_desc"));
-            values[10] = getValue(doc.getFieldValue("user_url"));
+            values[1] = getValue(doc.getFieldValue("user_statuses_count"));
+            values[2] = getValue(doc.getFieldValue("user_friends_count"));
+            values[3] = getValue(doc.getFieldValue("user_favorites_count"));
+            values[4] = getValue(doc.getFieldValue("user_retweeted_count"));
+            values[5] = getValue(doc.getFieldValue("user_retweet_count"));
+            values[6] = getValue(doc.getFieldValue("user_followers_count"));
+            values[7] = getValue(doc.getFieldValue("user_listed_count"));
+            values[8] = getValue(doc.getFieldValue("user_newtweet_count"));
+            values[9] = getValue(doc.getFieldValue("user_favorited_count"));
+            values[10] = countValues(doc.getFieldValues("user_entities_hashtag"));
+            values[11] = countValues(doc.getFieldValues("user_entities_url"));
+            values[12] = countValues(doc.getFieldValues("user_entities_user_mention"));
+            values[13] = countValues(doc.getFieldValues("user_entities_media_url"));
+            values[14] = getValue(doc.getFieldValue("user_screen_name"));
+            values[15] = getValue(doc.getFieldValue("user_name"));
+            String prof=doc.getFieldValue("user_desc").toString();
+            if (prof.length()==0)
+                emptyProfiles++;
+            values[16] = getValue(prof);
+
+            /*values[10] = getValue(doc.getFieldValue("user_url"));
             values[11] = getValue(doc.getFieldValue("profile_background_image_url"));
             values[12] = getValue(doc.getFieldValue("profile_image_url"));
-            values[13] = getValue(doc.getFieldValue("user_newtweet_count"));
-            values[14] = getValue(doc.getFieldValue("user_retweet_count"));
             values[15] = getValue(doc.getFieldValue("user_reply_count"));
             values[16] = getValue(doc.getFieldValue("user_quote_count"));
-            values[17] = getValue(doc.getFieldValue("user_favorited_count"));
-            values[18] = getValue(doc.getFieldValue("user_retweeted_count"));
             values[19] = getValue(doc.getFieldValue("user_quoted_count"));
             values[20] = getValue(doc.getFieldValue("user_replied_count"));
-            values[21] = countValues(doc.getFieldValues("user_entities_hashtag"));
             values[22] = countValues(doc.getFieldValues("user_entities_symbol"));
-            values[23] = countValues(doc.getFieldValues("user_entities_url"));
-            values[24] = countValues(doc.getFieldValues("user_entities_user_mention"));
-            values[25] = countValues(doc.getFieldValues("user_entities_media_url"));
-            values[26] = getValue(doc.getFieldValue("user_entities_media_type"));
+            values[26] = getValue(doc.getFieldValue("user_entities_media_type"));*/
             csvWriter.writeNext(values);
-
+            if (i%maxLinesPerFile==0 && i>0){
+                csvWriter.close();
+                fileCounter++;
+                csvWriter =
+                        Util.createCSVWriter(outFolder+"/basic_features_"+fileCounter+".csv");
+                csvWriter.writeNext(header);
+                System.out.println(fileCounter);
+            }
         }
         csvWriter.close();
 
+        System.out.println(String.format("Users= %d, emptyProfiles= %d", userIDs.size(), emptyProfiles));
     }
 
 
