@@ -406,7 +406,7 @@ def get_word_vocab(tweets, normalize_option):
 
 def create_submodel_metafeature(inputs, dim):
     #flat1 = Flatten()(input_features)
-    #hidden = Dense(dim)(inputs)
+    hidden = Dense(dim)(inputs)
     #model = Model(inputs=input_features, outputs=hidden)
     #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return inputs
@@ -486,7 +486,7 @@ def create_submodel_textfeature(
         return flat
     else:
         raise ValueError("model option not supported: %s"%model_option)
-    return None
+
 
 #a 1D convolution that skips some entries
 class SkipConv1D(Conv1D):

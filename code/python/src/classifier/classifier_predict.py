@@ -2,6 +2,7 @@ import gensim
 import keras
 from keras.models import model_from_yaml
 from keras.preprocessing import sequence
+from sklearn.preprocessing import LabelBinarizer
 
 from classifier import classifier_util as util
 import os
@@ -13,6 +14,14 @@ for non-DNN models, only non-text features are supported.'''
 def predict(model_flag, task, model_file,test_features, text_data,outfolder):
     print("start prediction stage :: data size:", len(test_features))
 
+    label_lookup={}
+    label_lookup[0]="Advocate"
+    label_lookup[1] = "HPI"
+    label_lookup[2] = "HPO"
+    label_lookup[3] = "Other"
+    label_lookup[4] = "Patient"
+    label_lookup[5] = "Research"
+
     if model_flag.startswith("dnn"):
         M = dmc.get_word_vocab(text_data, 1)
         text_based_features = M[0]
@@ -23,7 +32,7 @@ def predict(model_flag, task, model_file,test_features, text_data,outfolder):
             yaml_file = open(model_file+'.yaml', 'r')
             loaded_model_yaml = yaml_file.read()
             yaml_file.close()
-            model = model_from_yaml(loaded_model_yaml)
+            model = model_from_yaml(loaded_model_yaml)#,custom_objects={"SkipConv1D": SkipConv1D})
             # load weights into new model
             model.load_weights(model_file+".h5")
             print("Loaded model from disk")
@@ -32,7 +41,14 @@ def predict(model_flag, task, model_file,test_features, text_data,outfolder):
         else:
             model=keras.models.load_model(model_file+".h5")
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        predictions=model.predict(text_based_features)
+        prediction_prob=model.predict([text_based_features,test_features])
+        predictions = prediction_prob.argmax(axis=-1)
+
+        # y = test_features[:, 22]
+        # encoder = LabelBinarizer()
+        # y_int = encoder.fit_transform(y)
+        # util.save_scores(predictions, y_int.argmax(1), "dnn", task, "_test_data_", 2,
+        #                  outfolder)
 
     else:
 
@@ -66,4 +82,11 @@ def predict(model_flag, task, model_file,test_features, text_data,outfolder):
 
         predictions = model.predict_proba(test_features)
 
-    util.saveOutput(predictions, model_flag, task, outfolder)
+    filename = os.path.join(outfolder, "prediction-%s-%s.csv" % (model_flag, task))
+    file = open(filename, "w")
+    for p in predictions:
+        p_label=label_lookup[p]
+        file.write(p_label + "\n")
+    file.close()
+
+    #util.saveOutput()

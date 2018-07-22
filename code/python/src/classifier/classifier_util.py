@@ -33,14 +33,7 @@ def saveOutput(prediction, model_name, task,outfolder):
     filename = os.path.join(outfolder, "prediction-%s-%s.csv" % (model_name, task))
     file = open(filename, "w")
     for entry in prediction:
-        if (isinstance(entry, float)):
-            file.write(str(entry) + "\n")
-            # file.write("\n")
-        else:
-            if (entry[0] > entry[1]):
-                file.write("0\n")
-            else:
-                file.write("1\n")
+        file.write(str(entry)+"\n")
     file.close()
 
 

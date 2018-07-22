@@ -241,7 +241,7 @@ def learn_dnn(nfold, task,
     if X_train_metafeature is not None:
         model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
         model_metafeature = \
-            dmc.create_submodel_metafeature(model_metafeature_inputs, 50)
+            dmc.create_submodel_metafeature(model_metafeature_inputs, 20)
         merge = concatenate([model_text, model_metafeature])
         final = Dense(prediction_targets, activation="softmax")(merge)
         model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)

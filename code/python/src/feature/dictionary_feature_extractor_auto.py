@@ -246,11 +246,14 @@ if __name__=="__main__":
     #therefore also change the value'text_normalization_option = 0' in dictionary_extractor to use corresponding normalisation on text
     dict_lemstem_option="dict1"
     # output folder to save dictionary features
-    outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/full/dictionary_feature_1"
-    csv_feature_input = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
+    # outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/full/dictionary_feature_1"
+    # csv_feature_input = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
+    outfolder = "/home/zz/Work/msm4phi_data/paper2/all_user_autodictext_features"
+    csv_feature_input = "/home/zz/Work/msm4phi_data/paper2/all_user_features"
+
 
     # column id of the target text field
-    target_text_cols = 22  # 22=profile text; 15=name field
+    target_text_cols = 16  # 22=profile text; 15=name field
     target_text_name_suffix="_profile"
     col_id=0
     #how many entries from each dictionary should be selected for matching(top n). Changing this param will generate
@@ -258,13 +261,18 @@ if __name__=="__main__":
     topN_of_dict=100
 
     for file in os.listdir(csv_feature_input):
+
+        prefix=file[0:file.index(".csv")]+"_"
+
+        print(file)
+        file=csv_feature_input+"/"+file
         #load auto extracted dictionaries, match to 'profile'
         postype_dictionaries = \
             de.load_extracted_dictionary(dictionary_folder+"/auto_created/profile/"+dict_lemstem_option+"/frequency_pass2",
                                          topN_of_dict, "verb", "noun")
         extracted_dictionaries = flatten_dictionary(postype_dictionaries)
         match_extracted_dictionary(extracted_dictionaries, file,
-                                   col_id, outfolder +"/feature_autocreated_dict_match" + target_text_name_suffix +".csv",
+                                   col_id, outfolder +"/"+prefix+"feature_autocreated_dict_match" + target_text_name_suffix +".csv",
                                    target_text_cols)
 
         #load hashtag dictionaries
@@ -272,15 +280,16 @@ if __name__=="__main__":
             dictionary_folder+"/hashtag_dict/dictionary_hashtag_disease.csv"
         )
         match_extracted_healthconditions(hashtag_dictionary, file, col_id,
-                                         outfolder +"/feature_disease_hashtag_match" + target_text_name_suffix +".csv",
+                                         outfolder +"/"+prefix+"feature_disease_hashtag_match" + target_text_name_suffix +".csv",
                                          target_text_cols)
 
         disease_word_dictionary=dedh.load_disease_hashtag_dictionary(
             dictionary_folder+"/hashtag_dict/dictionary_word_disease.csv"
         )
         match_extracted_healthconditions(disease_word_dictionary, file, col_id,
-                                         outfolder + "/feature_disease_word_match" + target_text_name_suffix +".csv",
+                                         outfolder + "/"+prefix+"feature_disease_word_match" + target_text_name_suffix +".csv",
                                          target_text_cols)
+
 
         #load other generic dictionaries
         #person name
