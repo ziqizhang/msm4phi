@@ -1,4 +1,5 @@
 import sys
+import os
 
 import datetime
 from numpy.random import seed
@@ -15,6 +16,20 @@ import pandas as pd
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 
+def generate_extra_data_for_embeddingvocab(folder, text_col):
+    #/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features
+    #16
+    texts=[]
+
+    for file in os.listdir(folder):
+        df = pd.read_csv(folder+"/"+file, header=0, delimiter=",", quoting=0).as_matrix()
+        df.astype(str)
+        profiles = df[:, int(text_col)]
+        texts.extend(profiles)
+
+    return texts
+
+
 if __name__ == "__main__":
     # this is the file pointing to the basic features, i.e., just the numeric values
     # msm4phi/paper2/data/training_data/basic_features.csv
@@ -26,7 +41,12 @@ if __name__ == "__main__":
 
     # this is the folder to save output to
     outfolder = sys.argv[3]
-    n_fold = 10
+
+    tweets_exta=None
+    if len(sys.argv)>4:
+        tweets_exta=generate_extra_data_for_embeddingvocab(sys.argv[4],sys.argv[5])
+
+    n_fold = None
 
     datafeatures = {}
     #datafeatures["full_"] = (csv_basic_feature_folder + "/basic_features.csv",
@@ -83,9 +103,10 @@ if __name__ == "__main__":
             profiles = df[:, 22]
             profiles = ["" if type(x) is float else x for x in profiles]
             cls = cm.Classifer("stakeholdercls", "_dnn_text+autodictext_", X, y, outfolder,
-                               categorical_targets=6, algorithms=["dnn"],nfold=None,
+                               categorical_targets=6, algorithms=["dnn"],nfold=n_fold,
                                text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-                               dnn_descriptor=model_descriptor)
+                               dnn_descriptor=model_descriptor,
+                               dnn_text_data_extra_for_embedding_vcab=tweets_exta)
             cls.run()
             # #
             # print(datetime.datetime.now())

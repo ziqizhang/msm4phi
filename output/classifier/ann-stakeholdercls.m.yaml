@@ -23,7 +23,7 @@ config:
         class_name: RandomUniform
         config: {maxval: 0.05, minval: -0.05, seed: null}
       embeddings_regularizer: null
-      input_dim: 19774
+      input_dim: 85934
       input_length: 100
       mask_zero: false
       name: embedding_1

@@ -203,14 +203,27 @@ def learn_dnn_textonly(nfold, task,
     util.save_classifier_model(model, model_file)
 
 
-'''when X_train_metafeature is None, only text data are processed to extract features'''
+'''
+when X_train_metafeature is None, only text data are processed to extract features
+
+text_data_extra_for_embedding_vocab: (usually you do not need to provide this; also
+this workds only with pre-trained embeddings) 
+when we train a model to be later loaded to predict new data, the new data can have unseen
+words. When an embedding layer is used in the model, it takes a parameter of 'vocab'
+and 'weights' of these vocab. Typically these are based on the training data. But we can
+force this layer to 'remember' more words and their weightsTo improve the model performance, 
+by injecting additional text data that are not labeled. This 'text_data_extra' and 'text_data'
+will both be processed to extract words, which are indexed and stored in the embedding layer.
+But only 'text_data' that has labels are in fact used for training a model. 
+'''
 def learn_dnn(nfold, task,
               embedding_model_file,
               text_data, X_train_metafeature, y_train,
-              model_descriptor, outfolder, prediction_targets):
+              model_descriptor, outfolder, prediction_targets,
+              text_data_extra_for_embedding_vocab=None):
     print("== Perform ANN ...")  # create model
 
-    M = dmc.get_word_vocab(text_data, 1)
+    M = dmc.get_word_vocab(text_data, 1, tweets_extra=text_data_extra_for_embedding_vocab)
     X_train_textfeature = M[0]
     X_train_textfeature = sequence.pad_sequences(X_train_textfeature,
                                                  dmc.DNN_MAX_SEQUENCE_LENGTH)

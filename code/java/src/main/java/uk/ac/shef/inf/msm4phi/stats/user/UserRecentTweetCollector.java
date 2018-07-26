@@ -64,8 +64,6 @@ public class UserRecentTweetCollector {
         int countU=0;
         for(String[] u : users){
             countU++;
-            if (countU==17)
-                System.out.println();
             String screenname=u[1];
             LOG.info(String.format("processing user %s, %s",
                     screenname, String.valueOf(countU)));

@@ -58,6 +58,7 @@ class Classifer(object):
                  outfolder, categorical_targets, algorithms:list,
                  nfold=None, text_data=None,
                  dnn_embedding_file=None,
+                 dnn_text_data_extra_for_embedding_vcab=None,
                  dnn_descriptor=None):
         self.dataX = data_X
         self.dataY = data_y
@@ -70,6 +71,7 @@ class Classifer(object):
         self.dnn_embedding_file = dnn_embedding_file
         self.dnn_descriptor = dnn_descriptor
         self.algorithms = algorithms
+        self.dnn_text_data_extra=dnn_text_data_extra_for_embedding_vcab
 
     def train(self):
         # X_resampled, y_resampled = self.under_sampling(self.training_data, self.training_label)
@@ -135,7 +137,8 @@ class Classifer(object):
                          self.dnn_embedding_file, self.text_data,
                          X_train,
                          y_train, self.dnn_descriptor, self.outfolder,
-                         prediction_targets=self.categorical_targets)
+                         prediction_targets=self.categorical_targets,
+                         text_data_extra_for_embedding_vocab=self.dnn_text_data_extra)
 
         print("complete!")
 
@@ -164,7 +167,7 @@ class Classifer(object):
         #     ct.predict("dnn_text", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
         #                )
         if "dnn" in self.algorithms:
-            ct.predict("dnn", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
+            return ct.predict("dnn", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
                        )
         print("complete!")
 

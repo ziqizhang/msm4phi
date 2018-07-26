@@ -1,7 +1,10 @@
 import csv
 import urllib.request
+
+import math
 import pandas as pd
 import glob
+import os
 
 def optimize_solr_index(solr_url, corename):
     code = urllib.request. \
@@ -90,7 +93,8 @@ def fill_empty_profiles(csv_basic_feature_file,
 
 def filter_empty_profile_features(filtered_csv_basic_feature_file,
                                   target_feature_file_folder):
-    df = pd.read_csv(filtered_csv_basic_feature_file, header=None, delimiter=",", quoting=0
+    df = pd.read_csv(filtered_csv_basic_feature_file, header=None, delimiter=",",
+                     quoting=0,quotechar='"',names=['twitter_id', 'user_statuses_count', 'user_friends_count', 'user_favorites_count', 'user_retweeted_count', 'user_retweet_count user_followers_count', 'user_listed_count user_newtweet_count', 'user_favorited_count user_entities_hashtag', 'user_entities_url user_entities_user_mention', 'user_entities_media_url user_screen_name', 'user_name user_desc']
                      ).as_matrix()
     ids = set()
     for row in df:
@@ -111,6 +115,44 @@ def filter_empty_profile_features(filtered_csv_basic_feature_file,
                 if id in ids:
                     csvwriter.writerow(row)
 
+
+def remove_empty_profiles(source_feature_file,
+                                  target_feature_file):
+    header=['twitter_id', 'user_statuses_count', 'user_friends_count', 'user_favorites_count',
+            'user_retweeted_count', 'user_retweet_count','user_followers_count', 'user_listed_count',
+            'user_newtweet_count', 'user_favorited_count', 'user_entities_hashtag', 'user_entities_url',
+            'user_entities_user_mention', 'user_entities_media_url', 'user_screen_name', 'user_name',
+            'user_desc']
+    #pd.DataFrame([line.strip().split(',') for line in open('temp.csv', 'r')])
+
+    # df = pd.read_csv(source_feature_file, header=None, delimiter=",",
+    #                  quoting=0,quotechar='"',#
+    #                  names=header
+    #                  ).as_matrix()
+    df=pd.DataFrame([line.strip().split(',') for line in open(source_feature_file, 'r')]).as_matrix()
+    with open(target_feature_file, 'w', newline='\n') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow(header)
+        count=0
+        for row in df:
+            count+=1
+            if count==1:
+                continue
+            profile=row[16]
+            if type(profile) is float and math.isnan(profile):
+                continue
+            if type(profile) is str and len(profile)==0:
+                continue
+
+            if(len(row)>17):
+                for i in range(17, len(row)):
+                    if row[i] is not None:
+                        profile+=" "+row[i]
+                profile=profile.replace(",", " ").replace('"','').strip()
+                row[16]=profile
+            csvwriter.writerow(row[0:17])
+
+
 if __name__ == "__main__":
     # optimize_solr_index(sys.argv[1],sys.argv[2])
     # merge_csv_files("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/Georgica/classifier/output_features.csv",0, 14,
@@ -127,6 +169,14 @@ if __name__ == "__main__":
     #                     20,
     #                     "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features_filled_profiles.csv")
 
-    filter_empty_profile_features(
-        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features_no_empty_profiles.csv",
-        "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/empty_profile_removed")
+    # filter_empty_profile_features(
+    #     "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features_no_empty_profiles.csv",
+    #     "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/empty_profile_removed")
+
+    infolder="/home/zz/Work/msm4phi_data/paper2/all_user_features_empty_profile_filled"
+    outfolder="/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features"
+    for f in os.listdir(infolder):
+        print(f)
+        remove_empty_profiles(
+             infolder+"/"+f,
+            outfolder+"/"+f)

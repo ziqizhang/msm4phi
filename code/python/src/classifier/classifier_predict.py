@@ -23,7 +23,7 @@ def predict(model_flag, task, model_file,test_features, text_data,outfolder):
     label_lookup[5] = "Research"
 
     if model_flag.startswith("dnn"):
-        M = dmc.get_word_vocab(text_data, 1)
+        M = dmc.get_word_vocab(text_data, 1, use_saved_vocab=True)
         text_based_features = M[0]
         text_based_features = sequence.pad_sequences(text_based_features,
                                                      dmc.DNN_MAX_SEQUENCE_LENGTH)
@@ -84,9 +84,13 @@ def predict(model_flag, task, model_file,test_features, text_data,outfolder):
 
     filename = os.path.join(outfolder, "prediction-%s-%s.csv" % (model_flag, task))
     file = open(filename, "w")
+
+    prediction_labels=[]
     for p in predictions:
         p_label=label_lookup[p]
         file.write(p_label + "\n")
+        prediction_labels.append(p_label)
     file.close()
 
+    return prediction_labels
     #util.saveOutput()

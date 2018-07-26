@@ -45,13 +45,16 @@ def create_textprofileandname(csv_basic_feature):
     return X_ngram, y
 
 # this is the basic feature loader, using only the stats from indexed data.
-def create_basic(csv_basic_feature):
+def create_basic(csv_basic_feature, contains_label=True):
     feature_start_col = 1
     feature_end_col = 13
-    label_col = 40
 
+    y=None
     df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-    y = df[:, label_col]
+    if contains_label:
+        label_col = 40
+        y = df[:, label_col]
+
 
     X = df[:, feature_start_col:feature_end_col + 1]
     # Convert feature vectors to float64 type
@@ -146,6 +149,7 @@ def create_autocreated_dictext(csv_basic_feature, folder_other):
     X_all = numpy.concatenate([X_2, X_tweet_hashtag, X_tweet_word], axis=1)
 
     return X_all, y
+
 
 def create_basic_and_user_url(csv_basic_feature):
     X, y = create_basic(csv_basic_feature)

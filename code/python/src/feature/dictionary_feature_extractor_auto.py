@@ -4,6 +4,7 @@ import csv
 import re
 import os
 
+import datetime
 import pandas as pd
 from feature import dictionary_extractor as de
 from feature import nlp
@@ -25,7 +26,10 @@ def match_extracted_dictionary(dictionaries: dict, csv_input_feature_file, col_i
         output_header.append(k + "_matchbool")
     output_matrix.append(output_header)
 
+    count=0
     for row in df:
+        #print(count)
+        count+=1
         row_data = [row[col_id]]
         target_text = ""
 
@@ -248,8 +252,8 @@ if __name__=="__main__":
     # output folder to save dictionary features
     # outfolder = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/full/dictionary_feature_1"
     # csv_feature_input = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features.csv"
-    outfolder = "/home/zz/Work/msm4phi_data/paper2/all_user_autodictext_features"
-    csv_feature_input = "/home/zz/Work/msm4phi_data/paper2/all_user_features"
+    outfolder = "/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_autodictext_features"
+    csv_feature_input = "/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features"
 
 
     # column id of the target text field
@@ -265,6 +269,7 @@ if __name__=="__main__":
         prefix=file[0:file.index(".csv")]+"_"
 
         print(file)
+        print(datetime.datetime.now())
         file=csv_feature_input+"/"+file
         #load auto extracted dictionaries, match to 'profile'
         postype_dictionaries = \

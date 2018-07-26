@@ -9,7 +9,7 @@ from keras.regularizers import L1L2
 import random as rn
 
 from sklearn.feature_extraction.text import CountVectorizer
-
+import pickle
 from feature import nlp
 
 '''
@@ -377,7 +377,8 @@ def concatenate_matrices(matrix1, matrix2):
     concat = numpy.concatenate((matrix1,matrix2), axis=1)
     return concat
 
-def get_word_vocab(tweets, normalize_option):
+def get_word_vocab(tweets:list, normalize_option, use_saved_vocab=False,
+                   tweets_extra=None):
     word_vectorizer = CountVectorizer(
         # vectorizer = sklearn.feature_extraction.text.CountVectorizer(
         tokenizer=functools.partial(nlp.tokenize, stem_or_lemma=normalize_option),
@@ -385,23 +386,53 @@ def get_word_vocab(tweets, normalize_option):
         ngram_range=(1, 1),
         stop_words=nlp.stopwords,  # We do better when we keep stopwords
         decode_error='replace',
-        max_features=50000,
+        max_features=500000,
         min_df=1,
         max_df=0.99
     )
 
+    training_data_instances=len(tweets)
+    if tweets_extra is not None:
+        tweets.extend(tweets_extra)
     # logger.info("\tgenerating word vectors, {}".format(datetime.datetime.now()))
     counts = word_vectorizer.fit_transform(tweets).toarray()
     # logger.info("\t\t complete, dim={}, {}".format(counts.shape, datetime.datetime.now()))
     vocab = {v: i for i, v in enumerate(word_vectorizer.get_feature_names())}
-
     word_embedding_input = []
-    for tweet in counts:
-        tweet_vocab = []
-        for i in range(0, len(tweet)):
-            if tweet[i] != 0:
-                tweet_vocab.append(i)
-        word_embedding_input.append(tweet_vocab)
+
+    if not use_saved_vocab:
+        with open('vocab.pickle', 'wb') as handle:
+            pickle.dump(vocab, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        for x in range(0, training_data_instances):
+            tweet = counts[x]
+            tweet_vocab = []
+            for i in range(0, len(tweet)):
+                if tweet[i] != 0:
+                    tweet_vocab.append(i)
+            word_embedding_input.append(tweet_vocab)
+    else:
+        with open('vocab.pickle', 'rb') as handle:
+            saved_vocab = pickle.load(handle)
+            vocab_reversed={val:key for (key, val) in vocab.items()}
+
+            count_tweets=0
+            for tweet in counts:
+                count_tweets+=1
+                if count_tweets%200==0:
+                    print(count_tweets)
+                tweet_vocab = []
+
+                for i in range(0, len(tweet)):
+                    if tweet[i] != 0:
+                        vocab_index =i
+                        v=vocab_reversed[vocab_index]
+                        if v in saved_vocab.keys():
+                            new_index=saved_vocab[v]
+                            tweet_vocab.append(new_index)
+
+                word_embedding_input.append(tweet_vocab)
+
     return word_embedding_input, vocab
 
 def create_submodel_metafeature(inputs, dim):
@@ -427,12 +458,18 @@ def create_submodel_textfeature(
     embedding = Embedding(vocab_size, embedding_dim, input_length=max_seq_length,
                           weights=[weights], trainable=False)(inputs)
     if model_option.startswith("cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax"):
+        #conv1d_1 = Conv1D(filters=100,
+        #                  kernel_size=1, padding='same', activation='relu')(embedding)
         conv1d_2=Conv1D(filters=100,
                kernel_size=2, padding='same', activation='relu')(embedding)
         conv1d_3 = Conv1D(filters=100,
                           kernel_size=3, padding='same', activation='relu')(embedding)
         conv1d_4 = Conv1D(filters=100,
                           kernel_size=4, padding='same', activation='relu')(embedding)
+        # conv1d_5 = Conv1D(filters=100,
+        #                   kernel_size=5, padding='same', activation='relu')(embedding)
+        # conv1d_6 = Conv1D(filters=100,
+        #                   kernel_size=6, padding='same', activation='relu')(embedding)
         merge = concatenate([conv1d_2, conv1d_3,conv1d_4])
         pool=MaxPooling1D(pool_size=4)(merge)
         flat=Flatten()(pool)

@@ -16,8 +16,8 @@
       <file leaf-file-name="UserRecentTweetCollector.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="100" column="34" lean-forward="false" selection-start-line="100" selection-start-column="34" selection-end-line="100" selection-end-column="34" />
+            <state relative-caret-position="230">
+              <caret line="34" column="5" lean-forward="false" selection-start-line="26" selection-start-column="4" selection-end-line="34" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -25,33 +25,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AppUserFeatureExport.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/AppUserFeatureExport.java">
+      <file leaf-file-name="UserProfileFiller.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserProfileFiller.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="32">
-              <caret line="15" column="42" lean-forward="false" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UserFeatureExporter.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/analysis/UserFeatureExporter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="153" column="30" lean-forward="true" selection-start-line="153" selection-start-column="30" selection-end-line="153" selection-end-column="30" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Util.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/Util.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1818">
-              <caret line="120" column="35" lean-forward="false" selection-start-line="120" selection-start-column="35" selection-end-line="120" selection-end-column="35" />
+            <state relative-caret-position="128">
+              <caret line="91" column="54" lean-forward="false" selection-start-line="91" selection-start-column="54" selection-end-line="91" selection-end-column="54" />
               <folding>
-                <marker date="1530824985209" expanded="true" signature="7566:7573" ph="{...}" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -90,6 +70,7 @@
       <find>manso</find>
       <find>processing u</find>
       <find>failed</find>
+      <find>csvwr</find>
     </findStrings>
   </component>
   <component name="GradleLocalSettings">
@@ -100,8 +81,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/TestNodeXLExporter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/MasterPostProcessor.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/PostProcessor.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/IndexPopulatorUser.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/WorkerTweetExport.java" />
@@ -148,9 +127,11 @@
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/Util.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserDiseaseMentionCounter.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserTotalTweetsCounter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/AppUserFeatureExport.java" />
         <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/analysis/UserFeatureExporter.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/AppUserProfileFiller.java" />
+        <option value="$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserProfileFiller.java" />
       </list>
     </option>
   </component>
@@ -288,9 +269,9 @@
         </subPane>
       </pane>
       <pane id="AndroidView" />
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -321,7 +302,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.AppUserFeatureExport">
+  <component name="RunManager" selected="Application.UserProfileFiller">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -503,6 +484,20 @@
       <module name="java" />
       <envs />
     </configuration>
+    <configuration name="UserProfileFiller" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" value="uk.ac.shef.inf.msm4phi.stats.user.UserProfileFiller" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="20 aZXkudxJZvWkWZWVanNr7qNx1 r2hNOrpno0L6u1g0L64YTRU4V4qHchzqdjCVd3jpCcr7Kd3Yjf 1428046225-BjBqyO4hlI285Kg2QVpfsw04yvKq9TCrO86pcLb MFed5qOjROa7sxoLm4pBo4WneZLXl1nagYwcLosPHGtHo $PROJECT_DIR$/../../../msm4phi_data/paper2/all_user_features/batch $PROJECT_DIR$/../../../msm4phi_data/paper2/all_user_features_empty_profile_filled" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="java" />
+      <envs />
+    </configuration>
     <configuration name="UserRecentTweetCollector" type="Application" factoryName="Application" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -615,7 +610,7 @@
       <option name="PROGRAM_PARAMETERS" />
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
-    <list size="13">
+    <list size="14">
       <item index="0" class="java.lang.String" itemvalue="Application.AppNodeXLExporter" />
       <item index="1" class="java.lang.String" itemvalue="Application.AppPostProcess" />
       <item index="2" class="java.lang.String" itemvalue="Application.AppUserIndexGenerator" />
@@ -628,7 +623,8 @@
       <item index="9" class="java.lang.String" itemvalue="Application.UserTotalTweetsCounter" />
       <item index="10" class="java.lang.String" itemvalue="Application.UserDiseaseMentionCounter" />
       <item index="11" class="java.lang.String" itemvalue="Application.UserRecentTweetCollector" />
-      <item index="12" class="java.lang.String" itemvalue="Application.AppUserFeatureExport" />
+      <item index="12" class="java.lang.String" itemvalue="Application.UserProfileFiller" />
+      <item index="13" class="java.lang.String" itemvalue="Application.AppUserFeatureExport" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
@@ -658,19 +654,19 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44427" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27636644" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18681319" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26096997" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3720565" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5102041" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -794,13 +790,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java</url>
-          <line>67</line>
-          <properties />
-          <option name="timeStamp" value="400" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java</url>
-          <line>98</line>
+          <line>96</line>
           <properties />
           <option name="timeStamp" value="401" />
         </line-breakpoint>
@@ -811,7 +801,7 @@
           <option name="timeStamp" value="408" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="409" />
+      <option name="time" value="426" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -865,15 +855,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="936">
-          <caret line="52" column="21" lean-forward="false" selection-start-line="52" selection-start-column="21" selection-end-line="52" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/msm4phi/inf/shef/ac/uk/solr.java" />
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/solr/solr-core/7.2.1/solr-core-7.2.1-sources.jar!/org/apache/solr/client/solrj/embedded/EmbeddedSolrServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="305">
@@ -2148,26 +2129,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserTotalTweetsCounter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="73">
-          <caret line="82" column="0" lean-forward="false" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="100" column="34" lean-forward="false" selection-start-line="100" selection-start-column="34" selection-end-line="100" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/Util.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1818">
@@ -2180,7 +2141,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/AppUserFeatureExport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
+        <state relative-caret-position="162">
           <caret line="15" column="42" lean-forward="false" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
           <folding />
         </state>
@@ -2188,9 +2149,45 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/analysis/UserFeatureExporter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="153" column="30" lean-forward="true" selection-start-line="153" selection-start-column="30" selection-end-line="153" selection-end-column="30" />
+        <state relative-caret-position="229">
+          <caret line="161" column="0" lean-forward="true" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserTotalTweetsCounter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="178" column="0" lean-forward="true" selection-start-line="154" selection-start-column="4" selection-end-line="178" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/app/AppUserProfileFiller.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="8" lean-forward="false" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserRecentTweetCollector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="34" column="5" lean-forward="false" selection-start-line="26" selection-start-column="4" selection-end-line="34" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/uk/ac/shef/inf/msm4phi/stats/user/UserProfileFiller.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="91" column="54" lean-forward="false" selection-start-line="91" selection-start-column="54" selection-end-line="91" selection-end-column="54" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
