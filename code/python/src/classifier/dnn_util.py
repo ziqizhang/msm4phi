@@ -1,12 +1,12 @@
 import functools
+import random
 
 from keras.layers import Embedding, concatenate
 import numpy
-from keras import Model, Sequential, Input
+from keras import Model, Sequential
 from keras.layers import Concatenate, Dropout, LSTM, GRU, Bidirectional, Conv1D, MaxPooling1D, GlobalMaxPooling1D, \
     Dense, Flatten, K
 from keras.regularizers import L1L2
-import random as rn
 
 from sklearn.feature_extraction.text import CountVectorizer
 import pickle
@@ -338,18 +338,22 @@ def build_pretrained_embedding_matrix(word_vocab: dict, model, expected_emb_dim,
     # logger.info("\tloading complete. {}".format(datetime.datetime.now()))
 
     randomized_vectors = {}
+    random_candidates=[] #list of word indexes in the embedding model to be randomly chosen
+    words_matched=set() #track words that already matched and whose vectors are already used
+
     matrix = numpy.zeros((len(word_vocab), expected_emb_dim))
     count = 0
-    random = 0
+    randomized = 0
     for word, i in word_vocab.items():
         is_in_model = False
         if word in model.wv.vocab.keys():
             is_in_model = True
             vec = model.wv[word]
             matrix[i] = vec
+            words_matched.add(word)
 
         if not is_in_model:
-            random += 1
+            randomized += 1
             if randomize_strategy == '1' or randomize_strategy == 1:  # randomly set values following a continuous uniform distribution
                 vec = numpy.random.random_sample(expected_emb_dim)
                 matrix[i] = vec
@@ -357,19 +361,29 @@ def build_pretrained_embedding_matrix(word_vocab: dict, model, expected_emb_dim,
                 if word in randomized_vectors.keys():
                     vec = randomized_vectors[word]
                 else:
-                    max = len(model.wv.vocab.keys()) - 1
-                    index = rn.randint(0, max)
-                    word = model.index2word[index]
+                    if len(random_candidates)==0:
+                        for x in range(0, len(model.wv.vocab.keys())):
+                            random_candidates.append(x)
+                        random.Random(4).shuffle(random_candidates)
+
+                    while (True):
+                        index = random_candidates.pop()
+                        word = model.index2word[index]
+                        if not word in words_matched:
+                            words_matched.add(word)
+                            break
+
                     vec = model.wv[word]
                     randomized_vectors[word] = vec
+
                 matrix[i] = vec
         count += 1
         if count % 100 == 0:
             print(count)
     if randomize_strategy != '0':
-        print("randomized={}".format(random))
+        print("randomized={}".format(randomized))
     else:
-        print("oov={}".format(random))
+        print("oov={}".format(randomized))
 
     return matrix
 

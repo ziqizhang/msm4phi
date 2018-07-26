@@ -10,7 +10,9 @@ from exp import feature_creator as fc
 from classifier import classifier_main as cm
 import pandas as pd
 import os
+from numpy.random import seed
 
+seed(1)
 
 def generate_extra_data_for_embeddingvocab(file, text_col):
     # /home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features
@@ -102,8 +104,9 @@ if __name__ == "__main__":
     embedding_model_file=sys.argv[8]
 
 # this is needed if dnn model is used
+    jobs=sorted(os.listdir(csv_basic_feature_folder))
 
-    for csv_basic_feature in os.listdir(csv_basic_feature_folder):
+    for csv_basic_feature in jobs:
         csv_other_feature = csv_other_feature_folder
         print(csv_basic_feature)
 
