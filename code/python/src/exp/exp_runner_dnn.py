@@ -1,5 +1,5 @@
 import sys
-import os
+from exp import annotator as ann
 
 import datetime
 from numpy.random import seed
@@ -16,18 +16,7 @@ import pandas as pd
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 
-def generate_extra_data_for_embeddingvocab(folder, text_col):
-    #/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features
-    #16
-    texts=[]
 
-    for file in os.listdir(folder):
-        df = pd.read_csv(folder+"/"+file, header=0, delimiter=",", quoting=0).as_matrix()
-        df.astype(str)
-        profiles = df[:, int(text_col)]
-        texts.extend(profiles)
-
-    return texts
 
 
 if __name__ == "__main__":
@@ -44,7 +33,7 @@ if __name__ == "__main__":
 
     tweets_exta=None
     if len(sys.argv)>4:
-        tweets_exta=generate_extra_data_for_embeddingvocab(sys.argv[4],sys.argv[5])
+        tweets_exta=ann.generate_extra_data_for_embeddingvocab(sys.argv[4],sys.argv[5])
 
     n_fold = None
 
