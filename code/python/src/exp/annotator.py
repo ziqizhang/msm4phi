@@ -142,4 +142,4 @@ if __name__ == "__main__":
                 row = list(df[i])
                 row.append(labels[i])
                 csvwriter.writerow(row)
-        exit(0)
+
