@@ -11,6 +11,7 @@ from keras.regularizers import L1L2
 from sklearn.feature_extraction.text import CountVectorizer
 import pickle
 from feature import nlp
+from data import data_util as du
 
 '''
 model_descriptor is parsed by 'parse_model_descriptor' method to create a Keras model object. some examples of the descriptors below
@@ -38,7 +39,7 @@ lstm examples:
 
 DNN_EMBEDDING_DIM=300
 DNN_MAX_SEQUENCE_LENGTH=100
-DNN_EPOCHES=20
+DNN_EPOCHES=40
 DNN_BATCH_SIZE=50
 #DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="lstm=100-False|dense=6-softmax|glv"
@@ -408,6 +409,9 @@ def get_word_vocab(tweets:list, normalize_option, use_saved_vocab=False,
     training_data_instances=len(tweets)
     if tweets_extra is not None:
         tweets.extend(tweets_extra)
+
+    tweets=du.replace_nan_in_list(tweets)
+
     # logger.info("\tgenerating word vectors, {}".format(datetime.datetime.now()))
     counts = word_vectorizer.fit_transform(tweets).toarray()
     # logger.info("\t\t complete, dim={}, {}".format(counts.shape, datetime.datetime.now()))

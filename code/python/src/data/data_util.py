@@ -1,7 +1,7 @@
 import csv
 import urllib.request
 
-import math
+import numpy as np
 import pandas as pd
 import glob
 import os
@@ -139,7 +139,7 @@ def remove_empty_profiles(source_feature_file,
             if count==1:
                 continue
             profile=row[16]
-            if type(profile) is float and math.isnan(profile):
+            if type(profile) is float and np.isnan(profile):
                 continue
             if type(profile) is str and len(profile)==0:
                 continue
@@ -152,6 +152,53 @@ def remove_empty_profiles(source_feature_file,
                 row[16]=profile
             csvwriter.writerow(row[0:17])
 
+def remove_empty_profiles_and_features(feature_file_folder,
+                                       other_feature_file_folder,
+                                       text_col):
+    for file in os.listdir(feature_file_folder):
+        remove_rows=[]
+        df = pd.read_csv(feature_file_folder+"/"+file,
+                         header=0, delimiter=",", quoting=0, quotechar='"').as_matrix()
+        for i in range(0, len(df)):
+            row=df[i]
+            if type(row[text_col]) is not str and np.isnan(row[text_col]):
+                remove_rows.append(i)
+
+        if len(remove_rows)!=0:
+            overwrite_and_remove(feature_file_folder+"/"+file, remove_rows)
+            other_feature_prefix = file[file.rfind("/") + 1:
+                                              file.rfind(".")]
+            overwrite_and_remove(other_feature_file_folder+"/"+other_feature_prefix+"_feature_autocreated_dict_match_profile.csv", remove_rows)
+            overwrite_and_remove(
+                other_feature_file_folder + "/" + other_feature_prefix + "_feature_disease_hashtag_match_profile.csv",
+                remove_rows)
+            overwrite_and_remove(
+                other_feature_file_folder + "/" + other_feature_prefix + "_feature_disease_word_match_profile.csv",
+                remove_rows)
+
+
+#overwrite the input file, deleting specified rows
+def overwrite_and_remove(file, remove_rows:list):
+    df = pd.read_csv(file,
+                     header=0, delimiter=",", quoting=0, quotechar='"')
+    header=list(df.columns.values)
+    df=df.as_matrix()
+    with open(file, 'w', newline='\n') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow(header)
+        for i in range(0, len(df)):
+            if i in remove_rows:
+                continue
+            csvwriter.writerow(df[i])
+
+
+
+def replace_nan_in_list(data):
+    for i in range(0, len(data)):
+        if type(data[i]) is not str and np.isnan(data[i]):
+            print("\t\t data row "+str(i)+" is empty")
+            data[i]=" "
+    return data
 
 if __name__ == "__main__":
     # optimize_solr_index(sys.argv[1],sys.argv[2])
@@ -173,10 +220,14 @@ if __name__ == "__main__":
     #     "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/training_data/basic_features_no_empty_profiles.csv",
     #     "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/features/empty_profile_removed")
 
-    infolder="/home/zz/Work/msm4phi_data/paper2/all_user_features_empty_profile_filled"
-    outfolder="/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features"
-    for f in os.listdir(infolder):
-        print(f)
-        remove_empty_profiles(
-             infolder+"/"+f,
-            outfolder+"/"+f)
+    # infolder="/home/zz/Work/msm4phi_data/paper2/all_user_features_empty_profile_filled"
+    # outfolder="/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features"
+    # for f in os.listdir(infolder):
+    #     print(f)
+    #     remove_empty_profiles(
+    #          infolder+"/"+f,
+    #         outfolder+"/"+f)
+
+    remove_empty_profiles_and_features("/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features",
+                                       "/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_autodictext_features",
+                                       16)

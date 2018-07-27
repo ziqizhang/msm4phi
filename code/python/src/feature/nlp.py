@@ -56,7 +56,7 @@ def normalize_tweet(tweet_text):
     tweet_text = list(filter(lambda a: a != 'RT', tweet_text))
     tweet_text = list(filter(lambda a: a != '"', tweet_text))
     tweet_text = " ".join(tweet_text)
-    return tweet_text
+    return tweet_text.strip()
 
 
 # stem_or_lemma: 0 - apply porter's stemming; 1: apply lemmatization; 2: neither
@@ -81,7 +81,7 @@ def tokenize(tweet, stem_or_lemma=0):
             else:
                 tokens.append(lemmatizer.lemmatize(t))
     else:
-        tokens = [t for t in tweet.split()] #this is basic_tokenize in TD's original code
+        tokens = [str(t) for t in tweet.split()] #this is basic_tokenize in TD's original code
     return tokens
 
 

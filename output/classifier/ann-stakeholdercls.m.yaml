@@ -2,17 +2,17 @@ backend: theano
 class_name: Model
 config:
   input_layers:
-  - [input_3, 0, 0]
-  - [input_4, 0, 0]
+  - [input_5, 0, 0]
+  - [input_6, 0, 0]
   layers:
   - class_name: InputLayer
     config:
       batch_input_shape: !!python/tuple [null, 100]
       dtype: float32
-      name: input_3
+      name: input_5
       sparse: false
     inbound_nodes: []
-    name: input_3
+    name: input_5
   - class_name: Embedding
     config:
       activity_regularizer: null
@@ -23,18 +23,18 @@ config:
         class_name: RandomUniform
         config: {maxval: 0.05, minval: -0.05, seed: null}
       embeddings_regularizer: null
-      input_dim: 84241
+      input_dim: 84633
       input_length: 100
       mask_zero: false
-      name: embedding_2
+      name: embedding_3
       output_dim: 300
       trainable: false
     inbound_nodes:
-    - - - input_3
+    - - - input_5
         - 0
         - 0
         - {}
-    name: embedding_2
+    name: embedding_3
   - class_name: Conv1D
     config:
       activation: relu
@@ -52,17 +52,17 @@ config:
         config: {distribution: uniform, mode: fan_avg, scale: 1.0, seed: null}
       kernel_regularizer: null
       kernel_size: !!python/tuple [2]
-      name: conv1d_4
+      name: conv1d_7
       padding: same
       strides: !!python/tuple [1]
       trainable: true
       use_bias: true
     inbound_nodes:
-    - - - embedding_2
+    - - - embedding_3
         - 0
         - 0
         - {}
-    name: conv1d_4
+    name: conv1d_7
   - class_name: Conv1D
     config:
       activation: relu
@@ -80,17 +80,17 @@ config:
         config: {distribution: uniform, mode: fan_avg, scale: 1.0, seed: null}
       kernel_regularizer: null
       kernel_size: !!python/tuple [3]
-      name: conv1d_5
+      name: conv1d_8
       padding: same
       strides: !!python/tuple [1]
       trainable: true
       use_bias: true
     inbound_nodes:
-    - - - embedding_2
+    - - - embedding_3
         - 0
         - 0
         - {}
-    name: conv1d_5
+    name: conv1d_8
   - class_name: Conv1D
     config:
       activation: relu
@@ -108,74 +108,74 @@ config:
         config: {distribution: uniform, mode: fan_avg, scale: 1.0, seed: null}
       kernel_regularizer: null
       kernel_size: !!python/tuple [4]
-      name: conv1d_6
+      name: conv1d_9
       padding: same
       strides: !!python/tuple [1]
       trainable: true
       use_bias: true
     inbound_nodes:
-    - - - embedding_2
+    - - - embedding_3
         - 0
         - 0
         - {}
-    name: conv1d_6
+    name: conv1d_9
   - class_name: Concatenate
-    config: {axis: -1, name: concatenate_3, trainable: true}
+    config: {axis: -1, name: concatenate_5, trainable: true}
     inbound_nodes:
-    - - - conv1d_4
+    - - - conv1d_7
         - 0
         - 0
         - &id001 {}
-      - - conv1d_5
+      - - conv1d_8
         - 0
         - 0
         - *id001
-      - - conv1d_6
+      - - conv1d_9
         - 0
         - 0
         - *id001
-    name: concatenate_3
+    name: concatenate_5
   - class_name: MaxPooling1D
     config:
-      name: max_pooling1d_2
+      name: max_pooling1d_3
       padding: valid
       pool_size: !!python/tuple [4]
       strides: !!python/tuple [4]
       trainable: true
     inbound_nodes:
-    - - - concatenate_3
+    - - - concatenate_5
         - 0
         - 0
         - {}
-    name: max_pooling1d_2
+    name: max_pooling1d_3
   - class_name: Flatten
-    config: {name: flatten_2, trainable: true}
+    config: {name: flatten_3, trainable: true}
     inbound_nodes:
-    - - - max_pooling1d_2
+    - - - max_pooling1d_3
         - 0
         - 0
         - {}
-    name: flatten_2
+    name: flatten_3
   - class_name: InputLayer
     config:
       batch_input_shape: !!python/tuple [null, 44]
       dtype: float32
-      name: input_4
+      name: input_6
       sparse: false
     inbound_nodes: []
-    name: input_4
+    name: input_6
   - class_name: Concatenate
-    config: {axis: -1, name: concatenate_4, trainable: true}
+    config: {axis: -1, name: concatenate_6, trainable: true}
     inbound_nodes:
-    - - - flatten_2
+    - - - flatten_3
         - 0
         - 0
         - &id002 {}
-      - - input_4
+      - - input_6
         - 0
         - 0
         - *id002
-    name: concatenate_4
+    name: concatenate_6
   - class_name: Dense
     config:
       activation: softmax
@@ -190,17 +190,17 @@ config:
         class_name: VarianceScaling
         config: {distribution: uniform, mode: fan_avg, scale: 1.0, seed: null}
       kernel_regularizer: null
-      name: dense_4
+      name: dense_6
       trainable: true
       units: 6
       use_bias: true
     inbound_nodes:
-    - - - concatenate_4
+    - - - concatenate_6
         - 0
         - 0
         - {}
-    name: dense_4
-  name: model_2
+    name: dense_6
+  name: model_3
   output_layers:
-  - [dense_4, 0, 0]
+  - [dense_6, 0, 0]
 keras_version: 2.0.9
