@@ -50,7 +50,7 @@ def create_basic(csv_basic_feature, contains_label=True):
     feature_end_col = 13
 
     y=None
-    df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+    df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0, quotechar='"').as_matrix()
     if contains_label:
         label_col = 40
         y = df[:, label_col]

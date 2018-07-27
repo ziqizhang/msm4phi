@@ -180,17 +180,32 @@ def remove_empty_profiles_and_features(feature_file_folder,
 #overwrite the input file, deleting specified rows
 def overwrite_and_remove(file, remove_rows:list):
     df = pd.read_csv(file,
-                     header=0, delimiter=",", quoting=0, quotechar='"')
+                     header=0, delimiter=",", skipinitialspace = True,quoting=0, quotechar='"')
     header=list(df.columns.values)
     df=df.as_matrix()
     with open(file, 'w', newline='\n') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csvwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
         csvwriter.writerow(header)
         for i in range(0, len(df)):
             if i in remove_rows:
                 continue
             csvwriter.writerow(df[i])
 
+#an ad hoc method to remove the """ chars in csv files
+def clean_data(folder):
+    for file in os.listdir(folder):
+        df = pd.read_csv(folder+"/"+file,
+                         header=0, delimiter=",", quoting=0, quotechar='"')
+        header = list(df.columns.values)
+        df = df.as_matrix()
+        with open(folder+"/"+file, 'w', newline='\n') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"',quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writerow(header)
+            for row in df:
+                for i in range(0, len(row)):
+                    if type(row[i]) is str and row[i].endswith('"'):
+                        row[i]=row[i][0:len(row[i])-1]
+                csvwriter.writerow(row)
 
 
 def replace_nan_in_list(data):
@@ -231,3 +246,4 @@ if __name__ == "__main__":
     remove_empty_profiles_and_features("/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features",
                                        "/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_autodictext_features",
                                        16)
+    #clean_data("/home/zz/Work/msm4phi_data/paper2/all_user_empty_filled_features")
