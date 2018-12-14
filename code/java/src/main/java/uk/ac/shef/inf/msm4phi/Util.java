@@ -51,6 +51,24 @@ public class Util {
         return solrClient;
     }
 
+    public static SolrQuery createQuerySortByDate(SolrQuery.ORDER order) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("*:*");
+        query.setStart(0);
+        query.setSort("created_at", order);
+        return query;
+    }
+
+    public static SolrQuery createQueryByUserType(String userType,
+                                                  int resultBatchSize) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("label_s:"+userType);
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+
+        return query;
+    }
+
     public static SolrQuery createQueryTweetsOfHashtags(int resultBatchSize, String... hashtags) {
         SolrQuery query = new SolrQuery();
         StringBuilder qValues = new StringBuilder();
@@ -213,5 +231,14 @@ public class Util {
         result.add(upper_outliers);
 
         return result;
+    }
+
+    public static SolrQuery createQueryByDateRange(String startD, String nextD, int resultBatchSize) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("created_at:[" + startD + " TO " +
+                nextD+"]");
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+        return query;
     }
 }

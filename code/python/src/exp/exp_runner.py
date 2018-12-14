@@ -21,10 +21,10 @@ if __name__ == "__main__":
 
 
     datafeatures={}
-    datafeatures["full_"]=(csv_basic_feature_folder+"/basic_features.csv",
-                           csv_other_feature_folder+"/full")
-    datafeatures["emtpyremoved_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_removed.csv",
-                           csv_other_feature_folder+"/empty_profile_removed")
+    # datafeatures["full_"]=(csv_basic_feature_folder+"/basic_features.csv",
+    #                        csv_other_feature_folder+"/full")
+    # datafeatures["emtpyremoved_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_removed.csv",
+    #                        csv_other_feature_folder+"/empty_profile_removed")
     datafeatures["emptyfilled_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_filled.csv",
                            csv_other_feature_folder+"/empty_profile_filled")
 
@@ -33,10 +33,10 @@ if __name__ == "__main__":
         print(datetime.datetime.now())
         csv_basic_feature=v[0]
         csv_other_feature=v[1]
-        # X, y = fc.create_textprofile(csv_basic_feature)
-        # cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
-        #                    categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
-        # cls.run()
+        X, y = fc.create_textprofile(csv_basic_feature)
+        cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
+                            categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
+        cls.run()
         #
         # # Setting 6 text+numeric
         # print(datetime.datetime.now())
@@ -46,11 +46,11 @@ if __name__ == "__main__":
         # cls.run()
         #
         # Setting 9 text+autocreated_dictext
-        print(datetime.datetime.now())
-        X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
-        cls = cm.Classifer(k+"stakeholdercls", "_text+autodictext_", X, y, outfolder,
-                           categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
-        cls.run()
+        # print(datetime.datetime.now())
+        # X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
+        # cls = cm.Classifer(k+"stakeholdercls", "_text+autodictext_", X, y, outfolder,
+        #                    categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
+        # cls.run()
 
         # setting 10 text+autodict_ext+numeric
         # print(datetime.datetime.now())
@@ -82,11 +82,11 @@ if __name__ == "__main__":
         # cls.run()
         #
         # Setting 9 text+autocreated_dictext
-        print(datetime.datetime.now())
-        X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
-        cls = cm.Classifer(k+"stakeholdercls", "_text+autodictext_", X, y, outfolder,
-                           categorical_targets=6, nfold=n_fold, algorithms=["pca-svm_l"])
-        cls.run()
+        # print(datetime.datetime.now())
+        # X, y = fc.create_text_and_autodictext(csv_basic_feature, csv_other_feature)
+        # cls = cm.Classifer(k+"stakeholdercls", "_text+autodictext_", X, y, outfolder,
+        #                    categorical_targets=6, nfold=n_fold, algorithms=["pca-svm_l"])
+        # cls.run()
 
         # setting 10 text+autodict_ext+numeric
         # print(datetime.datetime.now())

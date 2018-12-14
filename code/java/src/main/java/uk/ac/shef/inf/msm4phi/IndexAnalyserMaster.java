@@ -2,12 +2,9 @@ package uk.ac.shef.inf.msm4phi;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
-import uk.ac.shef.inf.msm4phi.export.WorkerTweetExport;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

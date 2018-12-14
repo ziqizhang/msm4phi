@@ -99,7 +99,7 @@ if __name__ == "__main__":
             cls.run()
             # #
             # print(datetime.datetime.now())
-            # X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
+            X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
             # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
             # df.astype(str)
             # profiles = df[:, 22]

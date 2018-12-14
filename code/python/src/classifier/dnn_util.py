@@ -475,7 +475,7 @@ def create_submodel_textfeature(
 
     embedding = Embedding(vocab_size, embedding_dim, input_length=max_seq_length,
                           weights=[weights], trainable=False)(inputs)
-    if model_option.startswith("cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax"):
+    if model_option.startswith("cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"):
         #conv1d_1 = Conv1D(filters=100,
         #                  kernel_size=1, padding='same', activation='relu')(embedding)
         conv1d_2=Conv1D(filters=100,
@@ -494,19 +494,19 @@ def create_submodel_textfeature(
         #final = Dense(targets, activation="softmax")(pool)
         #model = Model(inputs=deep_inputs, outputs=final)
         return flat
-    elif model_option.startswith("lstm=100-False|dense=6-softmax"):
+    elif model_option.startswith("lstm=100-False"):
         lstm=LSTM(units=100, return_sequences=False)(embedding)
         #final = Dense(targets, activation="softmax")(lstm)
         #model = Model(inputs=deep_inputs, outputs=final)
         #flat = Flatten()(lstm)
         return lstm
-    elif model_option.startswith("bilstm=100-False|dense=6-softmax"):
+    elif model_option.startswith("bilstm=100-False"):
         lstm=Bidirectional(LSTM(units=100, return_sequences=False))(embedding)
         #final = Dense(targets, activation="softmax")(lstm)
         #model = Model(inputs=deep_inputs, outputs=final)
         #flat = Flatten()(lstm)
         return lstm
-    elif model_option.startswith("scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax"):
+    elif model_option.startswith("scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten"):
         start=model_option.index("[")+1
         end=model_option.index("]")
         window_str = model_option[start:end]
@@ -524,7 +524,7 @@ def create_submodel_textfeature(
         #model = Model(inputs=deep_inputs, outputs=final)
         flat = Flatten()(pool)
         return flat
-    elif model_option.startswith("scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax"):
+    elif model_option.startswith("scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"):
         start=model_option.index("[")+1
         end=model_option.index("]")
         window_str = model_option[start:end]

@@ -1,0 +1,40 @@
+_text_only_N-fold results:
+,precision, recall, f1, support
+Advocates,0.51,0.31,0.39,892
+HPI,0.26,0.24,0.25,365
+HPO,0.22,0.34,0.27,273
+Other,0.50,0.65,0.56,963
+Patient,0.26,0.26,0.26,274
+Research,0.36,0.30,0.33,333
+avg,0.35,0.35,0.34,3100
+
+_text_only_N-fold results:
+,precision, recall, f1, support
+Advocates,0.51,0.45,0.48,892
+HPI,0.39,0.41,0.40,365
+HPO,0.28,0.35,0.31,273
+Other,0.59,0.54,0.56,963
+Patient,0.24,0.31,0.27,274
+Research,0.44,0.44,0.44,333
+avg,0.41,0.42,0.41,3100
+
+_text_only_N-fold results:
+,precision, recall, f1, support
+Advocates,0.55,0.39,0.46,892
+HPI,0.38,0.41,0.40,365
+HPO,0.30,0.42,0.35,273
+Other,0.56,0.57,0.57,963
+Patient,0.25,0.38,0.30,274
+Research,0.41,0.37,0.38,333
+avg,0.41,0.42,0.41,3100
+
+_text_only_N-fold results:
+,precision, recall, f1, support
+Advocates,0.55,0.34,0.42,892
+HPI,0.32,0.35,0.33,365
+HPO,0.24,0.41,0.30,273
+Other,0.56,0.56,0.56,963
+Patient,0.23,0.34,0.27,274
+Research,0.41,0.38,0.39,333
+avg,0.38,0.40,0.38,3100
+

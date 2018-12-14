@@ -7,6 +7,7 @@ import uk.ac.shef.inf.msm4phi.Util;
 import uk.ac.shef.inf.msm4phi.stats.content.ContentStatsExtractor;
 import uk.ac.shef.inf.msm4phi.stats.interaction.InteractionStatsExtractor;
 import uk.ac.shef.inf.msm4phi.stats.user.UserStatsExtractor;
+import uk.ac.shef.inf.msm4phi.stats.user.UserTypeStatsExtractor;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +27,11 @@ public class AppStatsExtractor {
         }else if (args[0].equalsIgnoreCase("u")){
             solrClient= Util.getSolrClient(Paths.get(args[1]),"users");
             worker = new UserStatsExtractor(0,solrClient, args[3]);
+        }else if (args[0].equalsIgnoreCase("ul")){
+            solrClient= Util.getSolrClient(Paths.get(args[1]),"users");
+            worker = new UserTypeStatsExtractor(0,solrClient, args[3]);
         }else{
-            System.err.println("Not supported. Use 'c/i/u'.");
+            System.err.println("Not supported. Use 'c/i/u/ul'.");
             System.exit(1);
         }
 
