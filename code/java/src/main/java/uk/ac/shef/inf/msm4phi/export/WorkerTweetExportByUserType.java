@@ -17,9 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class WorkerTweetExportByUserType extends IndexAnalyserWorker {
-    private SolrClient userIndex = null;
-    private SolrClient tweetIndex = null;
-    private String userType = null;
+    private SolrClient userIndex;
+    private SolrClient tweetIndex;
+    private String userType;
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     double maxUserSamplePercentage = 1.0;
     int outFileCounter = 1;
@@ -31,14 +31,14 @@ public class WorkerTweetExportByUserType extends IndexAnalyserWorker {
 
     public WorkerTweetExportByUserType(int id, SolrClient userIndex,
                                        SolrClient tweetIndex,
-                                       String userType,
+                                       String userType, double maxUserSamplePercentage,
                                        String outFolder) {
         super(id, userIndex, outFolder);
+        this.maxUserSamplePercentage=maxUserSamplePercentage;
         this.userIndex = userIndex;
         this.tweetIndex = tweetIndex;
         this.userType = userType;
     }
-
 
     public int getResultBatchSize() {
         return this.resultBatchSize;
@@ -93,7 +93,11 @@ public class WorkerTweetExportByUserType extends IndexAnalyserWorker {
             else
                 stop = true;
         }
-
+        try {
+            csvWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -159,7 +163,7 @@ public class WorkerTweetExportByUserType extends IndexAnalyserWorker {
     protected WorkerTweetExportByUserType createInstance(Map<String, List<String>> splitTasks, int id) {
         WorkerTweetExportByUserType worker =
                 new WorkerTweetExportByUserType(id, this.tweetIndex,
-                        this.userIndex, userType, outFolder);
+                        this.userIndex, userType,maxUserSamplePercentage, outFolder);
         worker.setHashtagMap(splitTasks);
         worker.setMaxTasksPerThread(this.maxTasksPerThread);
         return worker;
