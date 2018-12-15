@@ -19,9 +19,9 @@ import java.util.*;
 
 public class WorkerTweetExportByDays extends IndexAnalyserWorker {
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    final SimpleDateFormat DATE_FORMAT_SOLR = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ");
+    final SimpleDateFormat DATE_FORMAT_SOLR = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     int outFileCounter=1;
-    int outFileMaxRows=20000;
+    int outFileMaxRows=2000;
     int outFileCurrentRows=0;
     CSVWriter csvWriter=null;
 
@@ -57,23 +57,26 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
         try {
             SolrQuery q = Util.createQuerySortByDate(SolrQuery.ORDER.asc);
             QueryResponse res = Util.performQuery(q, solrClient);
-            startD = DATE_FORMAT.parse(res.getResults().get(0).getFieldValue("created_at")
-                    .toString());
+            startD = (Date)res.getResults().get(0).getFieldValue("created_at");
             q = Util.createQuerySortByDate(SolrQuery.ORDER.desc);
             res = Util.performQuery(q, solrClient);
-            endD = DATE_FORMAT.parse(res.getResults().get(0).getFieldValue("created_at")
-                    .toString());
+            endD = (Date)res.getResults().get(0).getFieldValue("created_at");
         } catch (Exception e) {
             LOG.warn(String.format("\t\t unable to get start and end date of tweets in the index", ExceptionUtils.getFullStackTrace(e)));
         }
 
         Random rand = new Random();
         if (startD != null && endD != null) {
-            Date nextD = DateUtils.addDays(startD, dayGap);
-            SolrQuery q = Util.createQueryByDateRange(DATE_FORMAT_SOLR.format(startD),
-                    DATE_FORMAT_SOLR.format(nextD), resultBatchSize);
             boolean stopAll = false;
             while (!stopAll) {
+                Date nextD = DateUtils.addDays(startD, dayGap);
+                SolrQuery q = Util.createQueryByDateRange(DATE_FORMAT_SOLR.format(startD),
+                        DATE_FORMAT_SOLR.format(nextD), resultBatchSize);
+                LOG.info(String.format("\tCurrently processing from %s to %s...",
+                        DATE_FORMAT_SOLR.format(startD), DATE_FORMAT_SOLR.format(nextD)));
+                if(startD.after(endD))
+                    stopAll=true;
+
                 boolean stop = false;
                 while (!stop) {
                     QueryResponse res = null;
@@ -108,12 +111,13 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
                     else
                         stop = true;
                 }
-                startD=DateUtils.addDays(nextD, dayGap);
-                if(startD.after(endD))
-                    stopAll=true;
-
+                startD=DateUtils.addSeconds(nextD,1);
             }
-
+        }
+        try {
+            csvWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return 0;
     }
