@@ -25,7 +25,7 @@ logging.basicConfig(filename=LOG_DIR + '/twitter_stream.log', level=logging.INFO
 # feat_vectorizer=fv_chase_basic.FeatureVectorizerChaseBasic()
 SCALING_STRATEGY = -1
 
-COMMIT_BATCH_SIZE=50
+COMMIT_BATCH_SIZE=1000
 SOLR_CORE_TWEETS= "tweets"
 
 

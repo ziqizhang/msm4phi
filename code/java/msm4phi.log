@@ -46502,3 +46502,24 @@ java.lang.NullPointerException
 2018-12-15 10:18:34 INFO  WorkerTweetExportByUserType:129 - 		total tweets of 1, currently processing from 0 to 10000...
 2018-12-15 10:18:34 INFO  WorkerTweetExportByUserType:129 - 		total tweets of 2, currently processing from 0 to 10000...
 2018-12-15 10:19:05 INFO  IndexAnalyserMaster:40 - Completed 0 hashtags at Sat Dec 15 10:19:05 GMT 2018
+2019-02-05 13:52:49 ERROR TransactionLog:612 - Error: Forcing close of tlog{file=/home/zz/Work/data/solr_mu/tweets/data/tlog/tlog.0000000000000462922 refcount=1}
+2019-02-05 13:52:49 ERROR TransactionLog:612 - Error: Forcing close of tlog{file=/home/zz/Work/data/solr_mu/tweets/data/tlog/tlog.0000000000000462921 refcount=2}
+2019-02-05 17:59:17 ERROR TransactionLog:612 - Error: Forcing close of tlog{file=/home/zz/Work/data/solr/tweets/data/tlog/tlog.0000000000000462922 refcount=1}
+2019-02-05 17:59:17 ERROR UpdateLog:148 - org.apache.solr.common.SolrException: openNewSearcher called on closed core
+	at org.apache.solr.core.SolrCore.openNewSearcher(SolrCore.java:1969)
+	at org.apache.solr.core.SolrCore.getSearcher(SolrCore.java:2215)
+	at org.apache.solr.core.SolrCore.getSearcher(SolrCore.java:1952)
+	at org.apache.solr.update.DirectUpdateHandler2.commit(DirectUpdateHandler2.java:715)
+	at org.apache.solr.update.UpdateLog$LogReplayer.doReplay(UpdateLog.java:1878)
+	at org.apache.solr.update.UpdateLog$LogReplayer.run(UpdateLog.java:1676)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:514)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:514)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.apache.solr.common.util.ExecutorUtil$MDCAwareThreadPoolExecutor.lambda$execute$0(ExecutorUtil.java:188)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1135)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:844)
+
+2019-02-05 17:59:17 ERROR UpdateLog:1705 - ERROR: didn't get to recover from tlog tlog{file=/home/zz/Work/data/solr/tweets/data/tlog/tlog.0000000000000462922 refcount=0}
+2019-02-05 18:00:01 ERROR TransactionLog:612 - Error: Forcing close of tlog{file=/home/zz/Work/data/solr/tweets/data/tlog/tlog.0000000000000462922 refcount=2}

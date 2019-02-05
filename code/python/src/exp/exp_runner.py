@@ -33,10 +33,10 @@ if __name__ == "__main__":
         print(datetime.datetime.now())
         csv_basic_feature=v[0]
         csv_other_feature=v[1]
-        X, y = fc.create_textprofile(csv_basic_feature)
-        cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
-                            categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
-        cls.run()
+        # X, y = fc.create_textprofile(csv_basic_feature)
+        # cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
+        #                     categorical_targets=6,nfold=n_fold,algorithms=["svm_l"])
+        # cls.run()
         #
         # # Setting 6 text+numeric
         # print(datetime.datetime.now())
@@ -68,11 +68,11 @@ if __name__ == "__main__":
 
         ######## svm, pca #######
 
-        # print(datetime.datetime.now())
-        # X, y = fc.create_textprofile(csv_basic_feature)
-        # cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
-        #                    categorical_targets=6, nfold=n_fold, algorithms=["pca-svm_l"])
-        # cls.run()
+        print(datetime.datetime.now())
+        X, y = fc.create_textprofile(csv_basic_feature)
+        cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
+                           categorical_targets=6, nfold=n_fold, algorithms=["pca-svm_l"])
+        cls.run()
         #
         # # Setting 6 text+numeric
         # print(datetime.datetime.now())

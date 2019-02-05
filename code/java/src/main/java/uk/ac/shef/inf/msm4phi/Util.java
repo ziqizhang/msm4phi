@@ -241,4 +241,20 @@ public class Util {
         query.setRows(resultBatchSize);
         return query;
     }
+
+    public static void main(String[] args) throws IOException, SolrServerException {
+        SolrClient solr=getSolrClient(Paths.get(args[0]),args[1]);
+        System.out.println("counting...");
+        SolrQuery query = new SolrQuery();
+        query.setQuery("*:*");
+        query.setStart(0);
+        QueryResponse qr = performQuery(query, solr);
+        System.out.println(qr.getResults().getNumFound());
+        System.out.println("optimizing...");
+        solr.optimize();
+        System.out.println(new Date());
+        solr.close();
+        System.exit(0);
+
+    }
 }
