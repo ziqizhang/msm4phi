@@ -17,6 +17,9 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * collect tweets for n days starting from the earliest available date
+ */
 public class WorkerTweetExportByDays extends IndexAnalyserWorker {
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     final SimpleDateFormat DATE_FORMAT_SOLR = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -223,7 +226,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
      */
     private void writeCSVContent(CSVWriter csvWriter, List<SolrDocument> results) {
         for (SolrDocument d : results) {
-            String vertex1 = "ID_" + d.getFieldValue("user_id_str").toString();
+            String vertex1 = "ID_" + d.getFieldValue("user_screen_name").toString();
             String reciprocated = "";
             String col3 = "";
             String relationship = "";
