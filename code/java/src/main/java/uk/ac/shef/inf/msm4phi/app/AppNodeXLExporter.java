@@ -14,14 +14,16 @@ import java.nio.file.Paths;
  */
 public class AppNodeXLExporter {
     public static void main(String[] args) throws IOException {
-        SolrClient solrClient = Util.getSolrClient(Paths.get("/home/zz/Work/msm4phi/resources/solr_offline"),"tweets");
+        SolrClient solrClient = Util.getSolrClient(Paths.get("/home/zz/Work/msm4phi_data/solr"),"tweets");
         WorkerTweetExportNodeXL worker = new WorkerTweetExportNodeXL(0,solrClient,
                 "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/nodexl");
         IndexAnalyserMaster exporter=new IndexAnalyserMaster(
-                new File("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/2_PART2_processed_hashtags.tsv"),
+                new File("/home/zz/Work/msm4phi/data/symplur_hashtags/2_processed_hashtags.tsv"),
                 worker
         );
         exporter.setThreads(1);
         exporter.process();
+        solrClient.close();
+        System.exit(0);
     }
 }

@@ -14,8 +14,8 @@ public class AppTweetExporterByDays {
         SolrClient solrClient =
                 Util.getSolrClient(Paths.get("/home/zz/Work/data/solr_mu"),"tweets");
         WorkerTweetExportByDays worker = new WorkerTweetExportByDays(0,solrClient,
-                "/home/zz/Cloud/GDrive/ziqizhang/teaching/sheffield/INF6024/2018-19/lab",
-                30, 0.01);
+                "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/nodexl/manU",
+                10, 0.5);
         /*
         the actual tag list is not used for selecting data
          */

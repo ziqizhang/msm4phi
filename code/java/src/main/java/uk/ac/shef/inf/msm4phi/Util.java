@@ -233,10 +233,19 @@ public class Util {
         return result;
     }
 
-    public static SolrQuery createQueryByDateRange(String startD, String nextD, int resultBatchSize) {
+    public static SolrQuery createQueryByDateRange_(String startD, String nextD, int resultBatchSize) {
         SolrQuery query = new SolrQuery();
         query.setQuery("created_at:[" + startD + " TO " +
                 nextD+"]");
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+        return query;
+    }
+
+    public static SolrQuery createQueryByDateRange(String startD, String nextD, int resultBatchSize) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("created_at:[" + startD + " TO " +
+                nextD+"] AND (user_screen_name:ManUtd OR status_text:@ManUtd)");
         query.setStart(0);
         query.setRows(resultBatchSize);
         return query;

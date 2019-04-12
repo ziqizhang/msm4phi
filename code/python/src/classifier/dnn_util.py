@@ -39,8 +39,8 @@ lstm examples:
 
 DNN_EMBEDDING_DIM=300
 DNN_MAX_SEQUENCE_LENGTH=100
-DNN_EPOCHES=40
-DNN_BATCH_SIZE=50
+DNN_EPOCHES=20
+DNN_BATCH_SIZE=100
 #DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="lstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="bilstm=100-False|dense=6-softmax|glv"
@@ -548,11 +548,11 @@ class SkipConv1D(Conv1D):
 
     #in the init, let's just add a parameter to tell which grams to skip
     def __init__(self, validGrams, **kwargs):
-
+        self.validGrams_input=validGrams
         #for this example, I'm assuming validGrams is a list
         #it should contain zeros and ones, where 0's go on the skip positions
         #example: [1,1,0,1] will skip the third gram in the window of 4 grams
-        assert len(validGrams) == kwargs.get('kernel_size')
+        #assert len(validGrams) == kwargs.get('kernel_size')
         self.validGrams = K.reshape(K.constant(validGrams),(len(validGrams),1,1))
             #the chosen shape matches the dimensions of the kernel
             #the first dimension is the kernel size, the others are input and ouptut channels
@@ -576,3 +576,10 @@ class SkipConv1D(Conv1D):
         self.originalKernel = self.kernel
         self.kernel = self.validGrams * self.originalKernel
 
+
+    # https://github.com/keras-team/keras/issues/5401
+    # solve the problem of keras.models.clone_model
+    def get_config(self):
+        config = {'validGrams': self.validGrams_input}
+        base_config = super(SkipConv1D, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))

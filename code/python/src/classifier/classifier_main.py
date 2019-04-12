@@ -133,7 +133,7 @@ class Classifer(object):
         #                           y_train, self.dnn_descriptor, self.outfolder)
 
         if "dnn" in self.algorithms:
-            cl.learn_dnn(self.nfold, self.task_name,
+            cl.learn_dnn(self.nfold, self.task_name+self.identifier,
                          self.dnn_embedding_file, self.text_data,
                          X_train,
                          y_train, self.dnn_descriptor, self.outfolder,

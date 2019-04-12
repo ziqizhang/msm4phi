@@ -20,7 +20,7 @@ SOLR_CORE_SEARCHAPI = "msm4phi"
 TWITTER_TIME_PATTERN = "%a %b %d %H:%M:%S %z %Y"
 SOLR_TIME_PATTERN = "%Y-%m-%dT%H:%M:%SZ"  # YYYY-MM-DDThh:mm:ssZ
 LOG_DIR = os.getcwd() + "/logs"
-logger = logging.getLogger(__name__)
+lger = logging.getLogger(__name__)
 logging.basicConfig(filename=LOG_DIR + '/twitter_stream.log', level=logging.INFO, filemode='w')
 # feat_vectorizer=fv_chase_basic.FeatureVectorizerChaseBasic()
 SCALING_STRATEGY = -1

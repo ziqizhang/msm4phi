@@ -19,7 +19,9 @@ import java.util.*;
 public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     private static final Logger LOG = Logger.getLogger(WorkerTweetExportNodeXL.class.getName());
-
+    private int count=1;
+    private int currLine=0;
+    private int maxLines=10000;
     public WorkerTweetExportNodeXL(int id, SolrClient solrClient, String outFolder) {
         super(id, solrClient, outFolder);
     }
@@ -41,12 +43,18 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
      */
     protected int computeSingleWorker(Map<String, List<String>> tasks) {
         for (Map.Entry<String, List<String>> en : tasks.entrySet()) {
+            count=0;
+            currLine=0;
             LOG.info(String.format("\t processing hashtag '%s' with %d variants...", en.getKey(), en.getValue().size()));
             SolrQuery q = Util.createQueryTweetsOfHashtags(resultBatchSize, en.getValue().toArray(new String[0]));
 
             CSVWriter csvWriter = null;
+            String tag=en.getKey();
+            if (tag.contains("appendicitis"))
+                System.out.println();
             try {
-                csvWriter = Util.createCSVWriter(outFolder + "/" + en.getKey().replaceAll("#", "_")+".csv");
+                csvWriter = Util.createCSVWriter(outFolder + "/" + tag.
+                        replaceAll("#", "_")+"_"+count+".csv");
                 writeCSVHeader(csvWriter);
             } catch (IOException e) {
                 LOG.warn(String.format("\tfailed due to unable to create output file at %s \n\tcontinue to the next hashtag",
@@ -65,7 +73,7 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                     //update results
                     LOG.info(String.format("\t\ttotal results of %d, currently processing from %d to %d...",
                             total, q.getStart(), q.getStart() + q.getRows()));
-                    writeCSVContent(csvWriter, res.getResults());
+                    csvWriter=writeCSVContent(csvWriter, tag, res.getResults());
 
                 } catch (Exception e) {
                     LOG.warn(String.format("\t\tquery %s caused an exception: \n\t %s \n\t trying for the next query...",
@@ -160,9 +168,21 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
      * @param csvWriter
      * @param results
      */
-    private void writeCSVContent(CSVWriter csvWriter, SolrDocumentList results) {
+    private CSVWriter writeCSVContent(CSVWriter csvWriter, String tag, SolrDocumentList results) {
         for (SolrDocument d : results) {
-            String vertex1 = "ID_"+d.getFieldValue("user_id_str").toString();
+            if (currLine>=maxLines){
+                try{
+                    csvWriter.close();
+                    currLine=0;
+                    count++;
+                    csvWriter = Util.createCSVWriter(outFolder + "/" + tag.
+                            replaceAll("#", "_")+"_"+count+".csv");
+                    writeCSVHeader(csvWriter);
+                }catch (IOException ioe){
+                    ioe.printStackTrace();
+                }
+            }
+            String vertex1 = d.getFieldValue("user_screen_name").toString();
             String reciprocated = "";
             String col3 = "";
             String relationship = "";
@@ -205,7 +225,7 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                 relationship = "Mentions";
                 for(Object vertex2 : userMentions) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, "ID_"+vertex2.toString(), reciprocated,col3,relationship, dateStr,
+                            vertex1, vertex2.toString(), reciprocated,col3,relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1],hashtags, media,
                             tweetImg, dateStr, twitterPage,lat, lon,importedID,
                             inReplyToTweetID, favorited,favoriteCount, inReplyToUserID,isQuoteStatus,
@@ -213,6 +233,7 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                             retweetedCount, retweetID,source,truncated,importedID,
                             importedTweetType
                     });
+                    currLine++;
                 }
             }
             Collection<Object> reply2UserIDs = d.getFieldValues("in_reply_to_user_id_str");
@@ -220,7 +241,7 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                 relationship = "Replies to";
                 for(Object vertex2 : reply2UserIDs) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, "ID_"+vertex2.toString(), reciprocated,col3,relationship, dateStr,
+                            vertex1, vertex2.toString(), reciprocated,col3,relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1],hashtags, media,
                             tweetImg, dateStr,twitterPage,lat, lon,importedID,
                             inReplyToTweetID, favorited,favoriteCount, inReplyToUserID,isQuoteStatus,
@@ -228,6 +249,7 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                             retweetedCount, retweetID,source,truncated,importedID,
                             importedTweetType
                     });
+                    currLine++;
                 }
             }
             if (userMentions == null && reply2UserIDs == null) {
@@ -241,9 +263,12 @@ public class WorkerTweetExportNodeXL extends IndexAnalyserWorker {
                         retweetedCount, retweetID,source,truncated,importedID,
                         importedTweetType
                 });
+                currLine++;
             }
         }
+        return csvWriter;
     }
+
 
     private String getTwitterPageForTweet(SolrDocument d) {
         return "https://twitter.com/statuses/"+d.getFieldValue("id");

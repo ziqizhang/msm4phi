@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class AppCytoscapeFormatAdaptor {
     public static void main(String[] args) throws IOException {
-        convert("/home/zz/Cloud/GDrive/ziqizhang/teaching/sheffield/INF6024/2018-19/lab/raw",
+        convert("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/data/nodexl/manU",
                 "/home/zz/Cloud/GDrive/ziqizhang/teaching/sheffield/INF6024/2018-19/lab/edges.csv");
     }
 

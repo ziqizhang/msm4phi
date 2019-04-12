@@ -45,49 +45,48 @@ if __name__ == "__main__":
     datafeatures["emptyfilled_"] = (csv_basic_feature_folder + "/basic_features_empty_profile_filled.csv",
                                     csv_other_feature_folder + "/empty_profile_filled")
 
-    model_descriptors=["cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"]#,
-                       # "scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv",
-                       # "scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"]
 
-    ######## svm, no pca #######
+    model_descriptors = ["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv",
+                         "bilstm=100-False"]
+
     for k, v in datafeatures.items():
         print(datetime.datetime.now())
 
-        csv_basic_feature = v[0]
+        csv_text = v[0]
         csv_other_feature = v[1]
-        print(csv_basic_feature)
+        print(csv_text)
 
         for model_descriptor in model_descriptors:
             print("\t"+model_descriptor)
 
             #SETTING0 dnn applied to profile only
-            # X, y = fc.create_basic(csv_basic_feature)
-            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            # df.astype(str)
-            # profiles = df[:, 22]
-            # profiles = ["" if type(x) is float else x for x in profiles]
-            # cls = cm.Classifer("stakeholdercls", "_dnn_text_", X, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
-            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
+            X, y = fc.create_basic_stats(csv_text)
+            df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
+            df.astype(str)
+            profiles = df[:, 22]
+            profiles = ["" if type(x) is float else x for x in profiles]
+            cls = cm.Classifer("stakeholdercls", "_dnn_text_", None, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
 
-            #
-            # print(datetime.datetime.now())
-            # X, y = fc.create_numeric(csv_basic_feature, csv_other_feature)
-            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            # df.astype(str)
-            # profiles = df[:, 22]
-            # profiles = ["" if type(x) is float else x for x in profiles]
-            # cls = cm.Classifer("stakeholdercls", "_dnn_text+numeric_", None, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
-            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
-            # #
+            # SETTING0 dnn applied to profile and stat meta feature only
+            X, y = fc.create_basic_stats(csv_text)
+            df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
+            df.astype(str)
+            profiles = df[:, 22]
+            profiles = ["" if type(x) is float else x for x in profiles]
+            cls = cm.Classifer("stakeholdercls", "_dnn_text+behaviour_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
+
+
             print(datetime.datetime.now())
-            X, y = fc.create_autocreated_dictext(csv_basic_feature, csv_other_feature)
-            df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
+            X, y = fc.create_autocreated_dict_and_text(csv_text, csv_other_feature)
+            df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
             df.astype(str)
             profiles = df[:, 22]
             profiles = ["" if type(x) is float else x for x in profiles]
@@ -98,15 +97,17 @@ if __name__ == "__main__":
                                dnn_text_data_extra_for_embedding_vcab=tweets_exta)
             cls.run()
             # #
-            # print(datetime.datetime.now())
-            X, y = fc.create_text_and_numeric_and_autodictext(csv_basic_feature, csv_other_feature)
-            # df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
-            # df.astype(str)
-            # profiles = df[:, 22]
-            # profiles = ["" if type(x) is float else x for x in profiles]
-            # cls = cm.Classifer("stakeholdercls", "_dnn_text+numeric+autodictext_", X, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn"],nfold=n_fold,
-            #                    text_data=profiles, dnn_embedding_file=dnn_embedding_file,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
+            print(datetime.datetime.now())
+            X, y = fc.create_text_and_meta_and_autodictext(csv_text, csv_other_feature)
+            df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
+            df.astype(str)
+            profiles = df[:, 22]
+            profiles = ["" if type(x) is float else x for x in profiles]
+            cls = cm.Classifer("stakeholdercls", "_dnn_text+behaviour+autodictext_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"],nfold=n_fold,
+                               text_data=profiles, dnn_embedding_file=dnn_embedding_file,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
 
+
+            #todo: dnn with just behaviour and autodict text

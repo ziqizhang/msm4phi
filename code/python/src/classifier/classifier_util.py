@@ -2,7 +2,7 @@ import pickle
 
 import datetime
 
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 import os
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
@@ -56,10 +56,10 @@ def prepare_score_string(p, r, f1, s, labels, target_names, digits):
     string += '{0}'.format(np.sum(s))+"\n\n"
     return string
 
-def save_scores(nfold_predictions, y_train, model_name, task_name,
+def save_scores(nfold_predictions, y_train, model_flag, task_name,
                 identifier, digits, outfolder):
-    outputPredictions(nfold_predictions, y_train, model_name, task_name, outfolder)
-    filename = os.path.join(outfolder, "%s-%s.csv" % (model_name, task_name))
+    outputPredictions(nfold_predictions, y_train, model_flag, task_name, outfolder)
+    filename = os.path.join(outfolder, "%s-%s.csv" % (model_flag, task_name))
     file = open(filename, "a+")
     file.write(identifier)
 
@@ -68,8 +68,21 @@ def save_scores(nfold_predictions, y_train, model_name, task_name,
     target_names = ['%s' % l for l in labels]
     p, r, f1, s = precision_recall_fscore_support(y_train, nfold_predictions,
                                                       labels=labels)
-    line=prepare_score_string(p,r,f1,s,labels,target_names,digits)
+    acc = accuracy_score(y_train, nfold_predictions)
+    mac_prf_line = prepare_score_string(p, r, f1, s, labels, target_names, digits)
+
+    prf_mac_weighted = precision_recall_fscore_support(y_train, nfold_predictions,
+                                                       average='weighted')
+    line = mac_prf_line + "\nmacro avg weighted," + \
+           str(prf_mac_weighted[0]) + "," + str(prf_mac_weighted[1]) + "," + \
+           str(prf_mac_weighted[2]) + "," + str(prf_mac_weighted[3])
+
+    prf = precision_recall_fscore_support(y_train, nfold_predictions,
+                                          average='micro')
+    line = line + "\nmicro avg," + str(prf[0]) + "," + str(prf[1]) + "," + \
+           str(prf[2]) + "," + str(prf[3])
     file.write(line)
+    file.write("\naccuracy on this run=" + str(acc) + "\n\n")
 
     file.close()
 
@@ -79,9 +92,12 @@ def index_max(values):
 
 
 def save_classifier_model(model, outfile):
-    if model:
-        with open(outfile, 'wb') as model_file:
-            pickle.dump(model, model_file)
+    try:
+        if model:
+            with open(outfile, 'wb') as model_file:
+                pickle.dump(model, model_file)
+    except AttributeError:
+        pass
 
 
 def print_eval_report(best_params, cv_score, prediction_dev,

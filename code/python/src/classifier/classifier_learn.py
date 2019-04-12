@@ -7,6 +7,7 @@ import numpy
 from keras import Input, Model
 from keras.callbacks import ModelCheckpoint
 from keras.layers import concatenate, Dense
+from keras.models import clone_model
 from keras.preprocessing import sequence
 from keras.utils import plot_model
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -142,6 +143,8 @@ def learn_generative(cpus, task, model_flag, X_train, y_train,
     if nfold is not None:
         print(y_train.shape)
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
+        if feature_reduction is not None:
+            model_flag+="-"+feature_reduction
         util.save_scores(nfold_predictions, y_train, model_flag, task, identifier, 2, outfolder)
     else:
         classifier.fit(X_train, y_train)
@@ -256,7 +259,8 @@ def learn_dnn(nfold, task,
         model_metafeature = \
             dmc.create_submodel_metafeature(model_metafeature_inputs, 20)
         merge = concatenate([model_text, model_metafeature])
-        final = Dense(prediction_targets, activation="softmax")(merge)
+        hidden=Dense(500)(merge)
+        final = Dense(prediction_targets, activation="softmax")(hidden)
         model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
         X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
     else:
@@ -266,9 +270,15 @@ def learn_dnn(nfold, task,
         X_merge = X_train_textfeature
 
     plot_model(model, to_file="model.png")
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     model_file = os.path.join(outfolder, "ann-%s.m" % task)
+
+    model_copies = []
+    for i in range(nfold):
+        model_copy = clone_model(model)
+        model_copy.set_weights(model.get_weights())
+        model_copies.append(model_copy)
 
     if nfold is not None:
         kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
@@ -276,6 +286,9 @@ def learn_dnn(nfold, task,
 
         nfold_predictions = dict()
         for k in range(0, len(splits)):
+            nfold_model = model_copies[k]
+            nfold_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
             # Fit the model
             X_train_index = splits[k][1][0]
             X_test_index = splits[k][1][1]
@@ -292,14 +305,14 @@ def learn_dnn(nfold, task,
             X_test_meta_feature = X_test_merge_[:, len(X_train_textfeature[0]):]
 
             if X_train_metafeature is not None:
-                model.fit([X_train_text_feature, X_train_meta_feature],
+                nfold_model.fit([X_train_text_feature, X_train_meta_feature],
                           y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
-                prediction_prob = model.predict([X_test_text_feature, X_test_meta_feature])
+                prediction_prob = nfold_model.predict([X_test_text_feature, X_test_meta_feature])
 
             else:
-                model.fit(X_train_text_feature,
+                nfold_model.fit(X_train_text_feature,
                           y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
-                prediction_prob = model.predict(X_test_text_feature)
+                prediction_prob = nfold_model.predict(X_test_text_feature)
             # evaluate the model
             #
             predictions = prediction_prob.argmax(axis=-1)
@@ -316,6 +329,8 @@ def learn_dnn(nfold, task,
         util.save_scores(predicted_labels, y_train_int.argmax(1), "dnn", task, model_descriptor, 2,
                          outfolder)
     else:
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
         if X_train_metafeature is not None:
             model.fit([X_train_textfeature, X_train_metafeature],
                   y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)

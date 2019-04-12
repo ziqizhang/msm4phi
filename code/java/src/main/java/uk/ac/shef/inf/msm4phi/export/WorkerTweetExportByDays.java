@@ -137,7 +137,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
         }
         writeCSVContent(csvWriter,selected);
         outFileCurrentRows+=selected.size();
-        if(outFileCurrentRows>outFileMaxRows){
+        if(outFileCurrentRows>=outFileMaxRows){
             outFileCounter++;
             outFileCurrentRows=0;
             try {
@@ -226,7 +226,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
      */
     private void writeCSVContent(CSVWriter csvWriter, List<SolrDocument> results) {
         for (SolrDocument d : results) {
-            String vertex1 = "ID_" + d.getFieldValue("user_screen_name").toString();
+            String vertex1 = d.getFieldValue("user_id_str").toString();
             String reciprocated = "";
             String col3 = "";
             String relationship = "";
@@ -269,7 +269,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
                 relationship = "Mentions";
                 for (Object vertex2 : userMentions) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, "ID_" + vertex2.toString(), reciprocated, col3, relationship, dateStr,
+                            "twitterID_"+vertex1, "twitterID_"+vertex2.toString(), reciprocated, col3, relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1], hashtags, media,
                             tweetImg, dateStr, twitterPage, lat, lon, importedID,
                             inReplyToTweetID, favorited, favoriteCount, inReplyToUserID, isQuoteStatus,
@@ -284,7 +284,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
                 relationship = "Replies to";
                 for (Object vertex2 : reply2UserIDs) {
                     csvWriter.writeNext(new String[]{
-                            vertex1, "ID_" + vertex2.toString(), reciprocated, col3, relationship, dateStr,
+                            "twitterID_"+vertex1, "twitterID_"+vertex2.toString(), reciprocated, col3, relationship, dateStr,
                             tweet, urls_and_domains[0], urls_and_domains[1], hashtags, media,
                             tweetImg, dateStr, twitterPage, lat, lon, importedID,
                             inReplyToTweetID, favorited, favoriteCount, inReplyToUserID, isQuoteStatus,
@@ -297,7 +297,7 @@ public class WorkerTweetExportByDays extends IndexAnalyserWorker {
             if (userMentions == null && reply2UserIDs == null) {
                 relationship = "Tweet";
                 csvWriter.writeNext(new String[]{
-                        vertex1, vertex1, reciprocated, col3, relationship, dateStr,
+                        "twitterID_"+vertex1, "twitterID_"+vertex1, reciprocated, col3, relationship, dateStr,
                         tweet, urls_and_domains[0], urls_and_domains[1], hashtags, media,
                         tweetImg, dateStr, twitterPage, lat, lon, importedID,
                         inReplyToTweetID, favorited, favoriteCount, inReplyToUserID, isQuoteStatus,

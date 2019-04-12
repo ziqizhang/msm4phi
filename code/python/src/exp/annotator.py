@@ -39,7 +39,7 @@ def train_with_extended_embeddingvocab(csv_basic_feature, csv_other_feature,dnn_
         tweets_exta = generate_extra_data_for_embeddingvocab(extra_data_for_embeddingvocab,
                                                              extra_data_for_embeddingvocab_text_col)
 
-    X, y = fc.create_autocreated_dictext(csv_basic_feature, csv_other_feature)
+    X, y = fc.create_autocreated_dict_and_text(csv_basic_feature, csv_other_feature)
     df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
     df.astype(str)
     profiles = df[:, 22]
@@ -53,7 +53,7 @@ def train_with_extended_embeddingvocab(csv_basic_feature, csv_other_feature,dnn_
 
 
 def predict_createfeature_autodictext(csv_basic_feature, folder_other):
-    X, y = fc.create_basic(csv_basic_feature, contains_label=False)
+    X, y = fc.create_basic_stats(csv_basic_feature, contains_label=False)
 
     other_feature_prefix = "/" + csv_basic_feature[csv_basic_feature.rfind("/") + 1:
                                                    csv_basic_feature.rfind(".")]
