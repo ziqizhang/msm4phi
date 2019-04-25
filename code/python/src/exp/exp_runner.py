@@ -71,7 +71,7 @@ if __name__ == "__main__":
         #                     categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
         #                                                                    "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
         #                                                                    "pca-svm_rbf"])
-        cls.run()
+        #cls.run()
 
         #text+dict
         print(">>>>> _text+dict_only_ >>>>>")

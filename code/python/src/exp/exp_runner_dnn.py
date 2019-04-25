@@ -45,7 +45,7 @@ if __name__ == "__main__":
                                     csv_other_feature_folder + "/empty_profile_filled")
 
 
-    model_descriptors = [#"scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv",
+    model_descriptors = ["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv",
                          "bilstm=100-False"]
 
     for k, v in datafeatures.items():
