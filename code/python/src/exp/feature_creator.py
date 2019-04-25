@@ -45,7 +45,7 @@ def create_textprofileandname(csv_basic_feature):
     return X_ngram, y
 
 # this is the basic feature loader, using only the stats from indexed data.
-def create_basic_stats(csv_basic_feature, contains_label=True):
+def create_behaviour(csv_basic_feature, contains_label=True):
     feature_start_col = 1
     feature_end_col = 13
 
@@ -65,7 +65,7 @@ def create_basic_stats(csv_basic_feature, contains_label=True):
 
 '''basic numeric features and tweet based numeric features (disease in tweets, topical tweets)'''
 def create_numeric(csv_basic_feature, folder_other):
-    X, y = create_basic_stats(csv_basic_feature)
+    X, y = create_behaviour(csv_basic_feature)
     csv_diseases_in_tweets = folder_other + \
                                    "/tweet_feature/diseases_in_tweets.csv"
 
@@ -89,7 +89,7 @@ def create_numeric(csv_basic_feature, folder_other):
 
 def create_manual_dict(csv_basic_feature, folder_other):
 
-    X, y = create_basic_stats(csv_basic_feature)
+    X, y = create_behaviour(csv_basic_feature)
 
     csv_manual_dict_feature = folder_other + \
                               "/manual_dict_feature_1/feature_manualcreated_dict_match_profile.csv"
@@ -102,8 +102,8 @@ def create_manual_dict(csv_basic_feature, folder_other):
     return X_2, y
 
 
-def create_autocreated_dict(csv_basic_feature, folder_other):
-    X, y = create_basic_stats(csv_basic_feature)
+def create_autodict(csv_basic_feature, folder_other):
+    X, y = create_behaviour(csv_basic_feature)
 
     csv_autocreated_dict_feature = folder_other + \
                                    "/dictionary_feature_1/feature_autocreated_dict_match_profile.csv"
@@ -116,9 +116,24 @@ def create_autocreated_dict(csv_basic_feature, folder_other):
     return X_2, y
 
 
+def create_behaviour_and_autodict(csv_basic_feature, folder_other):
+    X, y = create_behaviour(csv_basic_feature)
+
+    csv_autocreated_dict_feature = folder_other + \
+                                   "/dictionary_feature_1/feature_autocreated_dict_match_profile.csv"
+    df = pd.read_csv(csv_autocreated_dict_feature, header=0, delimiter=",", quoting=0).as_matrix()
+    X_2 = df[:, 1:]
+    X_2 = X_2.astype(numpy.float32)
+    # replace nan values to 0
+    numpy.nan_to_num(X_2,False)
+
+    X_all = numpy.concatenate([X, X_2], axis=1)
+
+    return X_all, y
+
 #auto dict, adds hashtags and words matched against profiles
-def create_autocreated_dict_and_text(csv_basic_feature, folder_other):
-    X, y = create_basic_stats(csv_basic_feature)
+def create_text_and_autodict(csv_basic_feature, folder_other):
+    X, y = create_behaviour(csv_basic_feature)
     #X is not used, we only need y as label column
 
     csv_autocreated_dict_feature = folder_other + \
@@ -129,31 +144,34 @@ def create_autocreated_dict_and_text(csv_basic_feature, folder_other):
     # replace nan values to 0
     numpy.nan_to_num(X_2,False)
 
-    csv_tweet_hashtag = folder_other + \
-                        "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
-    df = pd.read_csv(csv_tweet_hashtag, header=0, delimiter=",", quoting=0).as_matrix()
-    X_tweet_hashtag = df[:, 1:]
-    X_tweet_hashtag = X_tweet_hashtag.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_tweet_hashtag, False)
+    X_text, _ = create_textprofile(csv_basic_feature)
 
-    csv_tweet_word = folder_other + \
-                     "/dictionary_feature_1/feature_disease_word_match_profile.csv"
-    df = pd.read_csv(csv_tweet_word, header=0, delimiter=",", quoting=0).as_matrix()
-    X_tweet_word = df[:, 1:]
-    X_tweet_word = X_tweet_word.astype(numpy.float32)
-    # replace nan values to 0
-    numpy.nan_to_num(X_tweet_word, False)
+    # csv_tweet_hashtag = folder_other + \
+    #                     "/dictionary_feature_1/feature_disease_hashtag_match_profile.csv"
+    # df = pd.read_csv(csv_tweet_hashtag, header=0, delimiter=",", quoting=0).as_matrix()
+    # X_tweet_hashtag = df[:, 1:]
+    # X_tweet_hashtag = X_tweet_hashtag.astype(numpy.float32)
+    # # replace nan values to 0
+    # numpy.nan_to_num(X_tweet_hashtag, False)
+    #
+    # csv_tweet_word = folder_other + \
+    #                  "/dictionary_feature_1/feature_disease_word_match_profile.csv"
+    # df = pd.read_csv(csv_tweet_word, header=0, delimiter=",", quoting=0).as_matrix()
+    # X_tweet_word = df[:, 1:]
+    # X_tweet_word = X_tweet_word.astype(numpy.float32)
+    # # replace nan values to 0
+    # numpy.nan_to_num(X_tweet_word, False)
 
-    # concatenate all feature sets
-    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
-    X_all = numpy.concatenate([X_2, X_tweet_hashtag, X_tweet_word], axis=1)
+    #concatenate all feature sets
+    #basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+    X_all = numpy.concatenate([X_text, X_2], axis=1)
+
 
     return X_all, y
 
 
 def create_basic_and_user_url(csv_basic_feature):
-    X, y = create_basic_stats(csv_basic_feature)
+    X, y = create_behaviour(csv_basic_feature)
     url_column = 23
 
     df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
@@ -174,10 +192,10 @@ def get_all_numeric_features(csv_basic_feature, folder_other):
 
     # get all numeric features
 
-    X_basic, y = create_basic_stats(csv_basic_feature)
+    X_basic, y = create_behaviour(csv_basic_feature)
 
     X_manual, _ = create_manual_dict(csv_basic_feature, folder_other)
-    X_auto, _ = create_autocreated_dict(csv_basic_feature, folder_other)
+    X_auto, _ = create_autodict(csv_basic_feature, folder_other)
 
     csv_diseases_in_tweets = folder_other + \
                              "/tweet_feature/diseases_in_tweets.csv"
@@ -230,7 +248,7 @@ def get_all_numeric_features(csv_basic_feature, folder_other):
     return X_all, y
 
 
-def create_text_and_numeric(csv_basic_feature, folder_other):
+def create_text_and_behaviour(csv_basic_feature, folder_other):
     X_numeric, y = create_numeric(csv_basic_feature,folder_other)
     X_text,_ = create_textprofile(csv_basic_feature)
 
@@ -262,48 +280,48 @@ def create_text_and_manualdict(csv_basic_feature, folder_other):
     return X_all, y
 
 
-def create_text_and_autodict(csv_basic_feature, folder_other):
-    X_autodict, y = create_autocreated_dict(csv_basic_feature, folder_other)
-    X_text, _ = create_textprofile(csv_basic_feature)
+# def create_text_and_autodict(csv_basic_feature, folder_other):
+#     X_autodict, y = create_autodict(csv_basic_feature, folder_other)
+#     X_text, _ = create_textprofile(csv_basic_feature)
+#
+#     # replace nan values to 0
+#     numpy.nan_to_num(X_autodict, False)
+#
+#     # concatenate all feature sets
+#     # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+#     X_all = numpy.concatenate([X_text, X_autodict], axis=1)
+#     print("Size of the array: ")
+#     print(X_all.shape)
+#
+#     return X_all, y
+
+# def create_text_and_autodictext(csv_basic_feature, folder_other):
+#     X_autodictext, y = create_autocreated_dict_and_text(csv_basic_feature, folder_other)
+#     X_text, _ = create_textprofile(csv_basic_feature)
+#
+#     # replace nan values to 0
+#     numpy.nan_to_num(X_autodictext, False)
+#
+#     # concatenate all feature sets
+#     # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
+#     X_all = numpy.concatenate([X_text, X_autodictext], axis=1)
+#     print("Size of the array: ")
+#     print(X_all.shape)
+#
+#     return X_all, y
+
+
+def create_text_and_autodict_and_behaviour(csv_basic_feature, folder_other):
+    X_behaviour, y = create_behaviour(csv_basic_feature)
+    X_text_autodict, _ = create_text_and_autodict(csv_basic_feature, folder_other)
+    #X_text, _ = create_textprofile(csv_basic_feature)
 
     # replace nan values to 0
-    numpy.nan_to_num(X_autodict, False)
+    numpy.nan_to_num(X_text_autodict, False)
 
     # concatenate all feature sets
     # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
-    X_all = numpy.concatenate([X_text, X_autodict], axis=1)
-    print("Size of the array: ")
-    print(X_all.shape)
-
-    return X_all, y
-
-def create_text_and_autodictext(csv_basic_feature, folder_other):
-    X_autodictext, y = create_autocreated_dict_and_text(csv_basic_feature, folder_other)
-    X_text, _ = create_textprofile(csv_basic_feature)
-
-    # replace nan values to 0
-    numpy.nan_to_num(X_autodictext, False)
-
-    # concatenate all feature sets
-    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
-    X_all = numpy.concatenate([X_text, X_autodictext], axis=1)
-    print("Size of the array: ")
-    print(X_all.shape)
-
-    return X_all, y
-
-
-def create_text_and_meta_and_autodictext(csv_basic_feature, folder_other):
-    X_basic, y = create_basic_stats(csv_basic_feature)
-    X_autodictext, _ = create_autocreated_dict_and_text(csv_basic_feature, folder_other)
-    X_text, _ = create_textprofile(csv_basic_feature)
-
-    # replace nan values to 0
-    numpy.nan_to_num(X_autodictext, False)
-
-    # concatenate all feature sets
-    # basic + manual + auto + diseases + topical + manual_g + hashtag + word + generic1 + generic2
-    X_all = numpy.concatenate([X_text, X_basic,X_autodictext], axis=1)
+    X_all = numpy.concatenate([X_text_autodict, X_behaviour], axis=1)
     print("Size of the array: ")
     print(X_all.shape)
 

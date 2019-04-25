@@ -132,13 +132,19 @@ class Classifer(object):
         #                           self.dnn_embedding_file, self.text_data,
         #                           y_train, self.dnn_descriptor, self.outfolder)
 
-        if "dnn" in self.algorithms:
+        if "dnn" in self.algorithms and self.text_data is not None:
             cl.learn_dnn(self.nfold, self.task_name+self.identifier,
                          self.dnn_embedding_file, self.text_data,
                          X_train,
                          y_train, self.dnn_descriptor, self.outfolder,
                          prediction_targets=self.categorical_targets,
                          text_data_extra_for_embedding_vocab=self.dnn_text_data_extra)
+
+        if "dnn" in self.algorithms and self.text_data is None:
+            cl.learn_dnn_raw_features(self.nfold,self.task_name+self.identifier,
+                         X_train,
+                         y_train, self.dnn_descriptor, self.outfolder,
+                         prediction_targets=self.categorical_targets)
 
         print("complete!")
 

@@ -18,7 +18,6 @@ import pandas as pd
 
 
 
-
 if __name__ == "__main__":
     # this is the file pointing to the basic features, i.e., just the numeric values
     # msm4phi/paper2/data/training_data/basic_features.csv
@@ -46,7 +45,7 @@ if __name__ == "__main__":
                                     csv_other_feature_folder + "/empty_profile_filled")
 
 
-    model_descriptors = ["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv",
+    model_descriptors = [#"scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv",
                          "bilstm=100-False"]
 
     for k, v in datafeatures.items():
@@ -59,8 +58,29 @@ if __name__ == "__main__":
         for model_descriptor in model_descriptors:
             print("\t"+model_descriptor)
 
+            print(">>>>>> behaviour only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_behaviour(csv_text)
+            cls = cm.Classifer("stakeholdercls", "_dnn_behaviour_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=None, dnn_embedding_file=None,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
+
+            print(">>>>>> dict only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_autodict(csv_text, csv_other_feature)
+            cls = cm.Classifer("stakeholdercls", "_dnn_dict_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=None, dnn_embedding_file=None,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
+
+
             #SETTING0 dnn applied to profile only
-            X, y = fc.create_basic_stats(csv_text)
+            print(">>>>>> text only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_behaviour(csv_text)
             df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
             df.astype(str)
             profiles = df[:, 22]
@@ -72,7 +92,9 @@ if __name__ == "__main__":
             cls.run()
 
             # SETTING0 dnn applied to profile and stat meta feature only
-            X, y = fc.create_basic_stats(csv_text)
+            print(">>>>>> text+behaviour only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_behaviour(csv_text)
             df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
             df.astype(str)
             profiles = df[:, 22]
@@ -83,9 +105,8 @@ if __name__ == "__main__":
                                dnn_descriptor=model_descriptor)
             cls.run()
 
-
-            print(datetime.datetime.now())
-            X, y = fc.create_autocreated_dict_and_text(csv_text, csv_other_feature)
+            print(">>>>>> text+dict only >>>")
+            X, y = fc.create_autodict(csv_text, csv_other_feature)
             df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
             df.astype(str)
             profiles = df[:, 22]
@@ -97,8 +118,8 @@ if __name__ == "__main__":
                                dnn_text_data_extra_for_embedding_vcab=tweets_exta)
             cls.run()
             # #
-            print(datetime.datetime.now())
-            X, y = fc.create_text_and_meta_and_autodictext(csv_text, csv_other_feature)
+            print(">>>>>> text+behaviour+dict only >>>")
+            X, y = fc.create_behaviour_and_autodict(csv_text, csv_other_feature)
             df = pd.read_csv(csv_text, header=0, delimiter=",", quoting=0).as_matrix()
             df.astype(str)
             profiles = df[:, 22]
@@ -108,6 +129,3 @@ if __name__ == "__main__":
                                text_data=profiles, dnn_embedding_file=dnn_embedding_file,
                                dnn_descriptor=model_descriptor)
             cls.run()
-
-
-            #todo: dnn with just behaviour and autodict text

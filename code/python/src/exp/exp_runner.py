@@ -37,7 +37,7 @@ if __name__ == "__main__":
         # behaviour only
         print(">>>>> _behaviour_only_ >>>>>")
         print(datetime.datetime.now())
-        X, y = fc.create_basic_stats(csv_text_and_behaviour, True)
+        X, y = fc.create_behaviour(csv_text_and_behaviour, True)
         cls = cm.Classifer(k + "stakeholdercls", "_behaviour_only_", X, y, outfolder,
                            categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
                                                                             "pca-sgd","pca-svm_l", "pca-lr", "pca-rf", "pca-svm_rbf"])
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         # dict only
         print(">>>>> _autodictext_only_ >>>>>")
         print(datetime.datetime.now())
-        X, y = fc.create_autocreated_dict(csv_text_and_behaviour, csv_preprocessed_feature)
+        X, y = fc.create_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
         cls = cm.Classifer(k + "stakeholdercls", "_autodictext_only_", X, y, outfolder,
                            categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
                                                                             "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         #text+behaviour
         print(">>>>> _text+behaviour_only_ >>>>>")
         print(datetime.datetime.now())
-        X, y = fc.create_text_and_numeric(csv_text_and_behaviour, csv_preprocessed_feature)
+        X, y = fc.create_text_and_behaviour(csv_text_and_behaviour, csv_preprocessed_feature)
         cls = cm.Classifer(k+"stakeholdercls", "_text+behaviour_", X, y, outfolder,
                             categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
                                                                            "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         #text+dict
         print(">>>>> _text+dict_only_ >>>>>")
         print(datetime.datetime.now())
-        X, y = fc.create_autocreated_dict_and_text(csv_text_and_behaviour, csv_preprocessed_feature)
+        X, y = fc.create_text_and_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
         df = pd.read_csv(csv_text_and_behaviour, header=0, delimiter=",", quoting=0).as_matrix()
         cls = cm.Classifer(k + "stakeholdercls", "_text+dict_", X, y, outfolder,
                            categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         #text+behaviour+dict
         print(">>>>> _text+dict+behaviour_only_ >>>>>")
         print(datetime.datetime.now())
-        X, y = fc.create_text_and_meta_and_autodictext(csv_text_and_behaviour, csv_preprocessed_feature)
+        X, y = fc.create_text_and_autodict_and_behaviour(csv_text_and_behaviour, csv_preprocessed_feature)
         df = pd.read_csv(csv_text_and_behaviour, header=0, delimiter=",", quoting=0).as_matrix()
         cls = cm.Classifer(k + "stakeholdercls", "_text+behaviour+dict_", X, y, outfolder,
                            categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",

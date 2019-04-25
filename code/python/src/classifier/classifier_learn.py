@@ -47,13 +47,13 @@ will be saved. If nfold is an integer, the model will perform cross fold valiati
 results will be saved'''
 
 
-def learn_discriminative(cpus, task, model,
+def learn_discriminative(cpus, task, model_flag,
                          X_train, y_train,
                          identifier, outfolder, nfold=None, feature_reduction=None):
     classifier = None
     model_file = None
 
-    if (model == "rf"):
+    if (model_flag == "rf"):
         print("== Random Forest ...")
         cls = RandomForestClassifier(n_estimators=20, n_jobs=cpus)
         # rfc_tuning_params = {"max_depth": [3, 5, None],
@@ -70,7 +70,7 @@ def learn_discriminative(cpus, task, model,
         else:
             classifier = cls
         model_file = os.path.join(outfolder, "random-forest_classifier-%s.m" % task)
-    if (model == "svm-l"):
+    if (model_flag == "svm-l"):
         print("== SVM, kernel=linear ...")
         cls = svm.LinearSVC(class_weight='balanced', C=0.01, penalty='l2', loss='squared_hinge',
                             multi_class='ovr')
@@ -83,7 +83,7 @@ def learn_discriminative(cpus, task, model,
             classifier = cls
         model_file = os.path.join(outfolder, "liblinear-svm-linear-%s.m" % task)
 
-    if (model == "svm-rbf"):
+    if (model_flag == "svm-rbf"):
         # tuned_parameters = [{'gamma': np.logspace(-9, 3, 3), 'probability': [True], 'C': np.logspace(-2, 10, 3)},
         #                     {'C': [1e-1, 1e-3, 1e-5, 0.2, 0.5, 1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.8, 2]}]
         print("== SVM, kernel=rbf ...")
@@ -99,8 +99,10 @@ def learn_discriminative(cpus, task, model,
 
     if nfold is not None:
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
+        if feature_reduction is not None:
+            model_flag+="-"+feature_reduction
         util.save_classifier_model(classifier, model_file)
-        util.save_scores(nfold_predictions, y_train, model, task,
+        util.save_scores(nfold_predictions, y_train, model_flag, task,
                          identifier, 2, outfolder)
     else:
         classifier.fit(X_train, y_train)
@@ -141,7 +143,7 @@ def learn_generative(cpus, task, model_flag, X_train, y_train,
         model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
 
     if nfold is not None:
-        print(y_train.shape)
+        #print(y_train.shape)
         nfold_predictions = cross_val_predict(classifier, X_train, y_train, cv=nfold)
         if feature_reduction is not None:
             model_flag+="-"+feature_reduction
@@ -337,6 +339,94 @@ def learn_dnn(nfold, task,
         else:
             model.fit(X_train_textfeature,
                       y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+
+        # serialize model to YAML
+        model_yaml = model.to_yaml()
+        with open(model_file + ".yaml", "w") as yaml_file:
+            yaml_file.write(model_yaml)
+        # serialize weights to HDF5
+        model.save_weights(model_file + ".h5")
+        # util.save_classifier_model(model, model_file)
+
+#only use the features provided in X, ignore text data
+def learn_dnn_raw_features(nfold, task,
+              X_train_metafeature, y_train,
+              model_descriptor, outfolder, prediction_targets):
+    print("== Perform ANN ...")  # create model
+
+
+    encoder = LabelBinarizer()
+    y_train_int = encoder.fit_transform(y_train)
+
+    model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
+    model_metafeature = \
+        dmc.create_submodel_metafeature(model_metafeature_inputs, 20)
+    #merge = concatenate([model_text, model_metafeature])
+    hidden=Dense(500)(model_metafeature)
+    final = Dense(prediction_targets, activation="softmax")(hidden)
+    model = Model(inputs=model_metafeature_inputs, outputs=final)
+
+
+    plot_model(model, to_file="model.png")
+    #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    model_file = os.path.join(outfolder, "ann-%s.m" % task)
+
+    model_copies = []
+    for i in range(nfold):
+        model_copy = clone_model(model)
+        model_copy.set_weights(model.get_weights())
+        model_copies.append(model_copy)
+
+    if nfold is not None:
+        kfold = StratifiedKFold(n_splits=nfold, shuffle=True, random_state=RANDOM_STATE)
+        splits = list(enumerate(kfold.split(X_train_metafeature, y_train_int.argmax(1))))
+
+        nfold_predictions = dict()
+        for k in range(0, len(splits)):
+            nfold_model = model_copies[k]
+            nfold_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+            # Fit the model
+            X_train_index = splits[k][1][0]
+            X_test_index = splits[k][1][1]
+
+            X_train_merge_ = X_train_metafeature[X_train_index]
+            X_test_merge_ = X_train_metafeature[X_test_index]
+            y_train_ = y_train_int[X_train_index]
+
+
+
+            if X_train_metafeature is not None:
+                nfold_model.fit(X_train_merge_,
+                          y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+                prediction_prob = nfold_model.predict(X_test_merge_)
+
+            else:
+                nfold_model.fit(X_train_merge_,
+                          y_train_, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+                prediction_prob = nfold_model.predict(X_test_merge_)
+            # evaluate the model
+            #
+            predictions = prediction_prob.argmax(axis=-1)
+
+            for i, l in zip(X_test_index, predictions):
+                nfold_predictions[i] = l
+
+            # self.save_classifier_model(best_estimator, ann_model_file)
+
+        indexes = sorted(list(nfold_predictions.keys()))
+        predicted_labels = []
+        for i in indexes:
+            predicted_labels.append(nfold_predictions[i])
+        util.save_scores(predicted_labels, y_train_int.argmax(1), "dnn", task, model_descriptor, 2,
+                         outfolder)
+    else:
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+        model.fit(X_train_metafeature,
+                y_train_int, epochs=dmc.DNN_EPOCHES, batch_size=dmc.DNN_BATCH_SIZE, verbose=2)
+
 
         # serialize model to YAML
         model_yaml = model.to_yaml()
