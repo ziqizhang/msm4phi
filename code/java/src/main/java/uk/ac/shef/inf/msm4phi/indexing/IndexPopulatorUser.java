@@ -116,7 +116,7 @@ public class IndexPopulatorUser {
      * @param newDoc
      */
     private void populateFromTweetIndex(String userID, SolrInputDocument newDoc, SolrClient solrClient) {
-        SolrQuery q = Util.createQueryTweetsOfUser(10000, userID);
+        SolrQuery q = Util.createQueryTweetsOfUserScreenname( userID,10000);
         boolean stop = false;
 
         int newTweet = 0, retweet = 0, reply = 0, quote = 0,

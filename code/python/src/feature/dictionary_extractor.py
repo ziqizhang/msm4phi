@@ -12,7 +12,7 @@ text_normalization_option = 1  # 0=stemming, 1=lemma, 2=nothing
 # input is a csv file that must a user at each row, and text to be concatenated to form user profile at different columns
 # output: a dictionary containing a bag of profile text (normalised) for each label
 def load_user_profile_text(user_features_csv, *col_text):
-    df = pd.read_csv(user_features_csv, header=0, delimiter=",", quoting=0
+    df = pd.read_csv(user_features_csv, header=0, delimiter=",", quotechar='"'
                      )
 
     # process each label at a time to create a corpus of profile text for each label
@@ -101,7 +101,7 @@ def extract_dict(label_to_proftext: dict):
             if e not in vocab_overall_frequency.keys():
                 continue
             totalfreq = vocab_overall_frequency[e]
-            s = frequency / totalfreq
+            s = frequency / totalfreq #equation 1 in the OIR paper
             if s==1.0:
                 continue
             vocab_score[e] = s
@@ -109,7 +109,7 @@ def extract_dict(label_to_proftext: dict):
 
     return label_vocab_to_totalfreq, label_vocab_to_weightedscore, label_to_nouns, label_to_verbs
 
-
+#rank by frequency (equation 1 in oir paper)
 def rank_pass_one(outfolder, vocab_with_score: dict,
                   label_to_nouns, label_to_verbs,
                   topN, verb_topN, noun_topN):
@@ -150,7 +150,7 @@ def rank_pass_one(outfolder, vocab_with_score: dict,
         for v in verbs:
             file.write(v + "\n")
 
-
+#goodness score calculation
 def rank_pass_two(pass_one_outputfolder, topN, outfolder):
     updated_postype_dictionaries = {}
 
@@ -234,17 +234,21 @@ def load_extracted_dictionary(folder, topN,*permitted_postypes):
 
 if __name__ == "__main__":
     #col 40-label; col 22-desc;
-    profile_text = load_user_profile_text("/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/"
-                                          "data/stakeholder_classification/annotation/merged_training_data/user_features_and_labels_2.csv",
+    print("extracting text profiles...")
+    profile_text = load_user_profile_text("/home/zz/Work/msm4phi_data/paper2/reported/training_data/paper_reported"
+                                          "/basic_features_empty_profile_filled(tweets).csv",
                                           22) #22-profile; 15-name)
+    print("calculating weighted freq...")
     vocab_to_totalfreq, vocab_to_weightedscore, label_to_nouns, label_to_verbs = \
         extract_dict(profile_text)
 
+    print("ranking...")
     rank_pass_one(
-        "/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass1",
+        "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass1",
         vocab_to_totalfreq, label_to_nouns, label_to_verbs,
         200, 100, 100)
 
-    rank_pass_two("/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass1",
+    print("goodness scoring...")
+    rank_pass_two("/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass1",
                   5000,
-                   "/home/zz/Work/msm4phi/resources/dictionary/profile/dict2/frequency_pass2")
+                   "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass2")

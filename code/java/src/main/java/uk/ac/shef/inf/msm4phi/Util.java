@@ -69,6 +69,16 @@ public class Util {
         return query;
     }
 
+    public static SolrQuery createQueryByUser(String user,
+                                                  int resultBatchSize) {
+        SolrQuery query = new SolrQuery();
+        query.setQuery("user_id_str:"+user);
+        query.setStart(0);
+        query.setRows(resultBatchSize);
+
+        return query;
+    }
+
     public static SolrQuery createQueryTweetsOfHashtags(int resultBatchSize, String... hashtags) {
         SolrQuery query = new SolrQuery();
         StringBuilder qValues = new StringBuilder();
@@ -126,9 +136,9 @@ public class Util {
     }
 
 
-    public static SolrQuery createQueryTweetsOfUser(int resultBatchSize, String userID) {
+    public static SolrQuery createQueryTweetsOfUserScreenname(String userID, int resultBatchSize) {
         SolrQuery query = new SolrQuery();
-        query.setQuery("user_id_str:"+userID);
+        query.setQuery("user_screen_name:"+userID);
         query.setStart(0);
         query.setRows(resultBatchSize);
         return query;

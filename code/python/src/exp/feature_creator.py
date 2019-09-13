@@ -187,7 +187,7 @@ def create_basic_and_user_url(csv_basic_feature):
 
     return X_new,y
 
-
+#NOT USED
 def get_all_numeric_features(csv_basic_feature, folder_other):
 
     # get all numeric features

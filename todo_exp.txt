@@ -1,6 +1,3 @@
-test functional api, only text feature
-try functional, dense
-
-test fit/predict, load model
-
-Users= 452144, emptyProfiles= 64363
+baseline: all features applied to tweets (profile replaced, dict applied to tweets)
+- CML all
+- DNN change text length to 1000, all

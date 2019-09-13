@@ -115,7 +115,7 @@ public class WorkerTweetExportByUserType extends IndexAnalyserWorker {
         //write tweets of these users
         for(SolrDocument doc: selectedUsers){
             String userId=doc.getFieldValue("id").toString();
-            SolrQuery q = Util.createQueryTweetsOfUser(resultBatchSize, userId);
+            SolrQuery q = Util.createQueryTweetsOfUserScreenname(userId,resultBatchSize);
 
             boolean stop = false;
             while (!stop) {

@@ -5,14 +5,10 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import uk.ac.shef.inf.msm4phi.IndexAnalyserMaster;
-import uk.ac.shef.inf.msm4phi.Util;
-import uk.ac.shef.inf.msm4phi.analysis.UserFeatureExporter;
-import uk.ac.shef.inf.msm4phi.export.WorkerTweetExportByDays;
 import uk.ac.shef.inf.msm4phi.export.WorkerTweetExportByUserType;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class AppTweetExporterByUser {
     public static void main(String[] args) throws IOException, SolrServerException {

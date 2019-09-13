@@ -1,10 +1,14 @@
 import sys
-
+import os
 import datetime
+from numpy.random import seed
 
 from exp import feature_creator as fc
 from classifier import classifier_main as cm
 import pandas as pd
+
+seed(1)
+os.environ['PYTHONHASHSEED'] = '0'
 
 if __name__ == "__main__":
     #this is the file pointing to the basic features, i.e., just the numeric values
@@ -26,7 +30,11 @@ if __name__ == "__main__":
     # datafeatures["emtpyremoved_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_removed.csv",
     #                        csv_other_feature_folder+"/empty_profile_removed")
     datafeatures["emptyfilled_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_filled.csv",
-                           csv_other_feature_folder+"/empty_profile_filled")
+                                    #basic_features_empty_profile_filled - for features with profiles
+                                    #basic_features_empty_profile_filled(tweets) - for features with concatenated tweets
+                           csv_other_feature_folder+"/baseline_empty_profile_filled(tweets)")
+                            #baseline_empty_profile_filled(tweets) - for dict features generated on tweets
+                            #empty_profile_filled - for dict features generated on profiles
 
     ######## no pca #######
     for k,v in datafeatures.items():
@@ -44,23 +52,24 @@ if __name__ == "__main__":
         # cls.run()
         #
         # # dict only
-        # print(">>>>> _autodictext_only_ >>>>>")
-        # print(datetime.datetime.now())
-        # X, y = fc.create_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
-        # cls = cm.Classifer(k + "stakeholdercls", "_autodictext_only_", X, y, outfolder,
-        #                    categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
-        #                                                                     "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-        #                                                                     "pca-svm_rbf"])
-        # cls.run()
+        print(">>>>> _autodict_only_ >>>>>")
+        print(datetime.datetime.now())
+        X, y = fc.create_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
+        cls = cm.Classifer(k + "stakeholdercls", "_autodictext_only_", X, y, outfolder,
+                           categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
+                                                                            "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+                                                                            "pca-svm_rbf"])
+        cls.run()
+        exit(0)
         #
         # #text only
-        # print(">>>>> _text_only_ >>>>>")
-        # X, y = fc.create_textprofile(csv_text_and_behaviour)
-        # cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
-        #                      categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
-        #                                                                     "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-        #                                                                     "pca-svm_rbf"])
-        # cls.run()
+        print(">>>>> _text_only_ >>>>>")
+        X, y = fc.create_textprofile(csv_text_and_behaviour)
+        cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
+                             categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
+                                                                            "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+                                                                            "pca-svm_rbf"])
+        cls.run()
         #
         #
         # #text+behaviour
