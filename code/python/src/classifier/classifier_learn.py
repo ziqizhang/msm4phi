@@ -16,6 +16,7 @@ from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import cross_val_predict, StratifiedKFold
@@ -159,6 +160,19 @@ def learn_generative(cpus, task, model_flag, X_train, y_train,
         else:
             classifier = cls
         model_file = os.path.join(outfolder, "stochasticLR-%s.m" % task)
+
+    if (model_flag == "gpc"):
+        print("== Gaussian Process Classification ...")
+
+        cls = GaussianProcessClassifier(random_state=111)
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0], fr[1]), ('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
+        model_file = os.path.join(outfolder, "gaussianprocess-%s.m" % task)
 
     if nfold is not None:
         #print(y_train.shape)

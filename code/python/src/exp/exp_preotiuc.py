@@ -15,12 +15,12 @@ os.environ['PYTHONHASHSEED'] = '0'
 def create_features(csv_feature_folder):
     csv_features = csv_feature_folder + "/features.csv"
 
-    label_col=15
+    label_col=201
 
     df = pd.read_csv(csv_features, header=0, delimiter=",", quoting=0, quotechar='"').as_matrix()
     y = df[:, label_col]
 
-    X = df[:, 1:15]
+    X = df[:, 1:201]
     # Convert feature vectors to float64 type
     X = X.astype(numpy.float32)
 
@@ -39,9 +39,9 @@ if __name__ == "__main__":
     X, y=create_features(csv_feature_folder)
 
     #behaviour only
-    print(">>>>> _uddin2018_ >>>>>")
+    print(">>>>> _preotiuc15_ >>>>>")
     print(datetime.datetime.now())
-    cls = cm.Classifer("stakeholdercls", "_uddin18_", X, y, outfolder,
+    cls = cm.Classifer("stakeholdercls", "_preotiuc15_", X, y, outfolder,
                            categorical_targets=6, nfold=n_fold, algorithms=["svm_l"])
     cls.run()
 

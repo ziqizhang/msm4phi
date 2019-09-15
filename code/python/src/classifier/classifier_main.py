@@ -101,6 +101,11 @@ class Classifer(object):
             cl.learn_generative(-1, self.task_name, "lr", X_train,
                                 y_train, self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
 
+        if "gpc" in self.algorithms:
+            cl.learn_generative(-1, self.task_name, "gpc", X_train,
+                                y_train
+                                , self.identifier, self.outfolder, nfold=self.nfold)
+
         ######################### Random Forest Classifier #######################
         if "rf" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "rf", X_train,

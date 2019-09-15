@@ -18,8 +18,12 @@ def create_features(csv_feature_folder):
 
     label_col=62
 
-    df_other = pd.read_csv(csv_feature_other, header=0, delimiter=",", quoting=0, quotechar='"').as_matrix()
-    df_cos = pd.read_csv(csv_feature_cos, header=0, delimiter=",", quoting=0, quotechar='"').as_matrix()
+    df_other = pd.read_csv(csv_feature_other, header=0, delimiter=",", quoting=0, quotechar='"')
+    df_other.fillna(0)
+    df_other=df_other.as_matrix()
+    df_cos = pd.read_csv(csv_feature_cos, header=0, delimiter=",", quoting=0, quotechar='"')
+    df_cos.fillna(0)
+    df_cos=df_cos.as_matrix()
 
     cos_features={}
     for r in df_cos:

@@ -63,7 +63,7 @@ def normalize_tweet(tweet_text):
 # -set to 0 to reproduce Davidson. However, note that because a different stemmer is used, results could be
 # sightly different
 # -set to 2 will do 'basic_tokenize' as in Davidson
-def tokenize(tweet, stem_or_lemma=0):
+def tokenize(tweet, stem_or_lemma=1):
     """Removes punctuation & excess whitespace, sets to lowercase,
     and normalizes tweets. Returns a list of stemmed tokens."""
     tweet = " ".join(re.split("[^a-zA-Z]*", tweet.lower())).strip()
