@@ -14,7 +14,9 @@ def feature_tweet_cos(infolder, outcsv):
         csvwriter.writerow(["user","ot_cos_mean","ot_cos_std","rt_cos_mean","rt_cos_std"])
 
         for af in os.listdir(infolder):
-            with open(infolder+"/"+af) as f:
+            with open(infolder+"/"+af,encoding="utf-8") as f:
+                print(af)
+
                 lines = f.read().splitlines()
                 user=lines[0]
 
@@ -23,40 +25,53 @@ def feature_tweet_cos(infolder, outcsv):
                 lines=lines[1:]
                 for l in lines:
                     parts=l.split("|",1)
+                    if len(parts)<2:
+                        print("\tillegal char detected, line ignored:"+l)
+                        continue
+
                     if parts[0]=="ot":
                         ot.append(parts[1])
                     else:
                         rt.append(parts[1])
 
-                ot_cosine=get_cosine_sim(ot)
-                if len(ot_cosine)==0:
+                if len(ot) == 0:
                     ot_mean=0
                     ot_std=0
                 else:
-                    ot_mean=sum(ot_cosine) / len(ot_cosine)
+                    ot_cosine = get_cosine_sim(ot)
+                    ot_mean=sum(ot_cosine) / len(ot)
                     ot_std=np.std(ot_cosine)
-                rt_cosine=get_cosine_sim(rt)
-                if len(rt_cosine)==0:
+                if len(rt) == 0:
                     rt_mean=0
                     rt_std=0
                 else:
-                    rt_mean = sum(rt_cosine) / len(rt_cosine)
+                    rt_cosine = get_cosine_sim(rt)
+                    rt_mean = sum(rt_cosine) / len(rt)
                     rt_std = np.std(rt_cosine)
 
                 row=[user,ot_mean, ot_std, rt_mean, rt_std]
                 csvwriter.writerow(row)
 
         #calculate pairwise similarities
-def get_cosine_sim(*strs):
-    vectors = [t for t in get_vectors(*strs)]
-    return cosine_similarity(vectors)
+def get_cosine_sim(strs):
+    vectors = [t for t in get_vectors(strs)]
+    matrix= cosine_similarity(vectors)
+    vec = []
+    for i in range(len(matrix)):
+        for j in range(i + 1, len(matrix)):
+            vec.append(matrix[i][j])
+    return vec
 
 #create tfidf vectors
-def get_vectors(*strs):
-    text = [t for t in strs]
-    vectorizer = CountVectorizer(text)
-    vectorizer.fit(text)
-    return vectorizer.transform(text).toarray()
+def get_vectors(strs):
+    vectorizer = CountVectorizer(strs)
+    vectorizer.fit(strs)
+    return vectorizer.transform(strs).toarray()
+
+
+
+
+
 
 
 

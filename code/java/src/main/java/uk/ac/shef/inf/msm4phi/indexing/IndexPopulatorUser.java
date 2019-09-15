@@ -90,7 +90,7 @@ public class IndexPopulatorUser {
     }
 
     /**
-     * fetch data from the Tweet index to populate user data
+     * extractFeatures data from the Tweet index to populate user data
      * <p>
      * <!--the new tweets, retweets, replies, quotes, favorites by this user, based on the data
      * collected in the 'tweets' index-->

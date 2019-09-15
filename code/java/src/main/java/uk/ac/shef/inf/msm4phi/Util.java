@@ -72,7 +72,7 @@ public class Util {
     public static SolrQuery createQueryByUser(String user,
                                                   int resultBatchSize) {
         SolrQuery query = new SolrQuery();
-        query.setQuery("user_id_str:"+user);
+        query.setQuery("user_screen_name:"+user);
         query.setStart(0);
         query.setRows(resultBatchSize);
 

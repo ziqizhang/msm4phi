@@ -26,6 +26,7 @@ FEATURE_SELECTION_WITH_MAX_ENT_CLASSIFIER = False
 FEATURE_SELECTION_WITH_EXTRA_TREES_CLASSIFIER = True
 FEATURE_SELECTION_MANUAL_SETTING = False
 
+
 #####################################################
 
 
@@ -55,7 +56,7 @@ class Classifer(object):
     '''
 
     def __init__(self, task, identifier, data_X, data_y,
-                 outfolder, categorical_targets, algorithms:list,
+                 outfolder, categorical_targets, algorithms: list,
                  nfold=None, text_data=None,
                  dnn_embedding_file=None,
                  dnn_text_data_extra_for_embedding_vcab=None,
@@ -71,7 +72,7 @@ class Classifer(object):
         self.dnn_embedding_file = dnn_embedding_file
         self.dnn_descriptor = dnn_descriptor
         self.algorithms = algorithms
-        self.dnn_text_data_extra=dnn_text_data_extra_for_embedding_vcab
+        self.dnn_text_data_extra = dnn_text_data_extra_for_embedding_vcab
 
     def train(self):
         # X_resampled, y_resampled = self.under_sampling(self.training_data, self.training_label)
@@ -85,20 +86,20 @@ class Classifer(object):
         if "sgd" in self.algorithms:
             cl.learn_generative(-1, self.task_name, "sgd", X_train,
                                 y_train
-                                , self.identifier, self.outfolder,nfold=self.nfold)
+                                , self.identifier, self.outfolder, nfold=self.nfold)
         if "pca-sgd" in self.algorithms:
             cl.learn_generative(-1, self.task_name, "sgd", X_train,
                                 y_train,
-                                self.identifier, self.outfolder, feature_reduction="pca",nfold=self.nfold)
+                                self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
 
         ######################### Stochastic Logistic Regression#######################
         if "lr" in self.algorithms:
             cl.learn_generative(-1, self.task_name, "lr", X_train,
                                 y_train
-                                , self.identifier, self.outfolder,nfold=self.nfold)
+                                , self.identifier, self.outfolder, nfold=self.nfold)
         if "pca-lr" in self.algorithms:
             cl.learn_generative(-1, self.task_name, "lr", X_train,
-                                y_train, self.identifier, self.outfolder, feature_reduction="pca",nfold=self.nfold)
+                                y_train, self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
 
         ######################### Random Forest Classifier #######################
         if "rf" in self.algorithms:
@@ -106,25 +107,36 @@ class Classifer(object):
                                     y_train, self.identifier, self.outfolder, nfold=self.nfold)
         if "pca-rf" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "rf", X_train,
-                                    y_train, self.identifier, self.outfolder,feature_reduction="pca", nfold=self.nfold)
+                                    y_train, self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
 
         ###################  liblinear SVM ##############################
         if "svm_l" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "svm-l", X_train,
-                                    y_train, self.identifier, self.outfolder,nfold=self.nfold)
+                                    y_train, self.identifier, self.outfolder, nfold=self.nfold)
         if "pca-svm_l" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "svm-l", X_train,
-                                    y_train, self.identifier, self.outfolder, feature_reduction="pca",nfold=self.nfold)
+                                    y_train, self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
 
         ##################### RBF svm #####################
         if "svm_rbf" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "svm-rbf",
                                     X_train,
-                                    y_train, self.identifier, self.outfolder,nfold=self.nfold)
+                                    y_train, self.identifier, self.outfolder, nfold=self.nfold)
         if "pca-svm_rbf" in self.algorithms:
             cl.learn_discriminative(-1, self.task_name, "svm-rbf",
                                     X_train,
-                                    y_train, self.identifier, self.outfolder, feature_reduction="pca",nfold=self.nfold)
+                                    y_train, self.identifier, self.outfolder, feature_reduction="pca", nfold=self.nfold)
+
+        ##################### GBRT #####################
+        if "gbrt" in self.algorithms:
+            cl.learn_discriminative(-1, self.task_name, "gbrt",
+                                    X_train,
+                                    y_train, self.identifier, self.outfolder, nfold=self.nfold)
+        if "pca-gbrt" in self.algorithms:
+            cl.learn_discriminative(-1, self.task_name, "gbrt",
+                                    X_train,
+                                    y_train, self.identifier, self.outfolder, feature_reduction="pca",
+                                    nfold=self.nfold)
 
         ################# Artificial Neural Network #################
         # if "dnn_text" in self.algorithms:
@@ -133,7 +145,7 @@ class Classifer(object):
         #                           y_train, self.dnn_descriptor, self.outfolder)
 
         if "dnn" in self.algorithms and self.text_data is not None:
-            cl.learn_dnn(self.nfold, self.task_name+self.identifier,
+            cl.learn_dnn(self.nfold, self.task_name + self.identifier,
                          self.dnn_embedding_file, self.text_data,
                          X_train,
                          y_train, self.dnn_descriptor, self.outfolder,
@@ -141,10 +153,10 @@ class Classifer(object):
                          text_data_extra_for_embedding_vocab=self.dnn_text_data_extra)
 
         if "dnn" in self.algorithms and self.text_data is None:
-            cl.learn_dnn_raw_features(self.nfold,self.task_name+self.identifier,
-                         X_train,
-                         y_train, self.dnn_descriptor, self.outfolder,
-                         prediction_targets=self.categorical_targets)
+            cl.learn_dnn_raw_features(self.nfold, self.task_name + self.identifier,
+                                      X_train,
+                                      y_train, self.dnn_descriptor, self.outfolder,
+                                      prediction_targets=self.categorical_targets)
 
         print("complete!")
 
@@ -153,30 +165,29 @@ class Classifer(object):
 
         ######################### SGDClassifier #######################
         if "sgd" in self.algorithms:
-            ct.predict("sgd", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
+            ct.predict("sgd", self.task_name, model_file, self.dataX, self.text_data, self.outfolder)
 
         ######################### Stochastic Logistic Regression#######################
         if "lr" in self.algorithms:
-            ct.predict("lr", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
+            ct.predict("lr", self.task_name, model_file, self.dataX, self.text_data, self.outfolder)
 
         ######################### Random Forest Classifier #######################
         if "rf" in self.algorithms:
-            ct.predict("rf", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
+            ct.predict("rf", self.task_name, model_file, self.dataX, self.text_data, self.outfolder)
 
         ###################  liblinear SVM ##############################
         if "svm-l" in self.algorithms:
-            ct.predict("svm_l", self.task_name, model_file,self.dataX, self.text_data,self.outfolder)
+            ct.predict("svm_l", self.task_name, model_file, self.dataX, self.text_data, self.outfolder)
         ##################### RBF svm #####################
         if "svm-rbf" in self.algorithms:
-            ct.predict("svm_rbf", self.task_name, model_file,self.dataX,self.text_data, self.outfolder)
+            ct.predict("svm_rbf", self.task_name, model_file, self.dataX, self.text_data, self.outfolder)
         # if "dnn_text" in self.algorithms:
         #     ct.predict("dnn_text", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
         #                )
         if "dnn" in self.algorithms:
             return ct.predict("dnn", self.task_name, model_file, self.dataX, self.text_data, self.outfolder
-                       )
+                              )
         print("complete!")
-
 
     def feature_selection_with_max_entropy_classifier(self):
         print("automatic feature selection by maxEnt classifier ...")

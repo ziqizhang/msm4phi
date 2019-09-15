@@ -10,7 +10,7 @@ def create_textprofile(csv_basic_feature):
     df = pd.read_csv(csv_basic_feature, header=0, delimiter=",", quoting=0).as_matrix()
     y = df[:, label_col]
 
-    df.astype(str)
+    #df.astype(str)
 
     texts = df[:, text_col]
     texts = ["" if type(x) is float else x for x in texts]
@@ -249,7 +249,7 @@ def get_all_numeric_features(csv_basic_feature, folder_other):
 
 
 def create_text_and_behaviour(csv_basic_feature, folder_other):
-    X_numeric, y = create_numeric(csv_basic_feature,folder_other)
+    X_numeric, y = create_behaviour(csv_basic_feature,folder_other)
     X_text,_ = create_textprofile(csv_basic_feature)
 
     # replace nan values to 0

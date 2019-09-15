@@ -29,7 +29,7 @@ if __name__ == "__main__":
     #                        csv_other_feature_folder+"/full")
     # datafeatures["emtpyremoved_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_removed.csv",
     #                        csv_other_feature_folder+"/empty_profile_removed")
-    datafeatures["emptyfilled_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_filled.csv",
+    datafeatures["emptyfilled_"] = (csv_basic_feature_folder+"/basic_features_empty_profile_filled(tweets).csv",
                                     #basic_features_empty_profile_filled - for features with profiles
                                     #basic_features_empty_profile_filled(tweets) - for features with concatenated tweets
                            csv_other_feature_folder+"/baseline_empty_profile_filled(tweets)")
@@ -42,14 +42,14 @@ if __name__ == "__main__":
         csv_text_and_behaviour=v[0]
         csv_preprocessed_feature=v[1]
 
-        # behaviour only
-        # print(">>>>> _behaviour_only_ >>>>>")
-        # print(datetime.datetime.now())
-        # X, y = fc.create_behaviour(csv_text_and_behaviour, True)
-        # cls = cm.Classifer(k + "stakeholdercls", "_behaviour_only_", X, y, outfolder,
-        #                    categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
-        #                                                                     "pca-sgd","pca-svm_l", "pca-lr", "pca-rf", "pca-svm_rbf"])
-        # cls.run()
+        #behaviour only
+        print(">>>>> _behaviour_only_ >>>>>")
+        print(datetime.datetime.now())
+        X, y = fc.create_behaviour(csv_text_and_behaviour, True)
+        cls = cm.Classifer(k + "stakeholdercls", "_behaviour_only_", X, y, outfolder,
+                           categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
+                                                                            "pca-sgd","pca-svm_l", "pca-lr", "pca-rf", "pca-svm_rbf"])
+        cls.run()
         #
         # # dict only
         print(">>>>> _autodict_only_ >>>>>")
@@ -60,7 +60,6 @@ if __name__ == "__main__":
                                                                             "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
                                                                             "pca-svm_rbf"])
         cls.run()
-        exit(0)
         #
         # #text only
         print(">>>>> _text_only_ >>>>>")
@@ -73,14 +72,14 @@ if __name__ == "__main__":
         #
         #
         # #text+behaviour
-        # print(">>>>> _text+behaviour_only_ >>>>>")
-        # print(datetime.datetime.now())
-        # X, y = fc.create_text_and_behaviour(csv_text_and_behaviour, csv_preprocessed_feature)
-        # cls = cm.Classifer(k+"stakeholdercls", "_text+behaviour_", X, y, outfolder,
-        #                     categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
-        #                                                                    "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-        #                                                                    "pca-svm_rbf"])
-        #cls.run()
+        print(">>>>> _text+behaviour_only_ >>>>>")
+        print(datetime.datetime.now())
+        X, y = fc.create_text_and_behaviour(csv_text_and_behaviour, csv_preprocessed_feature)
+        cls = cm.Classifer(k+"stakeholdercls", "_text+behaviour_", X, y, outfolder,
+                            categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
+                                                                           "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+                                                                           "pca-svm_rbf"])
+        cls.run()
 
         #text+dict
         print(">>>>> _text+dict_only_ >>>>>")

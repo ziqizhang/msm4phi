@@ -12,11 +12,9 @@ import org.apache.solr.common.SolrDocumentList;
 import uk.ac.shef.inf.msm4phi.Util;
 import uk.ac.shef.inf.msm4phi.feature.oirbaseline.ProfileReplacer;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,12 +54,15 @@ public class UserTweetExporter {
             }
 
             String user = nextRecord[userCol];
-            PrintWriter p = new PrintWriter(outFolder+"/"+count+".txt");
-            p.println(user);
+            OutputStreamWriter p =
+                    new OutputStreamWriter(new FileOutputStream(outFolder+"/"+count+".txt"),
+                            StandardCharsets.UTF_8);
+
+            p.write(user+"\n");
 
             List<String> userTweets = fetch(user, tweets);
             for (String s : userTweets) {
-                p.println(s);
+                p.write(s+"\n");
             }
 
             p.close();

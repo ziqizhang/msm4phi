@@ -15,7 +15,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import cross_val_predict, StratifiedKFold
@@ -52,6 +52,24 @@ def learn_discriminative(cpus, task, model_flag,
                          identifier, outfolder, nfold=None, feature_reduction=None):
     classifier = None
     model_file = None
+
+    if (model_flag == "gbrt"):
+        print("== Gradient Boosting Decision Tree ...")
+        cls = GradientBoostingClassifier()
+        # rfc_tuning_params = {"max_depth": [3, 5, None],
+        #                      "max_features": [1, 3, 5, 7, 10],
+        #                      "min_samples_split": [2, 5, 10],
+        #                      "min_samples_leaf": [1, 3, 10],
+        #                      "bootstrap": [True, False],
+        #                      "criterion": ["gini", "entropy"]}
+        if feature_reduction is not None:
+            fr = create_feature_reduction_alg(feature_reduction, len(X_train[0]))
+            print("\t using " + str(fr[1]))
+            pipe = Pipeline([(fr[0], fr[1]), ('rf', cls)])
+            classifier = pipe
+        else:
+            classifier = cls
+        model_file = os.path.join(outfolder, "gbrt_classifier-%s.m" % task)
 
     if (model_flag == "rf"):
         print("== Random Forest ...")
