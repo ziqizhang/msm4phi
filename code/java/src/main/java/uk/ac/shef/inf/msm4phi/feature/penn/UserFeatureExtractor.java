@@ -177,11 +177,11 @@ public class UserFeatureExtractor {
         res[0] = count_alph;
         res[1] = count_digit;
         if (count_uppercase == count_alph)
-            res[2] = "All_Cap";
+            res[2] = "1"; //all cap
         else if (count_uppercase == 0)
-            res[2] = "All_Lower";
+            res[2] = "2";//all lower
         else
-            res[2] = "Mixed";
+            res[2] = "3";//mixed
         return res;
     }
 

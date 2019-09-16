@@ -151,6 +151,8 @@ def rank_pass_one(outfolder, vocab_with_score: dict,
             file.write(v + "\n")
 
 #goodness score calculation
+# freq of w in label X / sum of freq of w in any label *
+# freq of w in label X / sum of freq of and word in label X
 def rank_pass_two(pass_one_outputfolder, topN, outfolder):
     updated_postype_dictionaries = {}
 
@@ -168,7 +170,7 @@ def rank_pass_two(pass_one_outputfolder, topN, outfolder):
                 else:
                     concatenated_dict[w]=int(score)
                 sum+=int(score)
-            label_sumscores[label]=sum
+            label_sumscores[label]=sum #total freq for this label
 
         updated_label_dictionaries = {}
         for label, _dicts in dicts.items():

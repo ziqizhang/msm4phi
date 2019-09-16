@@ -29,7 +29,9 @@ if __name__ == "__main__":
     # this is the folder containing other extracted features
     csv_other_feature_folder = sys.argv[2]
     # this is needed if dnn model is used
-    dnn_embedding_file = "/home/zz/Work/data/embeddings/glove.840B.300d.bin.gensim"
+    #dnn_embedding_file = "/home/zz/Work/data/embeddings/glove.840B.300d.bin.gensim"
+    dnn_embedding_file = "/home/zz/Work/data/embeddings/Set1_TweetDataWithoutSpam_Word.bin"
+
 
     # this is the folder to save output to
     outfolder = sys.argv[3]
@@ -66,24 +68,24 @@ if __name__ == "__main__":
         for model_descriptor in model_descriptors:
             print("\t"+model_descriptor)
 
-            # print(">>>>>> behaviour only >>>")
-            # print(datetime.datetime.now())
-            # X, y = fc.create_behaviour(csv_text)
-            # cls = cm.Classifer("stakeholdercls", "_dnn_behaviour_", X, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
-            #                    text_data=None, dnn_embedding_file=None,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
+            print(">>>>>> behaviour only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_behaviour(csv_text)
+            cls = cm.Classifer("stakeholdercls", "_dnn_behaviour_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=None, dnn_embedding_file=None,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
+
+            print(">>>>>> dict only >>>")
+            print(datetime.datetime.now())
+            X, y = fc.create_autodict(csv_text, csv_other_feature)
+            cls = cm.Classifer("stakeholdercls", "_dnn_dict_", X, y, outfolder,
+                               categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
+                               text_data=None, dnn_embedding_file=None,
+                               dnn_descriptor=model_descriptor)
+            cls.run()
             #
-            # print(">>>>>> dict only >>>")
-            # print(datetime.datetime.now())
-            # X, y = fc.create_autodict(csv_text, csv_other_feature)
-            # cls = cm.Classifer("stakeholdercls", "_dnn_dict_", X, y, outfolder,
-            #                    categorical_targets=6, algorithms=["dnn"], nfold=n_fold,
-            #                    text_data=None, dnn_embedding_file=None,
-            #                    dnn_descriptor=model_descriptor)
-            # cls.run()
-            # #
             # #
             # # #SETTING0 dnn applied to profile only
             print(">>>>>> text only >>>")

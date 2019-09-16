@@ -132,9 +132,12 @@ def validate_training_set(training_set):
     row_i = 0
     for i in training_set:
         row_i += 1
-        if np.any(np.isnan(i)):
-            print("ERROR: [", row_i, "] is nan: ")
-            print(i)
+        try:
+            if np.any(np.isnan(i)):
+                print("ERROR: [", row_i, "] is nan: ")
+                print(i)
+        except TypeError:
+            print("\terror checking data anomaly...")
 
 
 def feature_scaling_mean_std(feature_set):
