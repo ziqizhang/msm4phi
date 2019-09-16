@@ -62,7 +62,7 @@ public class UserFeatureExtractor {
 
                 "total_tweets", "retweets", "retweet_frac", //10
                 "mean_hashtag", "mean_url", "avg_time_btw_tweets", //13
-                "std_time_btw_tweets", "avg_tweets_per_day", "std_tweets_per_day"};//16
+                "std_time_btw_tweets", "avg_tweets_per_day", "std_tweets_per_day", "label"};//16
         // Reading Records One by One in a String array
         csvWriter.writeNext(header);
         String[] nextRecord;
@@ -153,7 +153,7 @@ public class UserFeatureExtractor {
                     q.toQueryString(), ExceptionUtils.getFullStackTrace(e)));
         }
 
-        String[] features = new String[61];
+        String[] features = new String[18];
         for (int i = 0; i < features.length; i++)
             features[i] = "0";
         generateUserFeatures(u, features);
@@ -236,16 +236,22 @@ public class UserFeatureExtractor {
     private void generateTweetFeatures(List<SolrDocument> tweets, String[] features) {
         double[] hashtags = new double[tweets.size()];
         double[] urls = new double[tweets.size()];
-        long[] tweet_time = new long[tweets.size()];
 
         Map<String, Integer> tweets_on_day = new HashMap<>();
+        final Map<String, Long> tweets_timestamp=new HashMap<>();
         int index = 0;
         for (SolrDocument twt : tweets) {
-
+            String id=twt.getFieldValue("id").toString();
             List<String> tags = getFieldValuesCollection(twt, "entities_hashtag");
             List<String> urls_ = getFieldValuesCollection(twt, "entities_url");
             Date d = (Date) twt.getFieldValue("created_at");
-            String day = d.getMonth()+"_"+d.getDay();
+            tweets_timestamp.put(id, d.getTime());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(d);
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH); //169
+            int month = calendar.get(Calendar.MONTH); // 5
+
+            String day = month+"_"+dayOfMonth;
             if (tweets_on_day.containsKey(day)){
                 int freq = tweets_on_day.get(day);
                 freq++;
@@ -254,19 +260,24 @@ public class UserFeatureExtractor {
                 tweets_on_day.put(day,1);
             }
 
-            tweet_time[index] = d.getTime();
-
             hashtags[index] = tags.size();
             urls[index] = urls_.size();
 
             index++;
         }
 
-        double[] time_between=new double[tweets.size()-1];
-        if (tweets.size()>1){
-            for (int i=1; i<tweets.size();i++){
-                long prev_time=tweet_time[i-1];
-                long next_time=tweet_time[i];
+        double[] time_between;
+        if (tweets.size()>0)
+            time_between=new double[tweets.size()-1];
+        else
+            time_between=new double[0];
+        List<String> tweetIDs=new ArrayList<>(tweets_timestamp.keySet());
+        Collections.sort(tweetIDs, Comparator.comparing(tweets_timestamp::get));
+        if (tweetIDs.size()>1){
+            for (int i=1; i<tweetIDs.size();i++){
+
+                long prev_time=tweets_timestamp.get(tweetIDs.get(i-1));
+                long next_time=tweets_timestamp.get(tweetIDs.get(i));
                 long diff=next_time-prev_time;
                 time_between[i-1]=(double)diff/1000;
             }
