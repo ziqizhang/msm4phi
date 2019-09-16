@@ -42,7 +42,7 @@ if __name__ == "__main__":
     print(">>>>> _preotiuc15_ >>>>>")
     print(datetime.datetime.now())
     cls = cm.Classifer("stakeholdercls", "_preotiuc15_", X, y, outfolder,
-                           categorical_targets=6, nfold=n_fold, algorithms=["svm_l"])
+                           categorical_targets=6, nfold=n_fold, algorithms=["gpc"])
     cls.run()
 
 
