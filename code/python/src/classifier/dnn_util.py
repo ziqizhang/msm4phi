@@ -47,94 +47,6 @@ DNN_BATCH_SIZE=100
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 
-def create_model(model_descriptor: str, max_index, word_embedding_dim=DNN_EMBEDDING_DIM,
-                 max_sequence_length=DNN_MAX_SEQUENCE_LENGTH, wemb_matrix=None, append_feature_matrix=None):
-    '''no pre-trained embedding is provided'''
-    if wemb_matrix is None:
-        if append_feature_matrix is not None: #if we want to concat word embedding with any other features
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim,
-                                          input_length=max_sequence_length),
-                                Embedding(input_dim=max_index, output_dim=len(append_feature_matrix[0]),
-                                          weights=[append_feature_matrix],
-                                          input_length=max_sequence_length,
-                                          trainable=False)]
-        else:
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=word_embedding_dim,
-                                          input_length=max_sequence_length)]
-
-    else:
-        if append_feature_matrix is not None: #using pre-trained word embeddings
-            concat_matrices = concatenate_matrices(wemb_matrix, append_feature_matrix)
-            # load pre-trained word embeddings into an Embedding layer
-            # note that we set trainable = False so as to keep the embeddings fixed
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(concat_matrices[0]),
-                                          weights=[concat_matrices],
-                                          input_length=max_sequence_length,
-                                          trainable=False)]
-        else:
-            embedding_layers = [Embedding(input_dim=max_index, output_dim=len(wemb_matrix[0]),
-                                          weights=[wemb_matrix],
-                                          input_length=max_sequence_length,
-                                          trainable=False)]
-
-
-    model = parse_model_descriptor(embedding_layers, model_descriptor)
-
-    return model
-
-
-def parse_model_descriptor(embedding_layers, model_descriptor:str):
-    "sub_conv[2,3,4](dropout=0.2,conv1d=100-v,)"
-    layer_descriptors = model_descriptor.split("|")
-
-    first_layer=layer_descriptors[0]
-
-    '''example: cnn[2,3,4](conv1d=100,dropout=0.2)'''
-    if first_layer.startswith("cnn") or first_layer.startswith("scnn"):
-        window_size_str=first_layer[first_layer.index("[")+1: first_layer.index("]")]
-        cnn_layer_desc = first_layer[first_layer.index("(")+1:len(first_layer)-1]
-        cnns = []
-        for w in window_size_str.split(","):
-            cnn_components = cnn_layer_desc.split(",")
-            if not cnn_components[0].startswith("conv1d"):
-                raise ValueError('Error in the model descriptor for cnn layers. It must follow the pattern `conv1d=[filter]`: %s'%cnn_components[0])
-            cnn_components[0] = cnn_components[0]+"-"+w
-
-            if first_layer.startswith("cnn"):
-                cnns.append(create_sequential_model(cnn_components,
-                                                embedding_layers=embedding_layers))
-            else:
-                for mod in create_skipped_cnn_submodels(cnn_components, embedding_layers, int(w)):
-                    cnns.append(mod)
-
-    else: #assuming a sequential model
-        model= create_sequential_model(layer_descriptors, embedding_layers=embedding_layers)
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        model.summary()
-        return model
-
-    cnns_outputs = [model.output for model in cnns]
-    if len(cnns_outputs)>1:
-        x = Concatenate(axis=1)(cnns_outputs)
-    else:
-        x=cnns_outputs[0]
-
-    parallel_layers=Model(inputs=embedding_layers[0].input, outputs=x)
-    #print("submodel:")
-    #parallel_layers.summary()
-    #print("\n")
-
-    layer_descriptors.pop(0)
-    big_model = Sequential()
-    big_model.add(parallel_layers)
-    create_sequential_model(layer_descriptors, big_model)
-
-    big_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    big_model.summary()
-
-    return big_model
-
-
 def create_sequential_model(layer_descriptors:list(), model:Sequential=None,embedding_layers=None,  cnn_dilation=None):
     if model is None:
         model = Sequential()
@@ -246,7 +158,7 @@ def create_skipped_cnn_layers(cnn_ks, filter:int, conv_layers:list, layer=None):
             conv1d_3 = Conv1D(filters=filter, kernel_size=3, padding='same', activation='relu')(layer)
         conv_layers.append(conv1d_3)
 
-        # 2skip1
+        #2skip1
         ks_and_masks = generate_ks_and_masks(2, 1)
         for mask in ks_and_masks[1]:
             if layer is None:
@@ -276,7 +188,7 @@ def create_skipped_cnn_layers(cnn_ks, filter:int, conv_layers:list, layer=None):
                 conv_layers.append(SkipConv1D(filters=filter,
                                               kernel_size=int(ks_and_masks[0]), validGrams=mask,
                                               padding='same', activation='relu')(layer))
-        # 3skip1
+        #skip1
         ks_and_masks = generate_ks_and_masks(3, 1)
         for mask in ks_and_masks[1]:
             if layer is None:
@@ -475,6 +387,7 @@ def create_submodel_textfeature(
 
     embedding = Embedding(vocab_size, embedding_dim, input_length=max_seq_length,
                           weights=[weights], trainable=False)(inputs)
+
     if model_option.startswith("cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"):
         #conv1d_1 = Conv1D(filters=100,
         #                  kernel_size=1, padding='same', activation='relu')(embedding)
@@ -523,7 +436,7 @@ def create_submodel_textfeature(
         #final = Dense(targets, activation="softmax")(pool)
         #model = Model(inputs=deep_inputs, outputs=final)
         flat = Flatten()(pool)
-        return flat
+        return flat              #scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv
     elif model_option.startswith("scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"):
         start=model_option.index("[")+1
         end=model_option.index("]")
@@ -544,11 +457,12 @@ def create_submodel_textfeature(
 
 
 #a 1D convolution that skips some entries
+#WARNING: when using text+meta features, do not add another Dense after concat, it will not work. This only happens to sCNN
 class SkipConv1D(Conv1D):
 
     #in the init, let's just add a parameter to tell which grams to skip
     def __init__(self, validGrams, **kwargs):
-        self.validGrams_input=validGrams
+        self.vg_input=validGrams
         #for this example, I'm assuming validGrams is a list
         #it should contain zeros and ones, where 0's go on the skip positions
         #example: [1,1,0,1] will skip the third gram in the window of 4 grams
@@ -580,6 +494,6 @@ class SkipConv1D(Conv1D):
     # https://github.com/keras-team/keras/issues/5401
     # solve the problem of keras.models.clone_model
     def get_config(self):
-        config = {'validGrams': self.validGrams_input}
+        config = {'validGrams': self.vg_input}
         base_config = super(SkipConv1D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))

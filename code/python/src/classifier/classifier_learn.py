@@ -185,60 +185,6 @@ def learn_generative(cpus, task, model_flag, X_train, y_train,
         util.save_classifier_model(classifier, model_file)
 
 
-'''WARNING: 
-1) the fit and model saving function of this method is untested
-2) this method uses the sequential model. Although it builds parallel CNNs, it seems
-that the model performance is inferior to a same model built using the functional API
-(see the method 'learn_dnn' below). So it is recommended that the 'learn_dnn' method
-is used instead of this one.
-'''
-def learn_dnn_textonly(nfold, task,
-                       embedding_model_file,
-                       text_data, y_train,
-                       model_descriptor, outfolder):
-    print("== Perform ANN ...")  # create model
-
-    M = dmc.get_word_vocab(text_data, 1)
-    text_based_features = M[0]
-    text_based_features = sequence.pad_sequences(text_based_features,
-                                                 dmc.DNN_MAX_SEQUENCE_LENGTH)
-
-    gensimFormat = ".gensim" in embedding_model_file
-    if gensimFormat:
-        pretrained_embedding_models = gensim.models.KeyedVectors.load(embedding_model_file, mmap='r')
-    else:
-        pretrained_embedding_models = gensim.models.KeyedVectors. \
-            load_word2vec_format(embedding_model_file, binary=True)
-
-    pretrained_word_matrix = dmc.build_pretrained_embedding_matrix(M[1],
-                                                                   pretrained_embedding_models,
-                                                                   dmc.DNN_EMBEDDING_DIM,
-                                                                   0)
-    create_model_with_args = \
-        functools.partial(dmc.create_model, max_index=len(M[1]),
-                          wemb_matrix=pretrained_word_matrix, word_embedding_dim=dmc.DNN_EMBEDDING_DIM,
-                          max_sequence_length=dmc.DNN_MAX_SEQUENCE_LENGTH,
-                          append_feature_matrix=None,
-                          model_descriptor=model_descriptor)
-
-    model = KerasClassifier(build_fn=create_model_with_args, verbose=0, batch_size=dmc.DNN_BATCH_SIZE,
-                            epochs=dmc.DNN_EPOCHES)
-    model_file = os.path.join(outfolder, "ann-%s.m" % task)
-    if nfold is not None:
-        skf = StratifiedKFold(nfold, random_state=RANDOM_STATE)
-        nfold_predictions = cross_val_predict(model,
-                                              text_based_features,
-                                              y_train,
-                                              cv=skf)
-
-        print(datetime.datetime.now())
-        util.save_scores(nfold_predictions, y_train, "dnn", task, model_descriptor, 2, outfolder)
-    else:
-        chk = ModelCheckpoint(model_file + ".h5", monitor='val_loss', save_best_only=False)
-        model.fit(text_based_features, y_train, callbacks=[chk])
-
-    util.save_classifier_model(model, model_file)
-
 
 '''
 when X_train_metafeature is None, only text data are processed to extract features
@@ -291,11 +237,13 @@ def learn_dnn(nfold, task,
     if X_train_metafeature is not None:
         model_metafeature_inputs = Input(shape=(len(X_train_metafeature[0]),))
         model_metafeature = \
-            dmc.create_submodel_metafeature(model_metafeature_inputs, 20)
+            dmc.create_submodel_metafeature(model_metafeature_inputs, 20) #dim=20 not used
         merge = concatenate([model_text, model_metafeature])
-        hidden=Dense(500)(merge)
-        final = Dense(prediction_targets, activation="softmax")(hidden)
+        #hidden=Dense(500)(merge) WARNING: when using text+meta features, do not add another Dense after concat, it will not work. This only
+        #happens to sCNN
+        final = Dense(prediction_targets, activation="softmax")(merge)
         model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
+        # X_train_meta_feature =numpy.zeros(X_train_meta_feature.shape)
         X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
     else:
         print("--- using text features only ---")
@@ -305,7 +253,7 @@ def learn_dnn(nfold, task,
 
     plot_model(model, to_file="model.png")
     #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
+    print("final input dim={}".format(X_merge.shape))
     model_file = os.path.join(outfolder, "ann-%s.m" % task)
 
     model_copies = []

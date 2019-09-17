@@ -55,8 +55,10 @@ if __name__ == "__main__":
                                 # empty_profile_filled - for dict features generated on profiles
 
 
-    model_descriptors = ["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"]#,
-                        # "bilstm=100-False"]
+    model_descriptors =["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"] #["cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"]
+    #model_descriptors = ["cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten"]
+        #["scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"]#,
+                         #"bilstm=100-False"]
 
     for k, v in datafeatures.items():
         print(datetime.datetime.now())

@@ -43,42 +43,44 @@ if __name__ == "__main__":
         csv_preprocessed_feature=v[1]
 
         #behaviour only
-        print(">>>>> _behaviour_only_ >>>>>")
-        print(datetime.datetime.now())
-        X, y = fc.create_behaviour(csv_text_and_behaviour, True)
-        cls = cm.Classifer(k + "stakeholdercls", "_behaviour_only_", X, y, outfolder,
-                           categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
-                                                                            "pca-sgd","pca-svm_l", "pca-lr", "pca-rf", "pca-svm_rbf"])
-        cls.run()
-        #
-        # # dict only
-        print(">>>>> _autodict_only_ >>>>>")
-        print(datetime.datetime.now())
-        X, y = fc.create_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
-        cls = cm.Classifer(k + "stakeholdercls", "_autodictext_only_", X, y, outfolder,
-                           categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
-                                                                            "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-                                                                            "pca-svm_rbf"])
-        cls.run()
-        #
-        # #text only
-        print(">>>>> _text_only_ >>>>>")
-        X, y = fc.create_textprofile(csv_text_and_behaviour)
-        cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
-                             categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
-                                                                            "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-                                                                            "pca-svm_rbf"])
-        cls.run()
+        # print(">>>>> _behaviour_only_ >>>>>")
+        # print(datetime.datetime.now())
+        # X, y = fc.create_behaviour(csv_text_and_behaviour, True)
+        # cls = cm.Classifer(k + "stakeholdercls", "_behaviour_only_", X, y, outfolder,
+        #                    categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
+        #                                                                     "pca-sgd","pca-svm_l", "pca-lr", "pca-rf", "pca-svm_rbf"])
+        # cls.run()
+        # #
+        # # # dict only
+        # print(">>>>> _autodict_only_ >>>>>")
+        # print(datetime.datetime.now())
+        # X, y = fc.create_autodict(csv_text_and_behaviour, csv_preprocessed_feature)
+        # cls = cm.Classifer(k + "stakeholdercls", "_autodictext_only_", X, y, outfolder,
+        #                    categorical_targets=6, nfold=n_fold, algorithms=["sgd", "svm_l", "lr", "rf", "svm_rbf",
+        #                                                                     "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+        #                                                                     "pca-svm_rbf"])
+        # cls.run()
+        # #
+        # # #text only
+        # print(">>>>> _text_only_ >>>>>")
+        # X, y = fc.create_textprofile(csv_text_and_behaviour)
+        # cls = cm.Classifer(k+"stakeholdercls", "_text_only_", X, y, outfolder,
+        #                      categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
+        #                                                                     "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+        #                                                                     "pca-svm_rbf"])
+        # cls.run()
         #
         #
         # #text+behaviour
         print(">>>>> _text+behaviour_only_ >>>>>")
         print(datetime.datetime.now())
         X, y = fc.create_text_and_behaviour(csv_text_and_behaviour, csv_preprocessed_feature)
-        cls = cm.Classifer(k+"stakeholdercls", "_text+behaviour_", X, y, outfolder,
-                            categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
-                                                                           "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
-                                                                           "pca-svm_rbf"])
+        # cls = cm.Classifer(k+"stakeholdercls", "_text+behaviour_", X, y, outfolder,
+        #                     categorical_targets=6,nfold=n_fold,algorithms=["sgd","svm_l","lr","rf","svm_rbf",
+        #                                                                    "pca-sgd", "pca-svm_l", "pca-lr", "pca-rf",
+        #                                                                    "pca-svm_rbf"])
+        cls = cm.Classifer(k + "stakeholdercls", "_text+behaviour_", X, y, outfolder,
+                           categorical_targets=6, nfold=n_fold, algorithms=["lr"])
         cls.run()
 
         #text+dict
