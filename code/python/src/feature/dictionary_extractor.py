@@ -160,23 +160,23 @@ def rank_pass_two(pass_one_outputfolder, topN, outfolder):
 
 
     for postype, dicts in postype_dictionaries.items():
-        concatenated_dict={}
-        label_sumscores={}
+        freq_w_across_labels={}
+        freq_label_sum={}
         for label, _dicts in dicts.items():
             sum=0
             for w, score in _dicts.items():
-                if w in concatenated_dict.keys():
-                    concatenated_dict[w]+=int(score)
+                if w in freq_w_across_labels.keys():
+                    freq_w_across_labels[w]+=int(score)
                 else:
-                    concatenated_dict[w]=int(score)
+                    freq_w_across_labels[w]=int(score)
                 sum+=int(score)
-            label_sumscores[label]=sum #total freq for this label
+            freq_label_sum[label]=sum #total freq for this label
 
         updated_label_dictionaries = {}
         for label, _dicts in dicts.items():
             __dicts = {}
             for v, score in _dicts.items():
-                new_score=int(score)/concatenated_dict[v] * (int(score)/label_sumscores[label])
+                new_score=int(score)/freq_w_across_labels[v] * (int(score)/freq_label_sum[label])
                 __dicts[v]=new_score
             updated_label_dictionaries[label]=__dicts
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     #col 40-label; col 22-desc;
     print("extracting text profiles...")
     profile_text = load_user_profile_text("/home/zz/Work/msm4phi_data/paper2/reported/training_data/paper_reported"
-                                          "/basic_features_empty_profile_filled(tweets).csv",
+                                          "/basic_features_empty_profile_filled.csv",
                                           22) #22-profile; 15-name)
     print("calculating weighted freq...")
     vocab_to_totalfreq, vocab_to_weightedscore, label_to_nouns, label_to_verbs = \
@@ -246,11 +246,11 @@ if __name__ == "__main__":
 
     print("ranking...")
     rank_pass_one(
-        "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass1",
+        "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_/dict2/frequency_pass1",
         vocab_to_totalfreq, label_to_nouns, label_to_verbs,
         200, 100, 100)
 
     print("goodness scoring...")
-    rank_pass_two("/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass1",
+    rank_pass_two("/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_/dict2/frequency_pass1",
                   5000,
-                   "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_tweets/dict2/frequency_pass2")
+                   "/home/zz/Work/msm4phi/resources/dictionary/auto_created/profile_/dict2/frequency_pass2")

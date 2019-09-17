@@ -239,9 +239,9 @@ def learn_dnn(nfold, task,
         model_metafeature = \
             dmc.create_submodel_metafeature(model_metafeature_inputs, 20) #dim=20 not used
         merge = concatenate([model_text, model_metafeature])
-        #hidden=Dense(500)(merge) WARNING: when using text+meta features, do not add another Dense after concat, it will not work. This only
+        hidden=Dense(500)(merge) #WARNING: when using text+meta features, do not add another Dense after concat, it will not work. This only
         #happens to sCNN
-        final = Dense(prediction_targets, activation="softmax")(merge)
+        final = Dense(prediction_targets, activation="softmax")(hidden)
         model = Model(inputs=[model_text_inputs, model_metafeature_inputs], outputs=final)
         # X_train_meta_feature =numpy.zeros(X_train_meta_feature.shape)
         X_merge = numpy.concatenate([X_train_textfeature, X_train_metafeature], axis=1)
