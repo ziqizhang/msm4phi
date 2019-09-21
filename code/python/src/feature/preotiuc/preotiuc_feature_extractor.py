@@ -123,7 +123,7 @@ def generate_cluster_features(input_folder,cluster_members:dict,
         tweets = tweets.strip()
         user_tweets[user]=tweets
 
-    with open(out_feature_csv, 'w', newline='') as csvfile:
+    with open(out_feature_csv, 'wb', newline='') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=["user"]
