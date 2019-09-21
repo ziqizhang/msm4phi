@@ -26,7 +26,7 @@ word_vectorizer = CountVectorizer(
             ngram_range=(1, 1),
             stop_words=nlp.stopwords,  # We do better when we keep stopwords
             decode_error='replace',
-            min_df=2,
+            min_df=5,
             max_features=1000000
         )
 
@@ -71,7 +71,7 @@ def populate_word_vectors(word_emb_model, word_vocab, expected_emb_dim):
                 randomized_vectors[word] = vec
             word_vectors[i] = vec
         count += 1
-        if count % 100 == 0:
+        if count % 10000 == 0:
             print(count)
 
     return word_vectors, vector_index
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     for index, row in df.iterrows():
         text = row[5].replace("\\s+", " ").strip()
         tweets.add(text)
-       
+
 
     #2. extract vocab
     print("Extracting vocab, {} texts, at {}".format(len(tweets), datetime.now()))
