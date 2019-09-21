@@ -14,9 +14,9 @@ def replace_labels(v):
     elif v==4:
         return "Patient"
     elif v==5:
-        return "Research"
+        return "Researcher"
 
-in_file_name = "/home/zz/Cloud/GDrive/ziqizhang/project/msm4phi/paper2/data/error_analysis/predictions-bilstm-stakeholdercls_dnn_text_.csv"
+in_file_name = "/home/zz/Work/msm4phi/output/classifier/raw/oir/scnn/predictions-dnn-stakeholdercls_dnn_text+autodictext_.csv"
 
 df = pd.read_csv(in_file_name, header=0, delimiter=",", quoting=0, encoding="utf-8",
                  )
@@ -34,7 +34,7 @@ for i in range(len(df1)):
     t = df1_row[1]
     gold.append(replace_labels(t))
 
-class_labels=["Advocate", "IHP", "OHP","Other","Patient","Research"]
+class_labels=["Advocate", "IHP", "OHP","Other","Patient","Researcher"]
 cm=confusion_matrix(gold, pred, labels=class_labels)
 
 df_cm = pd.DataFrame(cm, index=class_labels, columns=class_labels)

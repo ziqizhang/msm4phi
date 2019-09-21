@@ -13,14 +13,11 @@ from exp import feature_creator as fc
 from classifier import classifier_main as cm
 import pandas as pd
 
-
 #DNN_MODEL_DESCRIPTOR= "cnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="lstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="bilstm=100-False|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100,maxpooling1d=4)|maxpooling1d=4|flatten|dense=6-softmax|glv"
 #DNN_MODEL_DESCRIPTOR="scnn[2,3,4](conv1d=100)|maxpooling1d=4|flatten|dense=6-softmax|glv"
-
-
 
 if __name__ == "__main__":
     # this is the file pointing to the basic features, i.e., just the numeric values
@@ -29,8 +26,8 @@ if __name__ == "__main__":
     # this is the folder containing other extracted features
     csv_other_feature_folder = sys.argv[2]
     # this is needed if dnn model is used
-    #dnn_embedding_file = "/home/zz/Work/data/embeddings/glove.840B.300d.bin.gensim"
-    dnn_embedding_file = "/home/zz/Work/data/embeddings/Set1_TweetDataWithoutSpam_Word.bin"
+    dnn_embedding_file = "/home/zz/Work/data/embeddings/glove.840B.300d.bin.gensim"
+    #dnn_embedding_file = "/home/zz/Work/data/embeddings/Set1_TweetDataWithoutSpam_Word.bin"
 
 
     # this is the folder to save output to
