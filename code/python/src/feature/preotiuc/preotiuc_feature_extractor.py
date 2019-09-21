@@ -71,7 +71,7 @@ def populate_word_vectors(word_emb_model, word_vocab, expected_emb_dim):
                 randomized_vectors[word] = vec
             word_vectors[i] = vec
         count += 1
-        if count % 10000 == 0:
+        if count % 100000 == 0:
             print(count)
 
     return word_vectors, vector_index
