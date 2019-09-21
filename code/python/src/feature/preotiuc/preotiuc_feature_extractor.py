@@ -123,7 +123,7 @@ def generate_cluster_features(input_folder,cluster_members:dict,
         tweets = tweets.strip()
         user_tweets[user]=tweets
 
-    with open(out_feature_csv, 'wb', newline='') as csvfile:
+    with open(out_feature_csv, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header=["user"]
@@ -220,7 +220,7 @@ if __name__ == "__main__":
         for index in v:
             cluster_members[index]=k
 
-    filehandler = open("clusters.data", 'w')
+    filehandler = open("clusters.data", 'wb')
     pickle.dump(cluster_members, filehandler)
     filehandler.close()
 
