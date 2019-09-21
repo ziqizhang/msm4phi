@@ -27,7 +27,7 @@ word_vectorizer = CountVectorizer(
             stop_words=nlp.stopwords,  # We do better when we keep stopwords
             decode_error='replace',
             min_df=5,
-            max_features=50000
+            max_features=40000
         )
 
 def load_embedding_model(embedding_model_file):
